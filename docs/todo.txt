@@ -1,0 +1,13 @@
+GENERAL:
+
+- make a resume of authorized functions
+- make a resume of built-in commands
+- decide what we understand by "working history"
+- make a list of interpreted/non-interpreted characters
+
+- faire un script / list de commands test
+
+THEO:
+
+- check differences between bash and bash --posix, choose which is simpler to implement
+- try to find bash order of actions
