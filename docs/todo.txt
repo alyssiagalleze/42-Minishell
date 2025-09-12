@@ -1,5 +1,6 @@
 GENERAL:
 
+- understand and clean makefile
 - make a resume of authorized functions
 - make a resume of built-in commands
 - decide what we understand by "working history"
@@ -9,5 +10,5 @@ GENERAL:
 
 THEO:
 
-- check differences between bash and bash --posix, choose which is simpler to implement
-- try to find bash order of actions
+- check differences between bash and bash --posix, choose which is simpler to implement:
+	|-> not posix !!!!

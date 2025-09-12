@@ -1,0 +1,58 @@
+
+
+echo a -> command
+echo a | echo b -> pipeline
+echo a | echo b -> list
+(echo a | echo b) -> list in a subshell
+/!\ les choses serieuses commencent :
+echo a -> one list of one pipeline composed of one command
+echo a | echo b && echo c | echo d -> two lists, each composed of one pipeline composed of two commands
+((echo a) && (echo b)) || echo c
+echo a || ((echo b) && (echo c)) || echo d || echo e
+echo a || echo b || echo c || echo d && echo e
+echo a && echo b || echo c || echo d && echo e
+
+2 x (1 + 2)
+2 x (1 + 2)
+BASH WORKFLOW:
+
+-> man workflow
+
+	1. Reads its input from a file, from a string supplied as an argument to the -c invocation option, or from the user’s terminal.
+	2. Breaks the input into words and operators, obeying the quoting rules. These tokens are separated by metacharacters. This step performs alias expansion.
+	3. Parses the tokens into simple and compound commands.
+	4. Performs the various shell expansions, breaking the expanded tokens into lists of filenames and commands and arguments.
+	5. Performs any necessary redirections and removes the redirection operators and their operands from the argument list.
+	6. Executes the command.
+	7. Waits for the command to complete and collects its exit status.
+
+-> explanation
+	1.	from a file : script shell // i don't think we care
+		from a string supplied as an argument to the -c invocation option : "bash -c ls" -> execute ls but terminal not set in bash // i don't think we care
+
+	2.	words : a sequence of characters treated as a unit by the shell, without unquoted metacharacters
+		operator : a sequence of metacharacters treated as a unit by the shell.
+			control operator : performs a control function '()', '|', '||', '&&', etc -> order of operation etc
+			redirection operator : >, <, >>, << -> in and out
+		quoting rules : single quote / double quotes / ANSI-C quoting (\t, \n etc) i think we don't care / Locale-Specific Translation ($"text" // i think we don't care)
+		tokens : a word or an operator
+		metacharacters : characters that separate words -> space / tab / newline / ( / ) / | / & / > / <
+		alias expansion : alias as www for werror wall wextra // i think we don't care since it needs built-in function we don't have to make
+
+	3.	simple command : sequence of words separated by blanks, terminated by a control operator
+			simple commands can be organized in different constructs:
+				-> pipeline : echo a | echo b 
+
+		compound command :
+
+-> simplified workflow
+
+	1. Reads its input from the user’s terminal.
+	2. Separate the input into words or operators, obeying "", '', and \char
+	2.5. Check for syntaxe error ?
+	3. Parses the tokens into simple and compound commands.
+	3.5 From this point, I suspect Bash treats each list of commands individualy
+	4. Performs the various shell expansions, breaking the expanded tokens into lists of filenames and commands and arguments.
+	5. Performs any necessary redirections and removes the redirection operators and their operands from the argument list.
+	6. Executes the command.
+	7. Waits for the command to complete and collects its exit status.
