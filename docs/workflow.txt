@@ -41,7 +41,8 @@ BASH WORKFLOW:
 
 	3.	simple command : sequence of words separated by blanks, terminated by a control operator
 			simple commands can be organized in different constructs:
-				-> pipeline : echo a | echo b 
+				-> pipeline : echo a | echo b
+				-> list
 
 		compound command :
 
@@ -56,3 +57,19 @@ BASH WORKFLOW:
 	5. Performs any necessary redirections and removes the redirection operators and their operands from the argument list.
 	6. Executes the command.
 	7. Waits for the command to complete and collects its exit status.
+
+-> command execution workflow
+
+	3.7.1 Simple Command Expansion
+	When the shell executes a simple command, it performs the following expansions, assign-
+	ments, and redirections, from left to right, in the following order.
+	1. The words that the parser has marked as variable assignments (those preceding the
+	command name) and redirections are saved for later processing.
+	2. The words that are not variable assignments or redirections are expanded (see
+	Section 3.5 [Shell Expansions], page 24). If any words remain after expansion, the
+	first word is taken to be the name of the command and the remaining words are the
+	arguments.
+	3. Redirections are performed as described above (see Section 3.6 [Redirections], page 41).
+	4. The text after the ‘=’ in each variable assignment undergoes tilde expansion, parameter
+	expansion, command substitution, arithmetic expansion, and quote removal before
+	being assigned to the variable

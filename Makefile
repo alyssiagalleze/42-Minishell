@@ -6,6 +6,9 @@ D_BUILD=.build/
 # HEADERS=minishell.h
 
 SRC=	SRC/main.c \
+		SRC/clean.c \
+		SRC/debug.c \
+		SRC/lexer.c \
 		SRC/string_manip.c
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
