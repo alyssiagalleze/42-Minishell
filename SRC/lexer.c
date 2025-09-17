@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:02:49 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 17:23:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/17 18:31:24 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,18 +183,6 @@ void	lexer_register_string(t_lexer **lexer, char **input, int *len, enum e_token
 	lexer_node_fill(new_node, substr, type);
 	if (input)
 		*input += *len;
-}
-
-int		ft_strlen(const char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		i ++;
-	}
-	return (i);
 }
 
 //remplacer par un print fd ??

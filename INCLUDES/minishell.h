@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 18:26:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/17 18:32:06 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ int		is_char_operator(const char c);
 int		is_char_separator(const char c);
 int		is_char_in_string(const char c, const char *str, int accept_null);
 int		is_str_empty_or_null(const char *str);
+int		ft_strlen(const char *str);
 int		str_cmp(char *str1, char *str2, int accept_null);
 int		str_ncmp(char *str1, char *str2, int n, int accept_null);
 char	*extract_string(const char *start, int len);
