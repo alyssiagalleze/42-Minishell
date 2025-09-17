@@ -60,7 +60,7 @@ BASH WORKFLOW:
 
 -> command execution workflow
 
-	3.7.1 Simple Command Expansion
+	3.7.1 Simple Command Expansioninclude
 	When the shell executes a simple command, it performs the following expansions, assign-
 	ments, and redirections, from left to right, in the following order.
 	1. The words that the parser has marked as variable assignments (those preceding the

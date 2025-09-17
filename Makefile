@@ -9,7 +9,15 @@ SRC=	SRC/main.c \
 		SRC/clean.c \
 		SRC/debug.c \
 		SRC/lexer.c \
-		SRC/string_manip.c
+		SRC/string_manip.c \
+		SRC/cd.c \
+		SRC/echo.c \
+		SRC/env.c \
+		SRC/my_env_list.c \
+		SRC/pwd.c \
+		SRC/unset.c \
+		SRC/split.c \
+		SRC/export.c
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/14 19:11:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/17 16:45:55 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,3 +101,41 @@ char	*extract_string(const char *start, int len)
 	new_str[i] = 0;
 	return (new_str);
 }
+
+int ft_strlen(const char *str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+char	*ft_strdup(const char *s)
+{
+	int			i;
+	size_t		len;
+	char		*ns;
+
+	i = 0;
+	len = ft_strlen(s);
+	if (!s)
+	{
+		ns = malloc(1);
+		if (!ns)
+			return (NULL);
+		ns[0] = '\0';
+	}
+	ns = malloc((len + 1) * sizeof(char));
+	if (!ns)
+		return (NULL);
+	while (s[i])
+	{
+		ns[i] = s[i];
+		i++;
+	}
+	ns[i] = '\0';
+	return (ns);
+}
+

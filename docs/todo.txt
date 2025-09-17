@@ -8,7 +8,3 @@ GENERAL:
 
 - faire un script / list de commands test
 
-THEO:
-
-- check differences between bash and bash --posix, choose which is simpler to implement:
-	|-> not posix !!!!
