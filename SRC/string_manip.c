@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 16:45:55 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:27:23 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,33 @@ int	str_cmp(char *str1, char *str2, int accept_null)
 	return (*str1 == *str2);
 }
 
+int	str_ncmp(char *str1, char *str2, int n, int accept_null)
+{
+	int	i;
+	
+	if (!accept_null && (str1 == NULL || str2 == NULL))
+	{
+		write(2, "err : str_ncmp received a NULL string !\n", 41);
+		return (FALSE);
+	}
+	if (str1 == str2)
+	{
+		return (TRUE);
+	}
+	if (str1 == NULL || str2 == NULL)
+	{
+		return (FALSE);
+	}
+	i = 0;
+	while (*str1 && (*str1 == *str2) && i < n)
+	{
+		i ++;
+		str1 ++;
+		str2 ++;
+	}
+	return (*str1 == *str2);
+}
+
 char	*extract_string(const char *start, int len)
 {
 	int		i;
@@ -89,7 +116,7 @@ char	*extract_string(const char *start, int len)
 	
 	if (start <= 0 || start == NULL )
 		return (NULL);
-	new_str = malloc(sizeof(char) * len);
+	new_str = malloc(sizeof(char) * (len + 1));
 	if (new_str == NULL)
 		return (NULL);
 	i = 0;

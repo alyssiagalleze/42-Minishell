@@ -1,0 +1,12 @@
+implementation : node NONE
+
+last node -> unclosed ' "
+BRACKET ( with no )
+BRACKET ) with no opening (
+BRACKET ( after a word
+
+---> 
+bash: unexpected EOF while looking for matching `''
+bash: syntax error: unexpected end of file
+
+CONTROL OPERATOR || && | apres un autre control operator

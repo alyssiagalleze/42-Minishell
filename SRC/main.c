@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 17:24:39 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:27:12 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int	main(int ac, char **av, char **env)
 	my_env = init_env_list(env);
 	while (1)
 	{
-		// clean_lexer(&lexer);
 		while (!input)
 			get_input(&input);
 		if (str_cmp(input, "EXIT", FALSE))
@@ -65,9 +64,12 @@ int	main(int ac, char **av, char **env)
 			errno = export(input_tab + 1, &my_env);	
 		//faire le lexer sur l'input et separer word / operators
 		lexer_parse_input(&lexer, input);
+			
+		debug_lexer_print(lexer);
+		
 		//STOP WORKING // STOP WORKING // STOP WORKING
 		clean_input(&input);
-		clean_lexer(lexer);
+		clean_lexer(&lexer);
 	}
 	printf("%d\n", errno);
 	// debug_lexer_print(lexer);
@@ -78,6 +80,5 @@ int	main(int ac, char **av, char **env)
 	return (printf("%s", RESET_FONT), 0);
 }
 
-//->lexer
 //->data struct ??
 

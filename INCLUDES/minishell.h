@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 17:16:13 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:26:35 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,21 @@
 # define	METACHARACTERS	"|&;()<>"
 # define	METASEPARATORS	"\t \n"
 
-enum	e_token_type {WORD, OPERATOR};
+# define	SINGLE_QUOTE	'\''
+# define	DOUBLE_QUOTE	'\"'
+
+# define	OPERATOR_NBR	9
+# define	OR			"||"
+# define	AND			"&&"
+# define	PIPE		"|"
+# define	OUT			">"
+# define	IN			"<"
+# define	HDOC		"<<"
+# define	OUT_APP		">>"
+# define	BRACKET_O	"("
+# define	BRACKET_C	")"
+
+enum	e_token_type {NONE, WORD, CONTR_OPERATOR, REDIR_OPERATOR, BRACKET};
 
 // STRUCTS
 
@@ -56,15 +70,15 @@ typedef struct s_env_list
 
 //	clean.c
 void	clean_input(char **input);
-void	clean_lexer(t_lexer	*lexer);
 void	clean_env(t_env *env);
+void	clean_lexer(t_lexer	**lexer);
 
 //	debug.c
 void	debug_lexer_print(t_lexer *lexer_node);
 
 //	lexer.c
 t_lexer	*lexer_add_node(t_lexer **lexer_start);
-void	lexer_node_fill(t_lexer *lexer_node, char *str);
+void	lexer_node_fill(t_lexer *lexer_node, char *str, enum e_token_type type);
 void	lexer_parse_input(t_lexer **lexer, char *input);
 
 //	string_manip.c
@@ -74,6 +88,7 @@ int		is_char_separator(const char c);
 int		is_char_in_string(const char c, const char *str, int accept_null);
 int		is_str_empty_or_null(const char *str);
 int		str_cmp(char *str1, char *str2, int accept_null);
+int		str_ncmp(char *str1, char *str2, int n, int accept_null);
 char	*extract_string(const char *start, int len);
 char	*ft_strdup(const char *s);
 

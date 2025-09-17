@@ -12,8 +12,9 @@ echo a || ((echo b) && (echo c)) || echo d || echo e
 echo a || echo b || echo c || echo d && echo e
 echo a && echo b || echo c || echo d && echo e
 
-2 x (1 + 2)
-2 x (1 + 2)
+false && (true || echo a)
+false && true || echo a
+
 BASH WORKFLOW:
 
 -> man workflow
@@ -34,7 +35,7 @@ BASH WORKFLOW:
 		operator : a sequence of metacharacters treated as a unit by the shell.
 			control operator : performs a control function '()', '|', '||', '&&', etc -> order of operation etc
 			redirection operator : >, <, >>, << -> in and out
-		quoting rules : single quote / double quotes / ANSI-C quoting (\t, \n etc) i think we don't care / Locale-Specific Translation ($"text" // i think we don't care)
+		quoting rules : single quote / double quotes / ANSI-C quoting ($'\t', \n etc) i think we don't care / Locale-Specific Translation ($"text" // i think we don't care)
 		tokens : a word or an operator
 		metacharacters : characters that separate words -> space / tab / newline / ( / ) / | / & / > / <
 		alias expansion : alias as www for werror wall wextra // i think we don't care since it needs built-in function we don't have to make
@@ -49,7 +50,7 @@ BASH WORKFLOW:
 -> simplified workflow
 
 	1. Reads its input from the user’s terminal.
-	2. Separate the input into words or operators, obeying "", '', and \char
+	2. Separate the input into words or operators, obeying "", ''
 	2.5. Check for syntaxe error ?
 	3. Parses the tokens into simple and compound commands.
 	3.5 From this point, I suspect Bash treats each list of commands individualy

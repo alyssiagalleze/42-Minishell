@@ -1,6 +1,6 @@
 NAME=minishell
 CC=cc
-CFLAGS=-Wall -Wextra -Werror -g -MMD
+CFLAGS=-Wall -Wextra -Werror -MMD -g 
 INCLUDES=-I INCLUDES
 D_BUILD=.build/
 # HEADERS=minishell.h
