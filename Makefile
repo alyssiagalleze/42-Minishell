@@ -8,16 +8,21 @@ D_BUILD=.build/
 SRC=	SRC/main.c \
 		SRC/clean.c \
 		SRC/debug.c \
+		SRC/env_list.c \
+		SRC/error.c	\
+		SRC/executer.c \
 		SRC/lexer.c \
-		SRC/string_manip.c \
-		SRC/cd.c \
-		SRC/echo.c \
-		SRC/env.c \
-		SRC/my_env_list.c \
-		SRC/pwd.c \
-		SRC/unset.c \
+		SRC/parser.c \
+		SRC/parser_bis.c \
 		SRC/split.c \
-		SRC/export.c
+		SRC/string_manip.c \
+		SRC/token_list.c \
+		SRC/BUILTIN/cd.c \
+		SRC/BUILTIN/echo.c \
+		SRC/BUILTIN/env.c \
+		SRC/BUILTIN/pwd.c \
+		SRC/BUILTIN/unset.c \
+		SRC/BUILTIN/export.c
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 

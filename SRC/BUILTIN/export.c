@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/17 17:21:10 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/09/17 19:03:23 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,9 @@ int	export(char **args, t_env **env)
 		print_exported(env);
 		return (0);
 	}
-	while (args[i])
+	while (args[i]) // needs a tab of strings
 	{
-		sep = strchr(args[i], '=');
+		sep = strchr(args[i], '='); //ILLEGAL
 		if (!sep)
 		{
 			if (!is_string_valid(args[i]))

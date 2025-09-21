@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 18:26:45 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/19 17:25:51 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ void	clean_input(char **input)
 	}
 }
 
-void	clean_lexer(t_lexer	**lexer)
+void	clean_token_list(t_token	**lexer)
 {
-	t_lexer *temp_node;
-	
+	t_token	*temp_node;
+
 	while ((*lexer))
 	{
 		temp_node = (*lexer)->next;
@@ -36,18 +36,19 @@ void	clean_lexer(t_lexer	**lexer)
 	*lexer = NULL;
 }
 
-void	clean_env(t_env *env)
+void	clean_env(t_env **env)
 {
-	t_env *tmp;
-	
-	while (env)
+	t_env	*tmp;
+
+	while (*env)
 	{
-		tmp = env->next;
-		if (env->var_name)
-			free(env->var_name);
-		if (env->var_value)
-			free(env->var_value);
-		free(env);
-		env = tmp;
+		tmp = (*env)->next;
+		if ((*env)->var_name)
+			free((*env)->var_name);
+		if ((*env)->var_value)
+			free((*env)->var_value);
+		free(*env);
+		*env = tmp;
 	}
+	env = NULL;
 }

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 18:27:12 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/21 17:12:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,40 @@ void	get_input(char **input)
 		add_history(*input);
 }
 
-// ls && echo -n "input for test" || echo "&& test et test && (echo a || echo b)"
+void	test_builtins(t_token *lexer, t_env **my_env)
+{
+	t_token	*curr_node;
+
+	curr_node = lexer;
+	while (curr_node)
+	{
+		if (str_cmp(curr_node->str, "cd", FALSE))
+		{
+			printf("-----%s\n", curr_node->next->str);
+			cd(curr_node->next->str, my_env);
+		}
+		if (str_cmp(curr_node->str, "env", FALSE))
+			print_env(my_env);
+		if (str_cmp(curr_node->str, "pwd", FALSE))
+			pwd();
+		if (str_cmp(curr_node->str, "echo", FALSE))
+			echo(&(curr_node->next->str));
+		if (str_cmp(curr_node->str, "unset", FALSE))
+			unset(my_env, curr_node->next->str);
+		if (str_cmp(curr_node->str, "export", FALSE))
+			errno = export(&(curr_node->next->str), my_env);
+		curr_node = curr_node->next;
+	}
+}
 
 int	main(int ac, char **av, char **env)
 {
 	char	*input;
-	t_lexer	*lexer;
-	t_lexer	*lexer_node;
+	t_token	*token_list;
 	t_env	*my_env;
-	char	**input_tab;
-	
+
 	input = NULL;
-	lexer = NULL;
-	lexer_node = NULL;
+	token_list = NULL;
 	my_env = init_env_list(env);
 	while (1)
 	{
@@ -42,43 +63,29 @@ int	main(int ac, char **av, char **env)
 		if (str_cmp(input, "EXIT", FALSE))
 		{
 			clean_input(&input);
-			break;
+			break ;
 		}
-		input_tab = ft_split(input, ' ');
-		if (!input_tab)
-		break;
-		if (str_cmp(input_tab[0], "cd", FALSE))
-		{
-			printf("-----%s\n", input_tab[1]);
-			cd(input_tab[1], &my_env);
-		}
-		if (str_cmp(input_tab[0], "env", FALSE))
-		print_env(&my_env);	
-		if (str_cmp(input_tab[0], "pwd", FALSE))
-		pwd();	
-		if (str_cmp(input_tab[0], "echo", FALSE))
-		echo(input_tab + 1);
-		if (str_cmp(input_tab[0], "unset", FALSE))
-			unset(&my_env, input_tab[1]);	
-		if (str_cmp(input_tab[0], "export", FALSE))
-			errno = export(input_tab + 1, &my_env);	
-		//faire le lexer sur l'input et separer word / operators
-		lexer_parse_input(&lexer, input);
-			
-		debug_lexer_print(lexer);
-		
-		//STOP WORKING // STOP WORKING // STOP WORKING
+		lexer(&token_list, input);
+		// if not NULL ?? CHECK when executed;
+		parser(&token_list);
+		debug_lexer_print_kind(token_list);
+		executer(&token_list, 0, 0);
+		// if (token_list)
+		// {
+		// 	test_builtins(token_list, &my_env);
+		// }
+		clean_token_list(&token_list);
 		clean_input(&input);
-		clean_lexer(&lexer);
 	}
+	clean_env(&my_env); // TODO: pointeur sur env ?
 	printf("%d\n", errno);
-	// debug_lexer_print(lexer);
-	// clean_env(my_env);
+	// debug_lexer_print(token_list);
 	rl_clear_history();
+	return (printf("%s", RESET_FONT), 0);
 	(void)ac;
 	(void)av;
-	return (printf("%s", RESET_FONT), 0);
 }
 
 //->data struct ??
 
+// verifier synthaxe tjrs ok -> faire debug

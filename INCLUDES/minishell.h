@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 18:32:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/21 16:52:52 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@
 # include <unistd.h>
 # include <errno.h>
 
+# define	MAX_ERROR_LEN	256
+# define	ERROR_TOO_LONG	"encountered an error too large to display\n"
+
+// # define	ARG_MAX	2097152 //actually more complicated, 18char per command and take in account PATH
+# define	ARG_MAX			4096 //minimum POSIX arg_max
+// maybe env max ?
+
 # define	TRUE	1
 # define	FALSE	0
 # define	PROMPT	"\1\e[1;38;5;82m\2XxxM3g4sh311xxX:\1\e[0;38;5;82m\2 "
@@ -37,26 +44,52 @@
 # define	DOUBLE_QUOTE	'\"'
 
 # define	OPERATOR_NBR	9
-# define	OR			"||"
-# define	AND			"&&"
-# define	PIPE		"|"
-# define	OUT			">"
-# define	IN			"<"
-# define	HDOC		"<<"
-# define	OUT_APP		">>"
-# define	BRACKET_O	"("
-# define	BRACKET_C	")"
+# define	_OR			"||"
+# define	_AND		"&&"
+# define	_PIPE		"|"
+# define	_OUT		">"
+# define	_IN			"<"
+# define	_HDOC		"<<"
+# define	_OUT_APP	">>"
+# define	_BRACKET_O	"("
+# define	_BRACKET_C	")"
 
-enum	e_token_type {NONE, WORD, CONTR_OPERATOR, REDIR_OPERATOR, BRACKET};
-
-// STRUCTS
-
-typedef struct s_syntax_list
+enum	e_type
 {
-	char					*str;
-	enum e_token_type		token_type;
-	struct s_syntax_list	*next;
-}	t_lexer;
+	NONE,
+	WORD,
+	CONTR_OPERATOR,
+	REDIR_OPERATOR,
+	BRACKET
+};
+
+enum	e_kind
+{
+	UNKNOWN,
+	WORD_FILE,
+	WORD_VAR,
+	WORD_COM,
+	WORD_ARG,
+	OR,
+	AND,
+	PIPE,
+	OUT,
+	IN,
+	HDOC,
+	OUT_APP,
+	BRACKET_O,
+	BRACKET_C
+};
+
+//STRUCTS
+
+typedef struct s_token
+{
+	char				*str;
+	enum e_type			type;
+	enum e_kind			kind;
+	struct s_token		*next;
+}	t_token;
 
 typedef struct s_env_list
 {
@@ -66,20 +99,44 @@ typedef struct s_env_list
 	struct s_env_list	*next;
 }	t_env;
 
+typedef struct cmd_data
+{
+	const char			*path;
+	char 				*argv[ARG_MAX];
+	char 				*envp[ARG_MAX]; // should change size
+	enum e_kind	 		roperator;
+}	t_cmd_data;
+
 // PROTOTYPES
 
 //	clean.c
 void	clean_input(char **input);
-void	clean_env(t_env *env);
-void	clean_lexer(t_lexer	**lexer);
+void	clean_env(t_env **env);
+void	clean_token_list(t_token	**lexer);
 
 //	debug.c
-void	debug_lexer_print(t_lexer *lexer_node);
+void	debug_lexer_print_type(t_token *lexer_node);
+void	debug_lexer_print_kind(t_token *lexer_node);
+void	debug_lexer_print_line(t_token *lexer_node);
+
+// env_list.c
+t_env   *init_env_list(char **env);
+int		update_variable(t_env **env, char *var, char *value);
+char	*get_var_value(t_env **env, char *var_name);
+void	env_add_node(t_env **top, t_env *node);
+t_env   *env_new_node(const char *var_name, const char *var_value, int exported);
+int		var_exists(t_env **env, char *name);
+
+//	error.c
+void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
+
+//	executer.c
+int	executer(t_token **token_list, int lvalue, enum e_kind loperator);
 
 //	lexer.c
-t_lexer	*lexer_add_node(t_lexer **lexer_start);
-void	lexer_node_fill(t_lexer *lexer_node, char *str, enum e_token_type type);
-void	lexer_parse_input(t_lexer **lexer, char *input);
+t_token	*token_list_add_node(t_token **lexer_start);
+void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind none);
+void	lexer(t_token **lexer, char *input);
 
 //	string_manip.c
 int		is_char_white_space(const char c);
@@ -93,13 +150,9 @@ int		str_ncmp(char *str1, char *str2, int n, int accept_null);
 char	*extract_string(const char *start, int len);
 char	*ft_strdup(const char *s);
 
-// env_list
-t_env   *init_env_list(char **env);
-int		update_variable(t_env **env, char *var, char *value);
-char	*get_var_value(t_env **env, char *var_name);
-void	env_add_node(t_env **top, t_env *node);
-t_env   *env_new_node(const char *var_name, const char *var_value, int exported);
-int		var_exists(t_env **env, char *name);
+// parser.c
+void	parser(t_token **lexer);
+int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind, int *line_has_cmd);
 
 // built-ins
 void	ft_putstr_fd(const char *s, int fd);
@@ -109,6 +162,11 @@ int		cd(char *path, t_env **env);
 int		print_env(t_env **env);
 int 	pwd(void);
 int		echo(char **args);
-int	export(char **args, t_env **env);
+int		export(char **args, t_env **env);
+
+// token_list.c
+void	token_list_empty_node(t_token *token);
+t_token	*token_list_add_node(t_token **token_list_start);
+void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
 
 #endif

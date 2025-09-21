@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/17 18:27:23 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/19 17:30:04 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,17 @@ int	is_char_white_space(const char c)
 	return ((c >= 9 && c <= 13) || c == 32);
 }
 
-int		is_char_operator(const char c)
+int	is_char_operator(const char c)
 {
 	return (is_char_in_string(c, METACHARACTERS, FALSE));
 }
 
-int		is_char_separator(const char c)
+int	is_char_separator(const char c)
 {
 	return (is_char_in_string(c, METASEPARATORS, FALSE));
 }
 
-int		is_char_in_string(const char c, const char *str, int accept_null)
+int	is_char_in_string(const char c, const char *str, int accept_null)
 {
 	int	i;
 
@@ -48,7 +48,7 @@ int		is_char_in_string(const char c, const char *str, int accept_null)
 	return (FALSE);
 }
 
-int is_str_empty_or_null(const char *str)
+int	is_str_empty_or_null(const char *str)
 {
 	while (str && *str)
 	{
@@ -85,7 +85,7 @@ int	str_cmp(char *str1, char *str2, int accept_null)
 int	str_ncmp(char *str1, char *str2, int n, int accept_null)
 {
 	int	i;
-	
+
 	if (!accept_null && (str1 == NULL || str2 == NULL))
 	{
 		write(2, "err : str_ncmp received a NULL string !\n", 41);
@@ -113,7 +113,7 @@ char	*extract_string(const char *start, int len)
 {
 	int		i;
 	char	*new_str;
-	
+
 	if (start <= 0 || start == NULL )
 		return (NULL);
 	new_str = malloc(sizeof(char) * (len + 1));
@@ -129,12 +129,12 @@ char	*extract_string(const char *start, int len)
 	return (new_str);
 }
 
-int ft_strlen(const char *str)
+int	ft_strlen(const char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
-	while (str[i])
+	while (str && str[i])
 		i++;
 	return (i);
 }
@@ -165,4 +165,3 @@ char	*ft_strdup(const char *s)
 	ns[i] = '\0';
 	return (ns);
 }
-
