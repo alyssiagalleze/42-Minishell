@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:02:49 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/21 15:32:18 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/22 16:37:51 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void	lexer(t_token **token_list, char *input)
 		if (len == -1)
 		{
 			lexer_create_token_from_input(token_list, NULL, 0, NONE);
-			break ;
+			break;
 		}
 		else if (len)
 			lexer_create_token_from_input(token_list, &input, len, NONE);

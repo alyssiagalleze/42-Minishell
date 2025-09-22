@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/21 16:52:52 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/22 17:33:42 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ typedef struct cmd_data
 	const char			*path;
 	char 				*argv[ARG_MAX];
 	char 				*envp[ARG_MAX]; // should change size
+	int					fd_in;
+	int					fd_out;
 	enum e_kind	 		roperator;
 }	t_cmd_data;
 
@@ -131,7 +133,7 @@ int		var_exists(t_env **env, char *name);
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
 //	executer.c
-int	executer(t_token **token_list, int lvalue, enum e_kind loperator);
+int	executer(t_token **token_list, int lvalue, enum e_kind loperator, int *is_subshell);
 
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
@@ -151,7 +153,7 @@ char	*extract_string(const char *start, int len);
 char	*ft_strdup(const char *s);
 
 // parser.c
-void	parser(t_token **lexer);
+int		parser(t_token **lexer);
 int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind, int *line_has_cmd);
 
 // built-ins

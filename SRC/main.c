@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/21 17:12:48 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/22 21:21:40 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,45 +47,51 @@ void	test_builtins(t_token *lexer, t_env **my_env)
 	}
 }
 
+void cleaner(t_env **my_env, char **input, t_token **token_list)
+{
+	clean_env(my_env);
+	clean_token_list(token_list);
+	clean_input(input);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*input;
 	t_token	*token_list;
+	t_token	*token_list_save; //find a way not to use it
 	t_env	*my_env;
+	int		is_subshell;
+	int		status;
 
-	input = NULL;
-	token_list = NULL;
-	my_env = init_env_list(env);
-	while (1)
+	is_subshell = 0;
+	while (!is_subshell)
 	{
+		input = NULL;
+		token_list = NULL;
+		token_list_save = NULL;
+		my_env = init_env_list(env);
+		status = 2;
 		while (!input)
 			get_input(&input);
 		if (str_cmp(input, "EXIT", FALSE))
-		{
-			clean_input(&input);
 			break ;
-		}
 		lexer(&token_list, input);
-		// if not NULL ?? CHECK when executed;
-		parser(&token_list);
-		debug_lexer_print_kind(token_list);
-		executer(&token_list, 0, 0);
-		// if (token_list)
-		// {
-		// 	test_builtins(token_list, &my_env);
-		// }
-		clean_token_list(&token_list);
-		clean_input(&input);
+		token_list_save = token_list;
+		if (parser(&token_list))
+		{
+			status = executer(&token_list, 0, 0, &is_subshell);
+		}
+		cleaner(&my_env, &input, &token_list_save);
+		printf("+++exit status: %i\n", status);
 	}
-	clean_env(&my_env); // TODO: pointeur sur env ?
-	printf("%d\n", errno);
-	// debug_lexer_print(token_list);
+	cleaner(&my_env, &input, &token_list_save); // oblige ??
 	rl_clear_history();
-	return (printf("%s", RESET_FONT), 0);
+	if (!is_subshell)
+		printf("%s", RESET_FONT);
+	printf("return %d\n", status);
+	return(status);
 	(void)ac;
 	(void)av;
 }
 
 //->data struct ??
-
-// verifier synthaxe tjrs ok -> faire debug

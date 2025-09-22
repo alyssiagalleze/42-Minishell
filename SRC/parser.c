@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/21 16:36:52 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/22 16:49:04 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,13 +111,15 @@ static int	parser_check_token(
 	return (FALSE);
 }
 
-void	parser(t_token **token_list)
+int	parser(t_token **token_list)
 {
 	t_token				*token;
 	t_token				*prev_token;
 	int					brackets;
 	int					line_has_cmd;
 
+	if (token_list == NULL)
+		printf("ATT : PARSER RECEIVED AN EMPTY TOKEN_LIST!");
 	token = *token_list;
 	prev_token = NULL;
 	brackets = 0;
@@ -126,8 +128,7 @@ void	parser(t_token **token_list)
 	{
 		if (parser_check_token(&token, prev_token, &brackets, &line_has_cmd))
 		{
-			clean_token_list(token_list);
-			return ;
+			return (FALSE);
 		}
 		prev_token = token;
 		token = token->next;
@@ -136,6 +137,7 @@ void	parser(t_token **token_list)
 	{
 		print_err(PROMPT, "unexpected EOF while looking for matching `(\'\n",
 			PROMPT, "syntax error: unexpected end of file\n");
-		clean_token_list(token_list);
+		return (FALSE);
 	}
+	return (TRUE);
 }

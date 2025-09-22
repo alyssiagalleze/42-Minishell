@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/19 17:25:51 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/22 16:40:57 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,20 @@ void	clean_input(char **input)
 	}
 }
 
-void	clean_token_list(t_token	**lexer)
+void	clean_token_list(t_token	**token_list)
 {
-	t_token	*temp_node;
+	t_token	*token;
 
-	while ((*lexer))
+	while (*token_list)
 	{
-		temp_node = (*lexer)->next;
-		if ((*lexer)->str)
-			free((*lexer)->str);
-		free((*lexer));
-		(*lexer) = temp_node;
+		token = (*token_list)->next;
+		if ((*token_list)->str)
+			free((*token_list)->str);
+		if (*token_list)
+			free((*token_list));
+		(*token_list) = token;
 	}
-	*lexer = NULL;
+	*token_list = NULL;
 }
 
 void	clean_env(t_env **env)
