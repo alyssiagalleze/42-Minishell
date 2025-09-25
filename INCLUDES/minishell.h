@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/22 17:33:42 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/25 20:56:11 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,15 +99,28 @@ typedef struct s_env_list
 	struct s_env_list	*next;
 }	t_env;
 
-typedef struct cmd_data
+typedef struct s_command
 {
-	const char			*path;
 	char 				*argv[ARG_MAX];
-	char 				*envp[ARG_MAX]; // should change size
-	int					fd_in;
-	int					fd_out;
-	enum e_kind	 		roperator;
-}	t_cmd_data;
+	char				*redir_in[ARG_MAX];
+	int					is_redir_in_heredoc[ARG_MAX];
+	char				*redir_out[ARG_MAX];
+	int					is_redir_out_append[ARG_MAX];
+} t_command;
+
+typedef struct s_subshell
+{
+	t_token		*token_sublist;
+} t_subshell;
+
+typedef struct s_exec
+{
+	int					is_command;
+	int					is_subshell;
+	t_command			*command;
+	t_subshell			*subshell;
+	struct s_exec		*next;
+} t_exec;
 
 // PROTOTYPES
 
@@ -120,6 +133,7 @@ void	clean_token_list(t_token	**lexer);
 void	debug_lexer_print_type(t_token *lexer_node);
 void	debug_lexer_print_kind(t_token *lexer_node);
 void	debug_lexer_print_line(t_token *lexer_node);
+void	debug_lexer_print_subline(t_token *lexer_node);
 
 // env_list.c
 t_env   *init_env_list(char **env);
@@ -132,13 +146,13 @@ int		var_exists(t_env **env, char *name);
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
-//	executer.c
-int	executer(t_token **token_list, int lvalue, enum e_kind loperator, int *is_subshell);
-
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
-void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind none);
+void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind kind);
 void	lexer(t_token **lexer, char *input);
+
+// lister.c
+int	lister(t_token **token_list, t_env **env);
 
 //	string_manip.c
 int		is_char_white_space(const char c);

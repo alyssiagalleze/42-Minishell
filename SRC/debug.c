@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:29:04 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/21 16:19:28 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/25 14:39:09 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,26 @@ void	debug_lexer_print_line(t_token *lexer_node)
 			printf(" ");
 	}
 	printf("\n");
+}
+
+void	debug_lexer_print_subline(t_token *lexer_node)
+{
+	int open_bracket;
+
+	open_bracket = 0;
+	if (lexer_node->kind == BRACKET_O)
+	{
+		printf("%s", lexer_node->str);
+		lexer_node = lexer_node->next;
+		open_bracket ++;
+	}
+	while (open_bracket != 0)
+	{
+		printf("%s", lexer_node->str);
+		if (lexer_node->kind == BRACKET_O)
+			open_bracket ++;
+		if (lexer_node->kind == BRACKET_C)
+			open_bracket --;
+		lexer_node = lexer_node->next;	
+	}
 }

@@ -10,8 +10,8 @@ SRC=	SRC/main.c \
 		SRC/debug.c \
 		SRC/env_list.c \
 		SRC/error.c	\
-		SRC/executer.c \
 		SRC/lexer.c \
+		SRC/lister.c \
 		SRC/parser.c \
 		SRC/parser_bis.c \
 		SRC/split.c \

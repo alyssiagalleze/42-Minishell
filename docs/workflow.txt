@@ -45,7 +45,27 @@ BASH WORKFLOW:
 				-> pipeline : echo a | echo b
 				-> list
 
-		compound command :
+	4.	shell expansions : 
+			(+ means it can increase the words number)
+			+ brace expansion = a{b, c, d} -> ab ac ad // we don't care
+			- tilde expansion = ~login name // we don't care
+			- $parameter expansion = 
+			- $variable expansion = 
+			- $arithmetic expansion = $((2 * 3)) // we don't care
+			- $command substitution = $(echo ls) -> ls , the command result becomes a command itself // we don't care
+			//
+			+ word splitting = -> recupere les expansions et split en se basant sur white space (complexe)
+			//
+			+ filename expansion -> scan for char * ? [ and make it a pattern
+				-> we only care for * :
+					Matches any string, including the null string. When the globstar shell option
+					is enabled, and ‘*’ is used in a filename expansion context, two adjacent ‘*’s used
+					as a single pattern match all files and zero or more directories and subdirectories.
+					If followed by a ‘/’, two adjacent ‘*’s match only directories and subdirectories.
+				-> subject : in the current directory
+			//
+			- quote removal = -> remove every ' " | that is unquoted / did not result from previous expansion
+
 
 -> simplified workflow
 
@@ -59,7 +79,7 @@ BASH WORKFLOW:
 	6. Executes the command.
 	7. Waits for the command to complete and collects its exit status.
 
--> command execution workflow
+6. command execution workflow
 
 	3.7.1 Simple Command Expansioninclude
 	When the shell executes a simple command, it performs the following expansions, assign-

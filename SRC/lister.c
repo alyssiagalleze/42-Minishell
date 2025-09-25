@@ -1,0 +1,351 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lister.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
+/*   Updated: 2025/09/25 20:58:03 by tfiette          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+# include "minishell.h"
+
+////////// TODO ////////////
+
+int temp_exec(t_exec *exec_list, t_env **env)
+{
+	(void)env;
+	int temp_res;
+
+	temp_res = TRUE;
+	
+	while (exec_list != NULL)
+	{
+		if (exec_list->is_subshell)
+		{
+			printf("to subshell -> ");
+			debug_lexer_print_subline(exec_list->subshell->token_sublist);
+		}
+		else if (exec_list->is_command)
+		{
+			printf("to exec -> ");
+			printf("%s", exec_list->command->argv[0]);
+			if (str_cmp(exec_list->command->argv[0], "true", FALSE)
+			|| str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
+				temp_res = FALSE;
+			else
+				temp_res = TRUE;
+		}
+		else 
+		{
+			printf("PROBLEM : EXEC NODE IS NOT A COMMAND NEITHER A SUBSHELL");
+		}
+		exec_list = exec_list->next;
+		if (exec_list)
+			printf(" | ");
+		else
+			printf("\n");
+	}
+	return (temp_res);
+}
+void	clean_exec_list(t_exec **exec_list)
+{
+	t_exec	*temp;
+	
+	while (*exec_list)
+	{
+		temp = (*exec_list)->next;
+		if ((*exec_list)->is_command)
+			free((*exec_list)->command);
+		else
+			free((*exec_list)->subshell);
+		free(*exec_list);
+		*exec_list = temp;
+	}
+	*exec_list = NULL;
+}
+
+void command_expand_words()
+{
+	
+}
+
+////////////////////////////
+
+
+void	lister_init_exec(t_exec *exec)
+{
+	exec->is_command = FALSE;
+	exec->is_subshell = FALSE;
+	exec->command = NULL;
+	exec->subshell = NULL;
+	exec->next = NULL;
+}
+
+// Renvoie valide sauf pour "TRUE ||" et "FALSE &&"
+// L'operateur doit etre en debut de token list
+int	lister_is_valid(t_token *token, int lvalue)
+{
+	if (token->kind == AND && lvalue)
+		return (FALSE);
+	if (token->kind == OR && !lvalue)
+		return (FALSE);
+	return (TRUE);
+}
+
+// skip l'entierete d'un subshell, de la parenthese entrante a la parenthese fermante
+void	lister_skip_subshell(t_token **token_list)
+{
+	int	open_bracket;
+
+	open_bracket = 1;
+	// skip la parenthese d'entree
+	(*token_list) = (*token_list)->next;
+	// skip jusqu'a parenthese de sortie correspondante inclue
+	while (open_bracket)
+	{
+		if ((*token_list)->kind == BRACKET_O)
+			open_bracket ++;
+		if ((*token_list)->kind == BRACKET_C)
+			open_bracket --;
+		*token_list = (*token_list)->next;
+	}
+}
+
+// skip tant que c'est des mots et des redirs
+void	lister_skip_words_and_redirs(t_token **token_list)
+{
+	while ((*token_list) && ((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
+	{
+		(*token_list) = (*token_list)->next;
+	}
+}
+
+// skip une liste qui a ete invalidee
+// -> skip tous les tokens jusqu'a arriver sur un && ou un || qui n'appartient pas a un subshell
+void	lister_skip_list(t_token **token_list)
+{
+	// skip l'operateur d'entree
+	if ((*token_list)->kind == OR || (*token_list)->kind == AND)
+	{
+		*token_list = (*token_list)->next;
+	}
+	// skip jusqu'a l'operateur de sortie
+	while (*token_list && (*token_list)->type != CONTR_OPERATOR)
+	{
+		if ((*token_list)->kind == BRACKET_O)
+			lister_skip_subshell(token_list);
+		else
+			lister_skip_words_and_redirs(token_list);
+		if (*token_list && (*token_list)->kind == PIPE)
+			*token_list = (*token_list)->next;
+	}
+}
+
+void	exec_list_init_node(t_exec *exec)
+{
+	exec->is_command = 0;
+	exec->is_subshell = 0;
+	exec->command = NULL;
+	exec->subshell = NULL;
+	exec->next = NULL;
+}
+
+t_exec	*exec_list_add_node(t_exec **exec_list_start)
+{
+	t_exec *new_node;
+	t_exec *curr_node;
+
+	new_node = malloc(sizeof(t_exec));
+	if (new_node == NULL)
+		return (NULL);
+	if (*exec_list_start != NULL)
+	{
+		curr_node = *exec_list_start;
+		while (curr_node->next)
+		{
+			curr_node = curr_node->next;
+		}
+		curr_node->next = new_node;
+	}
+	else
+	{
+		*exec_list_start = new_node;
+	}
+	exec_list_init_node(new_node);
+	return (new_node);
+}
+
+// Rajoute un t_subshell a exec_list
+// Fait avancer a liste jusqu'a la parenthese fermante inclue
+void	lister_create_exec_from_subshell(t_token **token_list, t_exec **exec_list)
+{
+	t_exec	*new_exec;
+	
+	new_exec = exec_list_add_node(exec_list);
+	if (new_exec == NULL)
+		return ;
+	new_exec->is_subshell = TRUE;
+	new_exec->subshell = malloc(sizeof(t_subshell));
+	if (new_exec->subshell == NULL)
+	{
+		clean_exec_list(exec_list); // TODO
+		return ;
+	}
+	new_exec->subshell->token_sublist = *token_list;
+	lister_skip_list(token_list);
+}
+
+// avancer dans ma token list tant que j'ai WORD ou REDIR OPERATEUR
+// (normalement il ne peut y avoir que NULL, OR , OU  et | apres)
+// faire les expansions a chaque token
+// ajouter les infos dans la struct
+
+
+void	lister_scan_command(t_token **token_list, t_command *command)
+{
+	int	in_nbr;
+	int	out_nbr;
+	int	arg_number;
+	
+	in_nbr = 0;
+	out_nbr = 0;
+	arg_number = 0;
+	while (*token_list && ((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
+	{
+		command_expand_words(); // TODO
+		if ((*token_list)->kind == IN || (*token_list)->kind == HDOC)
+		{
+			if ((*token_list)->kind == HDOC)
+				command->is_redir_in_heredoc[in_nbr] = TRUE;
+			*token_list = (*token_list)->next;
+			command->redir_in[in_nbr] = (*token_list)->str;
+			in_nbr ++;
+		}
+		else if ((*token_list)->kind == OUT || (*token_list)->kind == OUT_APP)
+		{
+			if ((*token_list)->kind == OUT_APP)
+				command->is_redir_out_append[out_nbr] = TRUE;
+			*token_list = (*token_list)->next;
+			command->redir_out[out_nbr] = (*token_list)->str;
+			out_nbr ++;
+		}
+		else if ((*token_list)->type == WORD)
+		{
+			if ((*token_list)->kind == WORD_COM)
+				command->argv[0] = (*token_list)->str;
+			else if ((*token_list)->kind == WORD_ARG)
+			{
+				arg_number ++;
+				command->argv[arg_number] = (*token_list)->str;
+			}
+		}
+		*token_list = (*token_list)->next;
+	}
+}
+
+void	exec_list_init_command(t_command *command)
+{
+	int	i;
+	
+	i = 0;
+	while (i < ARG_MAX)
+	{
+		command->argv[i] = 0;
+		command->redir_in[i] = 0;
+		command->is_redir_in_heredoc[i] = FALSE;
+		command->redir_out[i] = 0;
+		command->is_redir_out_append[i] = FALSE;
+		i ++;
+	}
+}
+
+// Rajoute un t_subshell a exec_list
+// Fait avancer a liste jusqu'au prochaine operateur exclus
+void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list)
+{
+	t_exec	*new_exec;
+
+	new_exec = exec_list_add_node(exec_list);
+	if (new_exec == NULL)
+		return ;
+	new_exec->is_command = TRUE;
+	new_exec->command = malloc(sizeof(t_command));
+	if (new_exec->command == NULL)
+	{
+		clean_exec_list(exec_list); // TODO
+		return ;
+	}
+	exec_list_init_command(new_exec->command);
+	lister_scan_command(token_list, new_exec->command);
+}
+
+// Le role de cette fonction est de dispatcher la token list en plusieurs listes de commandes a executer
+// La difficulte vient du fait qu'il y ait des sublists et des pipes
+// -> particulierement du fait qu'il peut y avoir une sublist dans un pipe et un pipe dans une sublist
+// Le plus simple est sans doute d'envoyer une liste chainee de commande ?
+//
+// --> Je dois identifier si je suis dans un pipe 
+// -> version naive est d'avancer en skippant les sublists et voir si j'ai un pipe a droite 
+//
+// --> Je dois travailler commande par commande
+//
+//
+// Je dois aussi recuperer le resutat de l'execution de la list
+// et faire les expansions a un moment
+void	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue) //RAJOUTER IS_SUBSHELL ??
+{
+	printf("lvalue : %d\n", lvalue);
+	// verifier si j'interprete ma liste
+	if (*token_list && !lister_is_valid(*token_list, lvalue)) // skip
+	{
+		lister_skip_list(token_list);
+		return ;
+	}
+	// skip prev operator
+	if ((*token_list)->kind == AND || (*token_list)->kind == OR)
+		*token_list = (*token_list)->next;
+	// tant que je n'ai pas fini ma liste
+	while (*token_list && ((*token_list)->kind != AND && (*token_list)->kind != OR))
+	{
+		if ((*token_list)->kind == PIPE)
+			*token_list = (*token_list)->next;
+		if ((*token_list)->kind == BRACKET_O)
+			lister_create_exec_from_subshell(token_list, exec_list);
+		else
+			lister_create_exec_from_command(token_list, exec_list);	
+		if (exec_list == NULL) // check malloc fail
+			return ;
+	}
+}
+
+// Attention a ne pas relancer quand j'interprete un subshell
+int	lister(t_token **token_list, t_env **env)
+{
+	int			status;
+	t_exec		*exec;
+
+	status = 0;
+	exec = NULL;
+	while (*token_list)
+	{
+		lister_simple(token_list, &exec, status);
+		if (exec)
+		{
+			status = temp_exec(exec, env); // TODO
+			clean_exec_list(&exec); // TODO
+		}
+		/* else malloc problem*/
+	}
+	return (status);
+}
+
+// trouver un moyen de tester temp_exec...
+// -> fonction ou envoyer la token list et qui s'arrete
+// -> copier token list et envoyer sublist sans les parentheses
+
+// avancer expansion de variable
+
+//nettoyer code

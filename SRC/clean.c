@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/22 16:40:57 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/25 20:50:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	clean_token_list(t_token	**token_list)
 		if ((*token_list)->str)
 			free((*token_list)->str);
 		if (*token_list)
-			free((*token_list));
-		(*token_list) = token;
+			free(*token_list);
+		*token_list = token;
 	}
 	*token_list = NULL;
 }

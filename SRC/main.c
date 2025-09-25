@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/22 21:21:40 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/25 20:56:20 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,12 @@ void	test_builtins(t_token *lexer, t_env **my_env)
 
 void cleaner(t_env **my_env, char **input, t_token **token_list)
 {
-	clean_env(my_env);
-	clean_token_list(token_list);
-	clean_input(input);
+	if (my_env)
+		clean_env(my_env);
+	if (input)
+		clean_token_list(token_list);
+	if (token_list)
+		clean_input(input);
 }
 
 int	main(int ac, char **av, char **env)
@@ -60,16 +63,14 @@ int	main(int ac, char **av, char **env)
 	t_token	*token_list;
 	t_token	*token_list_save; //find a way not to use it
 	t_env	*my_env;
-	int		is_subshell;
 	int		status;
 
-	is_subshell = 0;
-	while (!is_subshell)
+	my_env = init_env_list(env);
+	while (1)
 	{
 		input = NULL;
 		token_list = NULL;
 		token_list_save = NULL;
-		my_env = init_env_list(env);
 		status = 2;
 		while (!input)
 			get_input(&input);
@@ -79,15 +80,14 @@ int	main(int ac, char **av, char **env)
 		token_list_save = token_list;
 		if (parser(&token_list))
 		{
-			status = executer(&token_list, 0, 0, &is_subshell);
+			status = lister(&token_list, &my_env);
 		}
-		cleaner(&my_env, &input, &token_list_save);
+		cleaner(NULL, &input, &token_list_save);
 		printf("+++exit status: %i\n", status);
 	}
 	cleaner(&my_env, &input, &token_list_save); // oblige ??
 	rl_clear_history();
-	if (!is_subshell)
-		printf("%s", RESET_FONT);
+	printf("%s", RESET_FONT);
 	printf("return %d\n", status);
 	return(status);
 	(void)ac;
