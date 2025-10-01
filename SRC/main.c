@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/25 20:56:20 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 16:43:41 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,16 +47,6 @@ void	test_builtins(t_token *lexer, t_env **my_env)
 	}
 }
 
-void cleaner(t_env **my_env, char **input, t_token **token_list)
-{
-	if (my_env)
-		clean_env(my_env);
-	if (input)
-		clean_token_list(token_list);
-	if (token_list)
-		clean_input(input);
-}
-
 int	main(int ac, char **av, char **env)
 {
 	char	*input;
@@ -80,15 +70,13 @@ int	main(int ac, char **av, char **env)
 		token_list_save = token_list;
 		if (parser(&token_list))
 		{
-			status = lister(&token_list, &my_env);
+			status = lister(&token_list, &my_env, &input, &token_list_save);
 		}
-		cleaner(NULL, &input, &token_list_save);
 		printf("+++exit status: %i\n", status);
 	}
 	cleaner(&my_env, &input, &token_list_save); // oblige ??
 	rl_clear_history();
 	printf("%s", RESET_FONT);
-	printf("return %d\n", status);
 	return(status);
 	(void)ac;
 	(void)av;

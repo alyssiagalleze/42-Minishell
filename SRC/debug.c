@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:29:04 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/25 14:39:09 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/29 12:14:36 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,4 +106,5 @@ void	debug_lexer_print_subline(t_token *lexer_node)
 			open_bracket --;
 		lexer_node = lexer_node->next;	
 	}
+	printf("\n");
 }

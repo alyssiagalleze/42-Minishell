@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/19 17:30:04 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 16:44:42 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,9 +150,9 @@ char	*ft_strdup(const char *s)
 	if (!s)
 	{
 		ns = malloc(1);
-		if (!ns)
-			return (NULL);
-		ns[0] = '\0';
+		if (ns)
+			ns[0] = '\0';
+		return (ns);
 	}
 	ns = malloc((len + 1) * sizeof(char));
 	if (!ns)

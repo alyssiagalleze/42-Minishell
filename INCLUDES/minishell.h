@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/25 20:56:11 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/29 15:26:59 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,9 @@ typedef struct s_exec
 void	clean_input(char **input);
 void	clean_env(t_env **env);
 void	clean_token_list(t_token	**lexer);
+void	clean_exec_list(t_exec **exec_list);
+void cleaner(t_env **my_env, char **input, t_token **token_list);
+
 
 //	debug.c
 void	debug_lexer_print_type(t_token *lexer_node);
@@ -152,7 +155,7 @@ void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum
 void	lexer(t_token **lexer, char *input);
 
 // lister.c
-int	lister(t_token **token_list, t_env **env);
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 
 //	string_manip.c
 int		is_char_white_space(const char c);
