@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/29 15:26:59 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 17:30:49 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,11 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+# include <signal.h>
 # include <sys/wait.h>
 # include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
 # include <unistd.h>
 # include <errno.h>
 
@@ -122,12 +125,15 @@ typedef struct s_exec
 	struct s_exec		*next;
 } t_exec;
 
+
 // PROTOTYPES
 
 //	clean.c
 void	clean_input(char **input);
 void	clean_env(t_env **env);
 void	clean_token_list(t_token	**lexer);
+void	exec_cleaner(char **path_tab, char *path);
+void	cleaner(t_env **my_env, char **input, t_token **token_list);
 void	clean_exec_list(t_exec **exec_list);
 void cleaner(t_env **my_env, char **input, t_token **token_list);
 
@@ -145,6 +151,11 @@ char	*get_var_value(t_env **env, char *var_name);
 void	env_add_node(t_env **top, t_env *node);
 t_env   *env_new_node(const char *var_name, const char *var_value, int exported);
 int		var_exists(t_env **env, char *name);
+int		unset_single(char *arg, t_env **env);
+
+// signals.c
+void sigint_handler(int sig, siginfo_t *info, void *context);
+void init_signals(void);
 
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
@@ -162,12 +173,13 @@ int		is_char_white_space(const char c);
 int		is_char_operator(const char c);
 int		is_char_separator(const char c);
 int		is_char_in_string(const char c, const char *str, int accept_null);
-int		is_str_empty_or_null(const char *str);
+int		is_str_empty_or_null(const char *str, int status);
 int		ft_strlen(const char *str);
 int		str_cmp(char *str1, char *str2, int accept_null);
 int		str_ncmp(char *str1, char *str2, int n, int accept_null);
 char	*extract_string(const char *start, int len);
 char	*ft_strdup(const char *s);
+char	*ft_strjoin(char const *s1, char const *s2);
 
 // parser.c
 int		parser(t_token **lexer);
@@ -176,16 +188,21 @@ int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind,
 // built-ins
 void	ft_putstr_fd(const char *s, int fd);
 char	**ft_split(char const *s, char c);
-void	unset(t_env **env, char *name);
-int		cd(char *path, t_env **env);
+int		unset(char **args, t_env **env);
+int		cd(char **args, t_env **env);
 int		print_env(t_env **env);
 int 	pwd(void);
 int		echo(char **args);
 int		export(char **args, t_env **env);
+void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_save);
 
 // token_list.c
 void	token_list_empty_node(t_token *token);
 t_token	*token_list_add_node(t_token **token_list_start);
 void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
+
+// exec
+int	exec_command(t_exec *exec_list, t_env **env);
+char	*get_next_line(int fd);
 
 #endif

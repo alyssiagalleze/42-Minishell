@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lister.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 16:53:48 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 17:33:57 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,23 +54,30 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 		}
 		else if (exec_list->is_command)
 		{
-			printf("to exec -> ");
-			printf("%s", exec_list->command->argv[0]);
-			if (str_cmp(exec_list->command->argv[0], "true", FALSE)
-			|| str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
-				temp_res = FALSE;
-			else
-				temp_res = TRUE;
+			temp_res = exec_command(exec_list, env);
+			
+			// if (!temp_res)
+			// 	temp_res = FALSE;
+			// else
+			// 	temp_res = TRUE;
+			// printf("to exec -> ");
+			// printf("%s -> is command : %d\n", exec_list->command->argv[0], exec_list->is_command);
+			// printf("redir is %s", exec_list->command->redir_in[0]);
+			// if (str_cmp(exec_list->command->argv[0], "true", FALSE)
+			// || str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
+			// 	temp_res = FALSE;
+			// else
+			// 	temp_res = TRUE;
 		}
 		else 
 		{
 			printf("PROBLEM : EXEC NODE IS NOT A COMMAND NEITHER A SUBSHELL");
 		}
 		exec_list = exec_list->next;
-		if (exec_list)
+/* 		if (exec_list)
 			printf(" | ");
 		else
-			printf("\n");
+			printf("\n"); */
 	}
 	return (temp_res);
 }
@@ -267,6 +274,7 @@ void	lister_scan_command(t_token **token_list, t_command *command)
 			if ((*token_list)->kind == HDOC)
 				command->is_redir_in_heredoc[in_nbr] = TRUE;
 			*token_list = (*token_list)->next;
+			printf("%s\n", (*token_list)->str);
 			command->redir_in[in_nbr] = (*token_list)->str;
 			in_nbr ++;
 		}
@@ -372,6 +380,21 @@ void	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue) //RAJOU
 	}
 }
 
+/* void	print_exec_list(t_exec **exec_list)
+{
+	int	i;
+
+	i = 0;
+	printf("is_command : %d\n is_sub : %d\n", (*exec_list)->is_command, (*exec_list)->is_subshell );
+	while ((*exec_list)->command->argv[i])
+	{
+		printf("arg :%s\n ", (*exec_list)->command->argv[i]);
+		printf("\n");
+		printf("redir in : %s\n", (*exec_list)->command->redir_out[i]);
+		i++;
+	}
+} */
+
 // Attention a ne pas relancer quand j'interprete un subshell
 int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save)
 {
@@ -401,5 +424,6 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 // avancer expansion de variable
 
 //nettoyer code
+
 
 //heredoc meme si skip

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:29:30 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/16 18:10:05 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/09/26 16:58:00 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int  echo(char **args)
 	count = 0;
 	while (args[count])
 		count++;
-	i = 0;
+	i = 1;
 	if (is_n_enabled(args[i]))
 	{
 		i++;

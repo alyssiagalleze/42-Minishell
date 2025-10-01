@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 16:43:41 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 17:36:01 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	get_input(char **input)
+void	get_input(char **input, int status)
 {
 	*input = readline(PROMPT);
-	if (is_str_empty_or_null(*input))
+	// if (*input == NULL)
+	// 	exit(0); // ici appliquer la fonction exit qui utilisera le bon exit status 
+	if (is_str_empty_or_null(*input, status))
 		clean_input(input);
 	else
 		add_history(*input);
@@ -56,16 +58,17 @@ int	main(int ac, char **av, char **env)
 	int		status;
 
 	my_env = init_env_list(env);
+	status = 2;
+    init_signals();
 	while (1)
 	{
 		input = NULL;
 		token_list = NULL;
 		token_list_save = NULL;
-		status = 2;
 		while (!input)
-			get_input(&input);
-		if (str_cmp(input, "EXIT", FALSE))
-			break ;
+			get_input(&input, status);
+		if (str_cmp(input, "exit", FALSE))
+			my_exit(status, &my_env, &input, &token_list_save);
 		lexer(&token_list, input);
 		token_list_save = token_list;
 		if (parser(&token_list))
