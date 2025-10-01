@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 18:11:37 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/01 18:36:57 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,10 @@ int	main(int ac, char **av, char **env)
 		if (parser(&token_list))
 		{
 			status = lister(&token_list, &my_env, &input, &token_list_save);
+		}
+		else
+		{
+			cleaner(NULL, &input, &token_list_save);
 		}
 		printf("+++exit status: %i\n", status);
 	}

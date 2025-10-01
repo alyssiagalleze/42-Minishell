@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lister.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 17:33:57 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/01 18:39:11 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -417,13 +417,8 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 	return (status);
 }
 
-// trouver un moyen de tester temp_exec...
-// -> fonction ou envoyer la token list et qui s'arrete
-// -> copier token list et envoyer sublist sans les parentheses
-
 // avancer expansion de variable
 
 //nettoyer code
-
 
 //heredoc meme si skip
