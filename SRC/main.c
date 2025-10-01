@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 17:36:01 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/01 18:11:37 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,32 +21,6 @@ void	get_input(char **input, int status)
 		clean_input(input);
 	else
 		add_history(*input);
-}
-
-void	test_builtins(t_token *lexer, t_env **my_env)
-{
-	t_token	*curr_node;
-
-	curr_node = lexer;
-	while (curr_node)
-	{
-		if (str_cmp(curr_node->str, "cd", FALSE))
-		{
-			printf("-----%s\n", curr_node->next->str);
-			cd(curr_node->next->str, my_env);
-		}
-		if (str_cmp(curr_node->str, "env", FALSE))
-			print_env(my_env);
-		if (str_cmp(curr_node->str, "pwd", FALSE))
-			pwd();
-		if (str_cmp(curr_node->str, "echo", FALSE))
-			echo(&(curr_node->next->str));
-		if (str_cmp(curr_node->str, "unset", FALSE))
-			unset(my_env, curr_node->next->str);
-		if (str_cmp(curr_node->str, "export", FALSE))
-			errno = export(&(curr_node->next->str), my_env);
-		curr_node = curr_node->next;
-	}
 }
 
 int	main(int ac, char **av, char **env)

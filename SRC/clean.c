@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 17:31:34 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/01 18:12:20 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,49 +69,6 @@ void	exec_cleaner(char **path_tab, char *path)
 	}
 	if (path)
 		free(path);
-}
-
-void	clean_exec_list(t_exec **exec_list)
-{
-	t_exec	*temp;
-	int		i;
-	
-	while (*exec_list)
-	{
-		temp = (*exec_list)->next;
-		i = 0;
-		if ((*exec_list)->is_command)
-		{
-			while ((*exec_list)->command->argv[i])
-			{
-				free((*exec_list)->command->argv[i]);
-				(*exec_list)->command->argv[i] = NULL;
-				i ++;
-			}
-			free((*exec_list)->command);
-		}
-		else
-		{
-			if ((*exec_list)->subshell->token_sublist)
-			{
-				clean_token_list(&((*exec_list)->subshell->token_sublist));
-			}
-			free((*exec_list)->subshell);
-		}
-		free(*exec_list);
-		*exec_list = temp;
-	}
-	*exec_list = NULL;
-}
-
-void cleaner(t_env **my_env, char **input, t_token **token_list)
-{
-	if (my_env)
-		clean_env(my_env);
-	if (token_list)
-		clean_token_list(token_list);
-	if (input)
-		clean_input(input);
 }
 
 void	clean_exec_list(t_exec **exec_list)
