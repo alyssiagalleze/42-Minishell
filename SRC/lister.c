@@ -6,13 +6,11 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 18:39:11 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 19:55:14 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "minishell.h"
-
-////////// TODO ////////////
 
 int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save)
 {
@@ -81,13 +79,6 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 	}
 	return (temp_res);
 }
-
-void command_expand_words()
-{
-	
-}
-
-////////////////////////////
 
 
 void	lister_init_exec(t_exec *exec)
@@ -241,7 +232,7 @@ void	lister_create_exec_from_subshell(t_token **token_list, t_exec **exec_list)
 	new_exec->subshell = malloc(sizeof(t_subshell));
 	if (new_exec->subshell == NULL)
 	{
-		clean_exec_list(exec_list); // TODO
+		clean_exec_list(exec_list);
 		return ;
 	}
 	new_exec->subshell->token_sublist = lister_scan_subshell(token_list);
@@ -256,7 +247,6 @@ void	lister_create_exec_from_subshell(t_token **token_list, t_exec **exec_list)
 // faire les expansions a chaque token
 // ajouter les infos dans la struct
 
-
 void	lister_scan_command(t_token **token_list, t_command *command)
 {
 	int	in_nbr;
@@ -268,23 +258,12 @@ void	lister_scan_command(t_token **token_list, t_command *command)
 	arg_number = 0;
 	while (*token_list && ((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
 	{
-		command_expand_words(); // TODO
-		if ((*token_list)->kind == IN || (*token_list)->kind == HDOC)
+		if ((*token_list)->type == REDIR_OPERATOR)
 		{
-			if ((*token_list)->kind == HDOC)
-				command->is_redir_in_heredoc[in_nbr] = TRUE;
+			command->redir_kind[in_nbr] = (*token_list)->kind;
 			*token_list = (*token_list)->next;
-			printf("%s\n", (*token_list)->str);
-			command->redir_in[in_nbr] = (*token_list)->str;
+			command->redir[in_nbr] = (*token_list)->str;
 			in_nbr ++;
-		}
-		else if ((*token_list)->kind == OUT || (*token_list)->kind == OUT_APP)
-		{
-			if ((*token_list)->kind == OUT_APP)
-				command->is_redir_out_append[out_nbr] = TRUE;
-			*token_list = (*token_list)->next;
-			command->redir_out[out_nbr] = (*token_list)->str;
-			out_nbr ++;
 		}
 		else if ((*token_list)->type == WORD)
 		{
@@ -312,12 +291,22 @@ void	exec_list_init_command(t_command *command)
 	while (i < ARG_MAX)
 	{
 		command->argv[i] = 0;
-		command->redir_in[i] = 0;
-		command->is_redir_in_heredoc[i] = FALSE;
-		command->redir_out[i] = 0;
-		command->is_redir_out_append[i] = FALSE;
+		command->redir[i] = 0;
+		command->redir_kind[i] = 0;
 		i ++;
 	}
+}
+
+//iterer dans la list
+// /!\ attention a ne pas decaler le start
+void	lister_expand_command(t_token *token_list)
+{
+	(void)token_list;
+	// while (token_list
+	// 	&& (token_list->type == WORD || token_list->type == REDIR_OPERATOR))
+	// {
+		
+	// }
 }
 
 // Rajoute un t_subshell a exec_list
@@ -337,6 +326,7 @@ void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list)
 		return ;
 	}
 	exec_list_init_command(new_exec->command);
+	lister_expand_command(*token_list);
 	lister_scan_command(token_list, new_exec->command);
 }
 
@@ -422,3 +412,5 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 //nettoyer code
 
 //heredoc meme si skip
+
+//limiter a arg max

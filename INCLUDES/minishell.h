@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 17:30:49 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/01 19:49:50 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,10 +105,8 @@ typedef struct s_env_list
 typedef struct s_command
 {
 	char 				*argv[ARG_MAX];
-	char				*redir_in[ARG_MAX];
-	int					is_redir_in_heredoc[ARG_MAX];
-	char				*redir_out[ARG_MAX];
-	int					is_redir_out_append[ARG_MAX];
+	char				*redir[ARG_MAX];
+	enum e_kind			redir_kind[ARG_MAX];
 } t_command;
 
 typedef struct s_subshell

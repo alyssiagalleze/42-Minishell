@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 18:36:57 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/01 19:55:07 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,5 +62,3 @@ int	main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 }
-
-//->data struct ??
