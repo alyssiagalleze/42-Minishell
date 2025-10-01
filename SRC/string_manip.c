@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/19 17:30:04 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/30 18:55:32 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,10 @@ int	is_char_in_string(const char c, const char *str, int accept_null)
 	return (FALSE);
 }
 
-int	is_str_empty_or_null(const char *str)
+int	is_str_empty_or_null(const char *str, int status)
 {
+	if (str == NULL)
+		my_exit(status, NULL, NULL, NULL);
 	while (str && *str)
 	{
 		if (!is_char_white_space(*str))
@@ -164,4 +166,34 @@ char	*ft_strdup(const char *s)
 	}
 	ns[i] = '\0';
 	return (ns);
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	size_t	len;
+	char	*str;
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	j = 0;
+	if (!s1 || !s2)
+		s1 = ft_strdup("");
+	len = ft_strlen(s1) + ft_strlen(s2);
+	str = malloc((len + 1) * sizeof(char));
+	if (!str)
+		return (NULL);
+	while (s1[i])
+	{
+		str[i] = s1[i];
+		i++;
+	}
+	while (s2[j])
+	{
+		str[i] = s2[j];
+		i++;
+		j++;
+	}
+	str[i] = '\0';
+	return (str);
 }

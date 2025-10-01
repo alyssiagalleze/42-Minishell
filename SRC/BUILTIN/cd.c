@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/17 19:26:57 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/26 16:57:09 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,18 @@ char	*find_target(char *path, t_env **env)
 	return (target);
 }
 
-int	cd(char *path, t_env **env)
+int	cd(char **args, t_env **env)
 {
-	char	*target;
+	char	*target = NULL;
 	char	*working_dir;
 	
+	if (args[2] != NULL)
+		return (print_err(PROMPT, ": cd:", " too many arguments", NULL), 1);
+	printf("--------------------coucou\n");
 	working_dir = getcwd(NULL, 0); //mkdir a; cd a; rm ../a
 	if (working_dir == NULL)
 		return (perror("getcwd"), 1);
-	target = find_target(path, env);
+	target = find_target(args[1], env);
 	if (!target)
 	{
 		free(working_dir);
@@ -45,11 +48,12 @@ int	cd(char *path, t_env **env)
 	}
 	update_variable(env, "OLDPWD", working_dir);
 	if (chdir(target) == -1)
-		return (free(working_dir), free(target), perror(target), 1);
+		return (free(working_dir), perror(target), free(target), 1);
 	free(working_dir);
 	working_dir = getcwd(NULL, 0);
 	if (working_dir == NULL)
 		return (free(working_dir), free(target), perror("getcwd"), 1);
+	printf("------------------ new dir : %s\n", working_dir);
 	update_variable(env, "PWD", working_dir);
 	free(working_dir);
 	free(target);

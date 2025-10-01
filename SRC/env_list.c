@@ -72,7 +72,7 @@ t_env   *init_env_list(char **env)
 
 int	update_variable(t_env **env, char *var, char *value)
 {
-	unset(env, var);
+	unset_single(var, env);
 	env_add_node(env, env_new_node(var, value, FALSE));
 	return (0);
 }

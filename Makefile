@@ -17,12 +17,15 @@ SRC=	SRC/main.c \
 		SRC/split.c \
 		SRC/string_manip.c \
 		SRC/token_list.c \
+		SRC/exec_simple_command.c \
+		SRC/signals.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \
 		SRC/BUILTIN/pwd.c \
 		SRC/BUILTIN/unset.c \
-		SRC/BUILTIN/export.c
+		SRC/BUILTIN/export.c \
+		SRC/BUILTIN/exit.c 
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 

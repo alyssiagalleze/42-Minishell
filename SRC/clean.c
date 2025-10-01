@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/25 20:50:18 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/09/30 12:10:25 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,4 +52,19 @@ void	clean_env(t_env **env)
 		*env = tmp;
 	}
 	env = NULL;
+}
+
+void	exec_cleaner(char **path_tab, char *path)
+{
+	int	i;
+
+	i = 0;
+	if (path_tab)
+	{
+		while (path_tab[i])
+			free(path_tab[i++]);
+		free(path_tab);
+	}
+	if (path)
+		free(path);
 }
