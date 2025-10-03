@@ -140,109 +140,109 @@
 // 	return (0);
 // }
 
-// char	**get_paths(t_env **env)
-// {
-// 	t_env	*current;
-// 	char	**path_tab;
+char	**get_paths(t_env **env)
+{
+	t_env	*current;
+	char	**path_tab;
 	
-// 	current = *env;
-// 	path_tab = NULL;
-// 	while (current)
-// 	{
-// 		if (str_ncmp(current->var_name, "PATH", 3, FALSE))
-// 			path_tab = ft_split(current->var_value, ':');
-// 		current = current->next;
-// 	}
-// 	if (!path_tab)
-// 		return (NULL);
-// 	return (path_tab);
-// }
+	current = *env;
+	path_tab = NULL;
+	while (current)
+	{
+		if (str_ncmp(current->var_name, "PATH", 3, FALSE))
+			path_tab = ft_split(current->var_value, ':');
+		current = current->next;
+	}
+	if (!path_tab)
+		return (NULL);
+	return (path_tab);
+}
 
-// char	*append_exec_file(char *cmd_name, char *path)
-// {
-// 	char	*tmp;
-// 	char	*cmd_path;
+char	*append_exec_file(char *cmd_name, char *path)
+{
+	char	*tmp;
+	char	*cmd_path;
 	
-// 	tmp = NULL;
-// 	tmp = ft_strjoin(path, "/");
-// 	if (!tmp)
-// 		return (NULL);
-// 	cmd_path = ft_strjoin(tmp, cmd_name);
-// 	if (!cmd_path)
-// 	{
-// 		free(tmp);
-// 		return (NULL);
-// 	}
-// 	free(tmp);
-// 	return (cmd_path);
-// }
+	tmp = NULL;
+	tmp = ft_strjoin(path, "/");
+	if (!tmp)
+		return (NULL);
+	cmd_path = ft_strjoin(tmp, cmd_name);
+	if (!cmd_path)
+	{
+		free(tmp);
+		return (NULL);
+	}
+	free(tmp);
+	return (cmd_path);
+}
 
-// char	*set_command_path(t_exec *exec_list, t_env **env)
-// {
-// 	int		i;
-// 	char	**path_tab;
-// 	char	*cmd_path;
+char	*set_command_path(t_exec *exec_list, t_env **env)
+{
+	int		i;
+	char	**path_tab;
+	char	*cmd_path;
 	
-// 	path_tab = get_paths(env);
-// 	if (!path_tab)
-// 		return (NULL);
-// 	cmd_path = NULL;
-// 	i = 0;
-// 	while (path_tab[i])
-// 	{
-// 		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
-// 		if (!access(cmd_path, F_OK | X_OK))
-// 			return (exec_cleaner(path_tab, NULL), cmd_path);
-// 		free(cmd_path);	
-// 		i++;
-// 	}
-// 	exec_cleaner(path_tab, NULL);
-// 	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
-// 	if (!access(cmd_path, F_OK | X_OK))
-// 		return (cmd_path);
-// 	free(cmd_path);
-// 	return (perror(exec_list->command->argv[0]), NULL);
-// }
+	path_tab = get_paths(env);
+	if (!path_tab)
+		return (NULL);
+	cmd_path = NULL;
+	i = 0;
+	while (path_tab[i])
+	{
+		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
+		if (!access(cmd_path, F_OK | X_OK))
+			return (exec_cleaner(path_tab, NULL), cmd_path);
+		free(cmd_path);	
+		i++;
+	}
+	exec_cleaner(path_tab, NULL);
+	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
+	if (!access(cmd_path, F_OK | X_OK))
+		return (cmd_path);
+	free(cmd_path);
+	return (NULL);
+}
 
-// int	is_builtin(t_exec *exec_list)
-// {
-// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
-// 		return (TRUE);
-// 	else
-// 		return (FALSE);
-// }
+int	is_builtin(t_exec *exec_list)
+{
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
+		return (TRUE);
+	else
+		return (FALSE);
+}
 
-// int	built_in_exec(t_exec *exec_list, t_env **env)
-// {
-// 	int	exit_status;
+int	built_in_exec(t_exec *exec_list, t_env **env)
+{
+	int	exit_status;
 	
-// 	exit_status = 0;
-// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
-// 		exit_status = echo(exec_list->command->argv);
-// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-// 		exit_status = cd(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-// 		exit_status = pwd();
-// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-// 		exit_status = export(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-// 		exit_status = unset(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-// 		exit_status = print_env(env);
-// 	return (exit_status);
-// }
+	exit_status = 0;
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
+		exit_status = echo(exec_list->command->argv);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		exit_status = cd(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		exit_status = pwd();
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		exit_status = export(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		exit_status = unset(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		exit_status = print_env(env);
+	return (exit_status);
+}
 
 
 // int	fork_exec(t_exec *exec_list, t_env **env)
@@ -344,15 +344,19 @@
 //  */
 
 
-int	exec_pipeline(t_exec *exec_list, t_pid_list **pids)
+int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env)
 {
 	int		pipefds[2];
 	pid_t	pid;
+	char	*path;
+	int		status;
 
-	if (exec_list->next && exec_list->next->is_command)
+	status = 0;
+
+	if (exec_list->next/*  && exec_list->next->is_command */)
 	{
 		if (pipe(pipefds) == -1)
-			return (1);
+			return (printf("wsh ???\n"), 1);
 	}
 	pid = fork();
 	if (pid == -1)
@@ -362,30 +366,51 @@ int	exec_pipeline(t_exec *exec_list, t_pid_list **pids)
 		// printf("prev_fd : %d command : %s\n", exec_list->command->prev_fd, exec_list->command->argv[0]);
 		if (exec_list->command->prev_fd != -1)
 		{
-			dup2(exec_list->command->prev_fd, STDIN_FILENO);
+			if (dup2(exec_list->command->prev_fd, STDIN_FILENO) == -1)
+				return (print_err("dup2 for redirecting previous pipe read", NULL, NULL, NULL), 1);
 			close(exec_list->command->prev_fd);
 		}
 		if (exec_list->next && exec_list->next->is_command)
 		{
-			dup2(pipefds[1], STDOUT_FILENO);
-			close(pipefds[0]);
+			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+				return (print_err("dup2 for writing in pipe", NULL, NULL, NULL), 1);
 			close(pipefds[1]);
+			close(pipefds[0]);
 		}
+
 		// appliquer redrection ici
-		execvp(exec_list->command->argv[0], exec_list->command->argv);		
+
+		if (is_builtin(exec_list) == TRUE)
+		{
+			status = built_in_exec(exec_list, env);
+			exit(status);
+		}
+		else
+		{
+			path = set_command_path(exec_list, env);
+			if (!path)
+			{
+				print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+				exit(127);	
+			}
+			if (execve(path, exec_list->command->argv, NULL) == -1)
+				return (perror(exec_list->command->argv[0]), errno);		
+			return (status);
+		}
 	}
 	else
 	{
 		if (exec_list->command->prev_fd != -1)
 			close(exec_list->command->prev_fd);
-		if (exec_list->next && exec_list->next->is_command == TRUE)
+		if (exec_list->next/*  && exec_list->next->is_command == TRUE */)
 		{
 			exec_list->next->command->prev_fd = pipefds[0];
 			close(pipefds[1]);
-		}	
+			// close(pipefds[0]);
+		}
+		// printf("+++++cmd : %s, pid : %d\n", exec_list->command->argv[0], pid);
+		pid_add_back(pids, pid);
 	}
-	pid_add_back(pids, pid);
-	// printf("+++++pid : %d\n", pids->pid);
 	// close(pipefds[0]);
 	// close(pipefds[1]);
 	// waitpid(pid, NULL, 0);
@@ -399,20 +424,4 @@ int	exec_pipeline(t_exec *exec_list, t_pid_list **pids)
 // 	pid =
 // }
 
-int	exec_last(t_exec *exec_list, t_pid_list *pids, t_initialfds *fds)
-{
-	pid_t	pid;
 
-	pid = fork();
-	if (pid == -1)
-		return (1);
-	if (!pid)
-	{
-		if (dup2(fds->fd_out, STDOUT_FILENO) == -1)
-			return (1);
-		close(fds->fd_out);
-		execvp(exec_list->command->argv[0], exec_list->command->argv);		
-	}
-	pid_add_back(&pids, pid);
-	return (0);
-}

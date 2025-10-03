@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/03 11:33:10 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/03 15:48:15 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,6 @@ enum	e_kind
 
 //STRUCTS
 
-typedef struct s_initialfds
-{
-	int	fd_in;
-	int	fd_out;
-} t_initialfds;
-
 typedef struct s_token
 {
 	char				*str;
@@ -147,7 +141,7 @@ void	clean_token_list(t_token	**lexer);
 void	exec_cleaner(char **path_tab, char *path);
 void	cleaner(t_env **my_env, char **input, t_token **token_list);
 void	clean_exec_list(t_exec **exec_list);
-void cleaner(t_env **my_env, char **input, t_token **token_list);
+void	cleaner(t_env **my_env, char **input, t_token **token_list);
 
 
 //	debug.c
@@ -178,7 +172,7 @@ void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum
 void	lexer(t_token **lexer, char *input);
 
 // lister.c
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, t_initialfds *fds);
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 
 //	string_manip.c
 int		is_char_white_space(const char c);
@@ -216,8 +210,9 @@ void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_ki
 // exec
 int		exec_command(t_exec *exec_list, t_env **env);
 char	*get_next_line(int fd);
-int		exec_pipeline(t_exec *exec_list, t_pid_list **pids);
-int		exec_last(t_exec *exec_list, t_pid_list *pids, t_initialfds *fds);
+int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
+int		is_builtin(t_exec *exec_list);
+int	built_in_exec(t_exec *exec_list, t_env **env);
 
 // pids
 int		pid_wait_all(t_pid_list *list, int status);

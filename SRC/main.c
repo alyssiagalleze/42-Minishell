@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/02 19:04:47 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/03 15:47:43 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,9 @@ int	main(int ac, char **av, char **env)
 	t_token	*token_list_save; //find a way not to use it
 	t_env	*my_env;
 	int		status;
-	t_initialfds	*fds;
 
 	my_env = init_env_list(env);
 	status = 2;
-	fds = malloc(sizeof(t_initialfds));
-	fds->fd_in = dup(STDIN_FILENO);
-	fds->fd_out = dup(STDOUT_FILENO);
-	
     init_signals();
 	while (1)
 	{
@@ -52,7 +47,7 @@ int	main(int ac, char **av, char **env)
 		token_list_save = token_list;
 		if (parser(&token_list))
 		{
-			status = lister(&token_list, &my_env, &input, &token_list_save, fds);
+			status = lister(&token_list, &my_env, &input, &token_list_save);
 		}
 		// else
 		// {

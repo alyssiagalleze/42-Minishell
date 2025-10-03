@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/26 16:57:09 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/03 15:03:54 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ int	cd(char **args, t_env **env)
 	
 	if (args[2] != NULL)
 		return (print_err(PROMPT, ": cd:", " too many arguments", NULL), 1);
-	printf("--------------------coucou\n");
 	working_dir = getcwd(NULL, 0); //mkdir a; cd a; rm ../a
 	if (working_dir == NULL)
 		return (perror("getcwd"), 1);
@@ -53,7 +52,7 @@ int	cd(char **args, t_env **env)
 	working_dir = getcwd(NULL, 0);
 	if (working_dir == NULL)
 		return (free(working_dir), free(target), perror("getcwd"), 1);
-	printf("------------------ new dir : %s\n", working_dir);
+	// printf("------------------ new dir : %s\n", working_dir);
 	update_variable(env, "PWD", working_dir);
 	free(working_dir);
 	free(target);
