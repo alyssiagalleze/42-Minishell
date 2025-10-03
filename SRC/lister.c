@@ -3,25 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   lister.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 19:55:14 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/03 11:28:34 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "minishell.h"
 
-int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save)
+int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save, t_initialfds *fds)
 {
 	(void)env;
 	int 	temp_res;
 	pid_t	pid;
 	int		status;
 	t_token	*sublist_save;
+	t_pid_list *pids = NULL;
 
 	temp_res = TRUE;
-	
 	while (exec_list != NULL)
 	{
 		if (exec_list->is_subshell)
@@ -32,7 +32,7 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 			if (!pid)
 			{
 				sublist_save = exec_list->subshell->token_sublist;
-				status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save);
+				status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save, fds);
 				clean_token_list(&sublist_save);
 				clean_exec_list(&exec_list);
 				clean_env(env);
@@ -52,7 +52,16 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 		}
 		else if (exec_list->is_command)
 		{
-			temp_res = exec_command(exec_list, env);
+			status = exec_pipeline(exec_list, &pids);
+			if (!exec_list->next || exec_list->next->is_command == FALSE)
+			{
+				
+				printf("prout");
+				temp_res = pid_wait_all(pids, status);
+				clean_pid(&pids);
+			}
+
+
 			
 			// if (!temp_res)
 			// 	temp_res = FALSE;
@@ -152,6 +161,7 @@ void	lister_skip_list(t_token **token_list)
 
 void	exec_list_init_node(t_exec *exec)
 {
+	exec->pids = NULL;
 	exec->is_command = 0;
 	exec->is_subshell = 0;
 	exec->command = NULL;
@@ -288,6 +298,7 @@ void	exec_list_init_command(t_command *command)
 	int	i;
 	
 	i = 0;
+	command->prev_fd = -1;
 	while (i < ARG_MAX)
 	{
 		command->argv[i] = 0;
@@ -386,7 +397,7 @@ void	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue) //RAJOU
 } */
 
 // Attention a ne pas relancer quand j'interprete un subshell
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save)
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, t_initialfds *fds)
 {
 	int			status;
 	t_exec		*exec;
@@ -398,7 +409,7 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 		lister_simple(token_list, &exec, status);
 		if (exec)
 		{
-			status = temp_exec(exec, env, input, token_list_save); // TODO
+			status = temp_exec(exec, env, input, token_list_save, fds); // TODO
 			clean_exec_list(&exec); // TODO
 		}
 		/* else malloc problem*/

@@ -19,6 +19,7 @@ SRC=	SRC/main.c \
 		SRC/token_list.c \
 		SRC/exec_simple_command.c \
 		SRC/signals.c \
+		SRC/pid_list.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \

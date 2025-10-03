@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 19:49:50 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/03 11:33:10 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,12 @@ enum	e_kind
 
 //STRUCTS
 
+typedef struct s_initialfds
+{
+	int	fd_in;
+	int	fd_out;
+} t_initialfds;
+
 typedef struct s_token
 {
 	char				*str;
@@ -106,6 +112,7 @@ typedef struct s_command
 {
 	char 				*argv[ARG_MAX];
 	char				*redir[ARG_MAX];
+	int					prev_fd;
 	enum e_kind			redir_kind[ARG_MAX];
 } t_command;
 
@@ -114,10 +121,17 @@ typedef struct s_subshell
 	t_token		*token_sublist;
 } t_subshell;
 
+typedef struct s_pid_list
+{
+	pid_t pid;
+	struct s_pid_list *next;
+}   t_pid_list;
+
 typedef struct s_exec
 {
 	int					is_command;
 	int					is_subshell;
+	t_pid_list			*pids;
 	t_command			*command;
 	t_subshell			*subshell;
 	struct s_exec		*next;
@@ -164,7 +178,7 @@ void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum
 void	lexer(t_token **lexer, char *input);
 
 // lister.c
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, t_initialfds *fds);
 
 //	string_manip.c
 int		is_char_white_space(const char c);
@@ -200,7 +214,14 @@ t_token	*token_list_add_node(t_token **token_list_start);
 void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
 
 // exec
-int	exec_command(t_exec *exec_list, t_env **env);
+int		exec_command(t_exec *exec_list, t_env **env);
 char	*get_next_line(int fd);
+int		exec_pipeline(t_exec *exec_list, t_pid_list **pids);
+int		exec_last(t_exec *exec_list, t_pid_list *pids, t_initialfds *fds);
+
+// pids
+int		pid_wait_all(t_pid_list *list, int status);
+void 	clean_pid(t_pid_list **list);
+void	pid_add_back(t_pid_list **list, pid_t pid);
 
 #endif
