@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 18:11:38 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/06 15:41:58 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ typedef struct s_command
 {
 	char 				*argv[ARG_MAX];
 	char				*redir[ARG_MAX];
+	int					prev_fd;
 	enum e_kind			redir_kind[ARG_MAX];
 } t_command;
 
@@ -115,10 +116,17 @@ typedef struct s_subshell
 	t_token		*token_sublist;
 } t_subshell;
 
+typedef struct s_pid_list
+{
+	pid_t pid;
+	struct s_pid_list *next;
+}   t_pid_list;
+
 typedef struct s_exec
 {
 	int					is_command;
 	int					is_subshell;
+	t_pid_list			*pids;
 	t_command			*command;
 	t_subshell			*subshell;
 	struct s_exec		*next;
@@ -144,7 +152,8 @@ void	clean_env(t_env **env);
 void	clean_token_list(t_token	**lexer);
 void	exec_cleaner(char **path_tab, char *path);
 void	clean_exec_list(t_exec **exec_list);
-void 	cleaner(t_env **my_env, char **input, t_token **token_list);
+void	cleaner(t_env **my_env, char **input, t_token **token_list);
+
 
 //	debug.c
 void	debug_lexer_print_type(t_token *lexer_node);
@@ -167,8 +176,9 @@ int		unset_single(char *arg, t_env **env);
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
 // exec
-int		exec_command(t_exec *exec_list, t_env **env);
-char	*get_next_line(int fd);
+int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
+int		is_builtin(t_exec *exec_list);
+int		built_in_exec(t_exec *exec_list, t_env **env);
 
 // expand.c
 int		lister_expand_command(t_token *token_list, t_env *env);
@@ -205,6 +215,11 @@ char	*str_append_sq(char *from, char *app);
 // parser.c
 int		parser(t_token **lexer);
 int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind, int *line_has_cmd);
+
+// pids
+int		pid_wait_all(t_pid_list *list, int status);
+void 	clean_pid(t_pid_list **list);
+void	pid_add_back(t_pid_list **list, pid_t pid);
 
 // signals.c
 void sigint_handler(int sig, siginfo_t *info, void *context);

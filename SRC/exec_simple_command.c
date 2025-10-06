@@ -183,26 +183,26 @@
 // 	char	**path_tab;
 // 	char	*cmd_path;
 	
-// 	path_tab = get_paths(env);
-// 	if (!path_tab)
-// 		return (NULL);
-// 	cmd_path = NULL;
-// 	i = 0;
-// 	while (path_tab[i])
-// 	{
-// 		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
-// 		if (!access(cmd_path, F_OK | X_OK))
-// 			return (exec_cleaner(path_tab, NULL), cmd_path);
-// 		free(cmd_path);	
-// 		i++;
-// 	}
-// 	exec_cleaner(path_tab, NULL);
-// 	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
-// 	if (!access(cmd_path, F_OK | X_OK))
-// 		return (cmd_path);
-// 	free(cmd_path);
-// 	return (perror(exec_list->command->argv[0]), NULL);
-// }
+	path_tab = get_paths(env);
+	if (!path_tab)
+		return (NULL);
+	cmd_path = NULL;
+	i = 0;
+	while (path_tab[i])
+	{
+		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
+		if (!access(cmd_path, F_OK | X_OK))
+			return (exec_cleaner(path_tab, NULL), cmd_path);
+		free(cmd_path);	
+		i++;
+	}
+	exec_cleaner(path_tab, NULL);
+	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
+	if (!access(cmd_path, F_OK | X_OK))
+		return (cmd_path);
+	free(cmd_path);
+	return (NULL);
+}
 
 // int	is_builtin(t_exec *exec_list)
 // {
@@ -342,3 +342,86 @@
 // 	return (process_id);
 // }
 //  */
+
+
+int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env)
+{
+	int		pipefds[2];
+	pid_t	pid;
+	char	*path;
+	int		status;
+
+	status = 0;
+
+	if (exec_list->next/*  && exec_list->next->is_command */)
+	{
+		if (pipe(pipefds) == -1)
+			return (printf("wsh ???\n"), 1);
+	}
+	pid = fork();
+	if (pid == -1)
+	return (1);
+	if (!pid)
+	{
+		// printf("prev_fd : %d command : %s\n", exec_list->command->prev_fd, exec_list->command->argv[0]);
+		if (exec_list->command->prev_fd != -1)
+		{
+			if (dup2(exec_list->command->prev_fd, STDIN_FILENO) == -1)
+				return (print_err("dup2 for redirecting previous pipe read", NULL, NULL, NULL), 1);
+			close(exec_list->command->prev_fd);
+		}
+		if (exec_list->next && exec_list->next->is_command)
+		{
+			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+				return (print_err("dup2 for writing in pipe", NULL, NULL, NULL), 1);
+			close(pipefds[1]);
+			close(pipefds[0]);
+		}
+
+		// appliquer redrection ici
+
+		if (is_builtin(exec_list) == TRUE)
+		{
+			status = built_in_exec(exec_list, env);
+			exit(status);
+		}
+		else
+		{
+			path = set_command_path(exec_list, env);
+			if (!path)
+			{
+				print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+				exit(127);	
+			}
+			if (execve(path, exec_list->command->argv, NULL) == -1)
+				return (perror(exec_list->command->argv[0]), errno);		
+			return (status);
+		}
+	}
+	else
+	{
+		if (exec_list->command->prev_fd != -1)
+			close(exec_list->command->prev_fd);
+		if (exec_list->next/*  && exec_list->next->is_command == TRUE */)
+		{
+			exec_list->next->command->prev_fd = pipefds[0];
+			close(pipefds[1]);
+			// close(pipefds[0]);
+		}
+		// printf("+++++cmd : %s, pid : %d\n", exec_list->command->argv[0], pid);
+		pid_add_back(pids, pid);
+	}
+	// close(pipefds[0]);
+	// close(pipefds[1]);
+	// waitpid(pid, NULL, 0);
+	return (1);
+}
+
+// int	exec_last(t_exec *exec_list)
+// {
+// 	pid_t pid; 
+
+// 	pid =
+// }
+
+

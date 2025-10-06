@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 19:55:07 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/03 15:47:43 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,10 @@ int	main(int ac, char **av, char **env)
 		{
 			status = lister(&token_list, &my_env, &input, &token_list_save);
 		}
-		else
-		{
-			cleaner(NULL, &input, &token_list_save);
-		}
+		// else
+		// {
+		// 	cleaner(NULL, &input, &token_list_save);
+		// }
 		printf("+++exit status: %i\n", status);
 	}
 	cleaner(&my_env, &input, &token_list_save); // oblige ??

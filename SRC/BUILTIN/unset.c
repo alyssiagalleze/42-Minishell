@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:25:01 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/26 16:53:42 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/03 15:03:14 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ int	unset_single(char *arg, t_env **env)
 	{
 		if (str_cmp(current->var_name, arg, FALSE))
 		{
-			printf("-----------------var found \n");
 			if (prev)
 				prev->next = current->next;
 			else

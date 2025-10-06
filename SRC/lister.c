@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 20:11:32 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/06 15:37:15 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 	pid_t	pid;
 	int		status;
 	t_token	*sublist_save;
+	t_pid_list *pids = NULL;
 
 	temp_res = TRUE;
-	
 	while (exec_list != NULL)
 	{
 		if (exec_list->is_subshell)
@@ -53,19 +53,38 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 		}
 		else if (exec_list->is_command)
 		{
-			// temp_res = exec_command(exec_list, env);
+			if ((!exec_list->next || exec_list->next->is_command == FALSE)
+					&& is_builtin(exec_list) == TRUE)
+			{
+				// printf("vais je la ? \n");
+				temp_res = built_in_exec(exec_list, env);
+			}
+			else
+			{
+				// printf("+++++cmd : %s\n", exec_list->command->argv[0]);
+				status = exec_pipeline(exec_list, &pids, env);
+				if (!exec_list->next || exec_list->next->is_command == FALSE)
+				{
+					temp_res = pid_wait_all(pids, status);
+					// printf("status : %d, temp res : %d\n", status, temp_res);
+					clean_pid(&pids);
+				}
+			}
+
+
 			
-			if (!temp_res)
+			if (temp_res > 0)
 				temp_res = FALSE;
 			else
 				temp_res = TRUE;
-			printf("to exec -> ");
-			printf("%s -> is command : %d\n", exec_list->command->argv[0], exec_list->is_command);
-			if (str_cmp(exec_list->command->argv[0], "true", FALSE)
-			|| str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
-				temp_res = FALSE;
-			else
-				temp_res = TRUE;
+			// printf("to exec -> ");
+			// printf("%s -> is command : %d\n", exec_list->command->argv[0], exec_list->is_command);
+			// printf("redir is %s", exec_list->command->redir_in[0]);
+			// if (str_cmp(exec_list->command->argv[0], "true", FALSE)
+			// || str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
+			// 	temp_res = FALSE;
+			// else
+			// 	temp_res = TRUE;
 		}
 		else 
 		{
@@ -152,6 +171,7 @@ void	lister_skip_list(t_token **token_list)
 
 void	exec_list_init_node(t_exec *exec)
 {
+	exec->pids = NULL;
 	exec->is_command = 0;
 	exec->is_subshell = 0;
 	exec->command = NULL;
@@ -288,6 +308,7 @@ void	exec_list_init_command(t_command *command)
 	int	i;
 	
 	i = 0;
+	command->prev_fd = -1;
 	while (i < ARG_MAX)
 	{
 		command->argv[i] = 0;

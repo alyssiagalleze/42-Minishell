@@ -22,6 +22,7 @@ SRC=	SRC/main.c \
 		SRC/split.c \
 		SRC/string_manip.c \
 		SRC/token_list.c \
+		SRC/pid_list.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \
