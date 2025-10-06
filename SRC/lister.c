@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 19:55:14 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/04 20:11:32 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,19 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 		if (exec_list->is_subshell)
 		{
 			printf("to subshell -> ");
-			debug_lexer_print_subline(exec_list->subshell->token_sublist);
+			debug_lexer_print_line(exec_list->subshell->token_sublist);
 			pid = fork();
 			if (!pid)
 			{
 				sublist_save = exec_list->subshell->token_sublist;
 				status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save);
+				// clean_token_list(token_list_save);
 				clean_token_list(&sublist_save);
 				clean_exec_list(&exec_list);
 				clean_env(env);
 				clean_input(input);
 				rl_clear_history();
-				printf("end subshell");
+				printf("end subshell: ");
 				exit (status);
 			}
 			else if (pid)
@@ -52,20 +53,19 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 		}
 		else if (exec_list->is_command)
 		{
-			temp_res = exec_command(exec_list, env);
+			// temp_res = exec_command(exec_list, env);
 			
-			// if (!temp_res)
-			// 	temp_res = FALSE;
-			// else
-			// 	temp_res = TRUE;
-			// printf("to exec -> ");
-			// printf("%s -> is command : %d\n", exec_list->command->argv[0], exec_list->is_command);
-			// printf("redir is %s", exec_list->command->redir_in[0]);
-			// if (str_cmp(exec_list->command->argv[0], "true", FALSE)
-			// || str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
-			// 	temp_res = FALSE;
-			// else
-			// 	temp_res = TRUE;
+			if (!temp_res)
+				temp_res = FALSE;
+			else
+				temp_res = TRUE;
+			printf("to exec -> ");
+			printf("%s -> is command : %d\n", exec_list->command->argv[0], exec_list->is_command);
+			if (str_cmp(exec_list->command->argv[0], "true", FALSE)
+			|| str_cmp(exec_list->command->argv[0], "TRUE", FALSE))
+				temp_res = FALSE;
+			else
+				temp_res = TRUE;
 		}
 		else 
 		{
@@ -297,21 +297,9 @@ void	exec_list_init_command(t_command *command)
 	}
 }
 
-//iterer dans la list
-// /!\ attention a ne pas decaler le start
-void	lister_expand_command(t_token *token_list)
-{
-	(void)token_list;
-	// while (token_list
-	// 	&& (token_list->type == WORD || token_list->type == REDIR_OPERATOR))
-	// {
-		
-	// }
-}
-
 // Rajoute un t_subshell a exec_list
 // Fait avancer a liste jusqu'au prochaine operateur exclus
-void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list)
+void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env)
 {
 	t_exec	*new_exec;
 
@@ -326,7 +314,10 @@ void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list)
 		return ;
 	}
 	exec_list_init_command(new_exec->command);
-	lister_expand_command(*token_list);
+	if (!lister_expand_command(*token_list, env))
+		return (clean_exec_list(exec_list));
+	printf("token list after expand : ");
+	debug_lexer_print_line(*token_list);
 	lister_scan_command(token_list, new_exec->command);
 }
 
@@ -343,15 +334,15 @@ void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list)
 //
 // Je dois aussi recuperer le resutat de l'execution de la list
 // et faire les expansions a un moment
-void	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue) //RAJOUTER IS_SUBSHELL ??
+int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *env) 
 {
-	printf("lister_simple with : ");
+	printf("\nlister_simple with : ");
 	debug_lexer_print_line(*token_list);
 	// verifier si j'interprete ma liste
 	if (*token_list && !lister_is_valid(*token_list, lvalue)) // skip
 	{
 		lister_skip_list(token_list);
-		return ;
+		return (TRUE);
 	}
 	// skip prev operator
 	if ((*token_list)->kind == AND || (*token_list)->kind == OR)
@@ -364,10 +355,15 @@ void	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue) //RAJOU
 		if ((*token_list)->kind == BRACKET_O)
 			lister_create_exec_from_subshell(token_list, exec_list);
 		else
-			lister_create_exec_from_command(token_list, exec_list);	
-		if (exec_list == NULL) // check malloc fail
-			return ;
+			lister_create_exec_from_command(token_list, exec_list, env);	
+		if (*exec_list == NULL) // check malloc fail
+		{
+			while (*token_list && ((*token_list)->kind != AND && (*token_list)->kind != OR))
+				*token_list = (*token_list)->next;
+			return (FALSE);
+		}
 	}
+	return (TRUE);
 }
 
 /* void	print_exec_list(t_exec **exec_list)
@@ -390,27 +386,31 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 {
 	int			status;
 	t_exec		*exec;
+	int			abort;
 
 	status = 0;
 	exec = NULL;
+	abort = FALSE;
 	while (*token_list)
 	{
-		lister_simple(token_list, &exec, status);
+		if (!lister_simple(token_list, &exec, status, *env))
+		{
+			status = 2;
+		}
 		if (exec)
 		{
-			status = temp_exec(exec, env, input, token_list_save); // TODO
-			clean_exec_list(&exec); // TODO
+			status = temp_exec(exec, env, input, token_list_save); 
+			clean_exec_list(&exec); 
 		}
-		/* else malloc problem*/
 	}
 	cleaner(NULL, input, token_list_save);
 	return (status);
 }
 
-// avancer expansion de variable
+// faire plan des mallocs
 
-//nettoyer code
+// nettoyer / ranger code
 
-//heredoc meme si skip
+//heredoc meme si skip ?
 
 //limiter a arg max

@@ -10,15 +10,18 @@ SRC=	SRC/main.c \
 		SRC/debug.c \
 		SRC/env_list.c \
 		SRC/error.c	\
+		SRC/exec_simple_command.c \
+		SRC/expand.c \
+		SRC/expand_asterisk.c \
+		SRC/expand_dollar.c \
 		SRC/lexer.c \
 		SRC/lister.c \
 		SRC/parser.c \
 		SRC/parser_bis.c \
+		SRC/signals.c \
 		SRC/split.c \
 		SRC/string_manip.c \
 		SRC/token_list.c \
-		SRC/exec_simple_command.c \
-		SRC/signals.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \

@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 17:35:02 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/04 19:45:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_char_white_space(const char c)
+int	is_white_space(const char c)
 {
 	return ((c >= 9 && c <= 13) || c == 32);
 }
@@ -50,11 +50,12 @@ int	is_char_in_string(const char c, const char *str, int accept_null)
 
 int	is_str_empty_or_null(const char *str, int status)
 {
-	if (str == NULL)
-		my_exit(status, NULL, NULL, NULL);
+	(void)status;
+	// if (str == NULL)
+	// 	my_exit(status, NULL, NULL, NULL); // TODO : ????
 	while (str && *str)
 	{
-		if (!is_char_white_space(*str))
+		if (!is_white_space(*str))
 			return (FALSE);
 		str ++;
 	}
@@ -177,7 +178,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	if (!s1 || !s2)
+	if (!s1 || !s2) //TODO : FALSE, and malloc can break
 		s1 = ft_strdup("");
 	len = ft_strlen(s1) + ft_strlen(s2);
 	str = malloc((len + 1) * sizeof(char));
@@ -190,10 +191,41 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	while (s2[j])
 	{
-		str[i] = s2[j];
-		i++;
+		str[i + j] = s2[j];
 		j++;
 	}
-	str[i] = '\0';
+	str[i + j] = '\0';
 	return (str);
+}
+
+char	*str_append_sq(char *from, char *app)
+{
+	char	*new_str;
+	int		i;
+	int		j;
+
+	if (app == NULL)
+		return (from);
+	new_str = malloc(sizeof(char) * (ft_strlen(from) + ft_strlen(app) + 4));
+	if (new_str == NULL)
+		return (free(from), free(app), NULL);
+	i = 0;
+	while (from && from[i])
+	{
+		new_str[i] = from[i];
+		i ++;
+	}
+	if (from)
+		new_str[i++] = ' ';
+	new_str[i++] = '\'';
+	j = 0;
+	while (app[j])
+	{
+		new_str[i + j] = app[j];
+		j ++;
+	}
+	new_str[i + j++] = '\'';
+	new_str[i + j++] = '\0';
+	free(from);
+	return (new_str);
 }

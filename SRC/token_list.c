@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:54:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 16:43:46 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/04 14:41:04 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	token_list_empty_node(t_token *token)
 	token->type = NONE;
 	token->kind = UNKNOWN;
 	token->next = NULL;
+	token->wild_expanded = FALSE;
 }
 
 t_token	*token_list_add_node(t_token **token_list_start)

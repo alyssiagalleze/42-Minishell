@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/01 18:12:20 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/03 14:27:38 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void	clean_exec_list(t_exec **exec_list)
 			}
 			free((*exec_list)->command);
 		}
-		else
+		else if ((*exec_list)->is_subshell)
 		{
 			if ((*exec_list)->subshell->token_sublist)
 			{
@@ -106,10 +106,10 @@ void	clean_exec_list(t_exec **exec_list)
 
 void cleaner(t_env **my_env, char **input, t_token **token_list)
 {
-	if (my_env)
+	if (my_env && *my_env)
 		clean_env(my_env);
-	if (token_list)
+	if (token_list && *token_list)
 		clean_token_list(token_list);
-	if (input)
+	if (input && *input)
 		clean_input(input);
 }

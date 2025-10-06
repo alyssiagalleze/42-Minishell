@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:02:49 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/22 16:37:51 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/04 20:12:21 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ void	lexer_create_token_from_input(
 		*input += len;
 }
 
+// TODO : limit to arg max
 void	lexer(t_token **token_list, char *input)
 {
 	int		len;
@@ -161,7 +162,3 @@ void	lexer(t_token **token_list, char *input)
 			input ++;
 	}
 }
-
-//TODO:
-// -> reflechir forme a envoyer pour commandes
-// -> bah le faire duh !!
