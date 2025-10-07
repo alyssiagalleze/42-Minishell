@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 15:40:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/01 16:43:44 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/06 17:15:25 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ char	**ft_add_words(char const *str, char c, char **tab)
 	while (j < word_count)
 	{
 		word_len = 0;
-		while (str[i] == c)
+		if (str[i] == c)
 			i++;
 		while (str[i] != c && str[i])
 		{

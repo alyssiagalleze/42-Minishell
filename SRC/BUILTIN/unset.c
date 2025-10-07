@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:25:01 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/03 15:03:14 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/07 15:59:30 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,12 @@ int	unset_single(char *arg, t_env **env)
 			free(current->var_name);
 			free(current->var_value);
 			free(current);
-			break;
+			return (0);
 		}
 		prev = current;
 		current = current->next;
 	}
-	return (0);
+	return (1);
 }
 
 int	unset(char **args, t_env **env)

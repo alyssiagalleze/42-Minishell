@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 15:22:39 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/03 14:05:21 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/07 11:39:15 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,14 @@ int	pid_wait_all(t_pid_list *list, int status)
 	int	exit_status;
 	
 	exit_status = 0;
-	if (WIFEXITED(status))
-		exit_status = WEXITSTATUS(status);
-	else
-		exit_status = status;
 	while (list)
 	{
 		waitpid(list->pid, &status, 0);
 		list = list->next;
 	}
-
+	if (WIFEXITED(status))
+		exit_status = WEXITSTATUS(status);
+	else
+		exit_status = status;
 	return (exit_status);
 }

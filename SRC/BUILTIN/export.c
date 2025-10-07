@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/17 19:03:23 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 15:03:14 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,10 @@ int	export(char **args, t_env **env)
 	char	*sep;
 	t_env	*new_node;
 	
-	i = 0;
+	i = 1;
 
-	if (!args || args[i] == NULL)
+	printf("coucou\n");
+	if (/* !args ||  */args[i] == NULL)
 	{
 		print_exported(env);
 		return (0);
@@ -95,6 +96,11 @@ int	export(char **args, t_env **env)
 			{
 				errno = 1;
 				return (1);
+			}
+			if (var_exists(env, args[i]))
+			{
+				printf("var : %s exists\n", args[i]);
+				unset_single(args[i], env);
 			}
 			new_node = env_new_node(args[i], sep + 1, FALSE);
 			// free(sep);

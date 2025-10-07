@@ -1,16 +1,16 @@
-// /* ************************************************************************** */
-// /*                                                                            */
-// /*                                                        :::      ::::::::   */
-// /*   exec_simple_command.c                              :+:      :+:    :+:   */
-// /*                                                    +:+ +:+         +:+     */
-// /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
-// /*                                                +#+#+#+#+#+   +#+           */
-// /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-// /*   Updated: 2025/10/01 16:54:59 by agalleze         ###   ########.fr       */
-// /*                                                                            */
-// /* ************************************************************************** */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_simple_command.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/07 15:22:55 by agalleze         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// #include "minishell.h"
+#include "minishell.h"
 
 // int	ft_strncmp(const char *s1, const char *s2, size_t n)
 // {
@@ -140,48 +140,60 @@
 // 	return (0);
 // }
 
-// char	**get_paths(t_env **env)
-// {
-// 	t_env	*current;
-// 	char	**path_tab;
+char	**get_paths(char **env_tab)
+{
+	// t_env	*current;
+	char	**path_tab;
+	int		i;
 	
-// 	current = *env;
-// 	path_tab = NULL;
-// 	while (current)
-// 	{
-// 		if (str_ncmp(current->var_name, "PATH", 3, FALSE))
-// 			path_tab = ft_split(current->var_value, ':');
-// 		current = current->next;
-// 	}
-// 	if (!path_tab)
-// 		return (NULL);
-// 	return (path_tab);
-// }
+	i = 0;
+	while (env_tab[i])
+	{
+		if (str_ncmp(env_tab[i], "PATH", 3, FALSE))
+		{
+			path_tab = ft_split(env_tab[i], ':');
+			if (!path_tab)
+				return (NULL);
+		}
+		i++;
+	}
+	// current = *env;
+	// path_tab = NULL;
+	// while (current)
+	// {
+	// 	if (str_ncmp(current->var_name, "PATH", 3, FALSE))
+	// 		path_tab = ft_split(current->var_value, ':');
+	// 	current = current->next;
+	// }
+	// if (!path_tab)
+	// 	return (NULL);
+	return (path_tab);
+}
 
-// char	*append_exec_file(char *cmd_name, char *path)
-// {
-// 	char	*tmp;
-// 	char	*cmd_path;
+char	*append_exec_file(char *cmd_name, char *path)
+{
+	char	*tmp;
+	char	*cmd_path;
 	
-// 	tmp = NULL;
-// 	tmp = ft_strjoin(path, "/");
-// 	if (!tmp)
-// 		return (NULL);
-// 	cmd_path = ft_strjoin(tmp, cmd_name);
-// 	if (!cmd_path)
-// 	{
-// 		free(tmp);
-// 		return (NULL);
-// 	}
-// 	free(tmp);
-// 	return (cmd_path);
-// }
+	tmp = NULL;
+	tmp = ft_strjoin(path, "/");
+	if (!tmp)
+		return (NULL);
+	cmd_path = ft_strjoin(tmp, cmd_name);
+	if (!cmd_path)
+	{
+		free(tmp);
+		return (NULL);
+	}
+	free(tmp);
+	return (cmd_path);
+}
 
-// char	*set_command_path(t_exec *exec_list, t_env **env)
-// {
-// 	int		i;
-// 	char	**path_tab;
-// 	char	*cmd_path;
+char	*set_command_path(t_exec *exec_list, char **env)
+{
+	int		i;
+	char	**path_tab;
+	char	*cmd_path;
 	
 	path_tab = get_paths(env);
 	if (!path_tab)
@@ -204,45 +216,45 @@
 	return (NULL);
 }
 
-// int	is_builtin(t_exec *exec_list)
-// {
-// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
-// 		return (TRUE);
-// 	else
-// 		return (FALSE);
-// }
+int	is_builtin(t_exec *exec_list)
+{
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
+		return (TRUE);
+	else
+		return (FALSE);
+}
 
-// int	built_in_exec(t_exec *exec_list, t_env **env)
-// {
-// 	int	exit_status;
+int	built_in_exec(t_exec *exec_list, t_env **env)
+{
+	int	exit_status;
 	
-// 	exit_status = 0;
-// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
-// 		exit_status = echo(exec_list->command->argv);
-// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-// 		exit_status = cd(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-// 		exit_status = pwd();
-// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-// 		exit_status = export(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-// 		exit_status = unset(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-// 		exit_status = print_env(env);
-// 	return (exit_status);
-// }
+	exit_status = 0;
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
+		exit_status = echo(exec_list->command->argv);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		exit_status = cd(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		exit_status = pwd();
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		exit_status = export(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		exit_status = unset(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		exit_status = print_env(env);
+	return (exit_status);
+}
 
 
 // int	fork_exec(t_exec *exec_list, t_env **env)
@@ -344,78 +356,97 @@
 //  */
 
 
-int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env)
-{
-	int		pipefds[2];
-	pid_t	pid;
-	char	*path;
-	int		status;
+// int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
+// {
+// 	int		pipefds[2];
+// 	pid_t	pid;
+// 	char	*path;
+// 	int		status;
 
-	status = 0;
+// 	status = 0;
+// 	exec_list->command->prev_fd = *prev_fd;
+	
+// 	if (exec_list->next/*  && exec_list->next->is_command */)
+// 	{
+// 		// printf("cmd : %s je viens ici ?\n", exec_list->command->argv[0]);
+// 		if (pipe(pipefds) == -1)
+// 			return (printf("wsh ???\n"), 1);
+// 	}
+// 	if (!is_builtin(exec_list))
+// 	{
+// 		path = set_command_path(exec_list, env);
+// 		if (!path)
+// 		{
+// 			print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+// 			return (127);	
+// 		}
+// 	}
+// 	pid = fork();
+// 	if (pid == -1)
+// 	return (1);
+// 	if (!pid)
+// 	{
+// 		// printf("pipe read : %d\n\n", pipefds[0]);
+// 		printf("cmd : %s, is subshell :%d\n", exec_list->command->argv[0], exec_list->is_command);
+// 			printf("redirected to %d\n", *prev_fd);
+// 		// printf("prev_fd : %d command : %s\n", exec_list->command->prev_fd, exec_list->command->argv[0]);
+// 		if (*prev_fd != -1)
+// 		{
+// 			if (dup2(*prev_fd, STDIN_FILENO) == -1)
+// 				return (print_err("dup2 for redirecting previous pipe read", NULL, NULL, NULL), 1);
+// 			close(exec_list->command->prev_fd);
+// 		}
+// 		if (exec_list->next/*  && exec_list->next->is_command */)
+// 		{
+// 			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+// 				return (print_err("dup2 for writing in pipe", NULL, NULL, NULL), 1);
+// 			// printf("redirected to pipe write \n");
+// 			close(pipefds[1]);
+// 			close(pipefds[0]);
+// 		}
 
-	if (exec_list->next/*  && exec_list->next->is_command */)
-	{
-		if (pipe(pipefds) == -1)
-			return (printf("wsh ???\n"), 1);
-	}
-	pid = fork();
-	if (pid == -1)
-	return (1);
-	if (!pid)
-	{
-		// printf("prev_fd : %d command : %s\n", exec_list->command->prev_fd, exec_list->command->argv[0]);
-		if (exec_list->command->prev_fd != -1)
-		{
-			if (dup2(exec_list->command->prev_fd, STDIN_FILENO) == -1)
-				return (print_err("dup2 for redirecting previous pipe read", NULL, NULL, NULL), 1);
-			close(exec_list->command->prev_fd);
-		}
-		if (exec_list->next && exec_list->next->is_command)
-		{
-			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-				return (print_err("dup2 for writing in pipe", NULL, NULL, NULL), 1);
-			close(pipefds[1]);
-			close(pipefds[0]);
-		}
+// 		// appliquer redrection ici
+// 		if (exec_list->is_subshell == TRUE)
+// 			exit(status);
+// 		if (is_builtin(exec_list) == TRUE)
+// 		{
+// 			status = built_in_exec(exec_list, env);
+// 			exit(status);
+// 		}
+// 		else
+// 			if (execve(path, exec_list->command->argv, NULL) == -1)
+// 				return (perror(exec_list->command->argv[0]), errno);		
+// 			else
+// 				return (status);
+// 	}
+// 	else
+// 	{
+// 		if (*prev_fd != -1)
+// 			close(*prev_fd);
+// 		if (exec_list->next/*  && exec_list->next->is_command == TRUE */)
+// 		{
+// 			printf(" --------------cmd : %s, je viens icci? \n", exec_list->command->argv[0]);
+// 			// exec_list->next->command->prev_fd = pipefds[0];
+// 			close(pipefds[1]);
+// 			*prev_fd = pipefds[0];
+// 		}
+// 		else 
+// 		{
+			
+// 			close(pipefds[0]);
+// 			close(pipefds[1]);
+// 			*prev_fd = -1;
+// 		}
+// 		pid_add_back(pids, pid);
 
-		// appliquer redrection ici
-
-		if (is_builtin(exec_list) == TRUE)
-		{
-			status = built_in_exec(exec_list, env);
-			exit(status);
-		}
-		else
-		{
-			path = set_command_path(exec_list, env);
-			if (!path)
-			{
-				print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
-				exit(127);	
-			}
-			if (execve(path, exec_list->command->argv, NULL) == -1)
-				return (perror(exec_list->command->argv[0]), errno);		
-			return (status);
-		}
-	}
-	else
-	{
-		if (exec_list->command->prev_fd != -1)
-			close(exec_list->command->prev_fd);
-		if (exec_list->next/*  && exec_list->next->is_command == TRUE */)
-		{
-			exec_list->next->command->prev_fd = pipefds[0];
-			close(pipefds[1]);
-			// close(pipefds[0]);
-		}
-		// printf("+++++cmd : %s, pid : %d\n", exec_list->command->argv[0], pid);
-		pid_add_back(pids, pid);
-	}
-	// close(pipefds[0]);
-	// close(pipefds[1]);
-	// waitpid(pid, NULL, 0);
-	return (1);
-}
+// 		// printf("+++++cmd : %s, pid : %d\n", exec_list->command->argv[0], pid);
+// 	}
+// 	// printf("prev fd : %d, cmd : %s\n", *prev_fd, exec_list->command->argv[0]);
+// 	// close(pipefds[0]);
+// 	// close(pipefds[1]);
+// 	// waitpid(pid, NULL, 0);
+// 	return (1);
+// }
 
 // int	exec_last(t_exec *exec_list)
 // {
@@ -424,4 +455,146 @@ int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env)
 // 	pid =
 // }
 
+char	*build_env_variable(t_env *node)
+{
+	char	*var;
+	int		len;
+	int		i;
+	int		j;
+	
+	len = ft_strlen(node->var_name) + ft_strlen(node->var_value) + 2;
+	var = malloc(len);
+	if (!var)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (i < len && node->var_name[j])
+		var[i++] = node->var_name[j++];
+	var[i] = '=';
+	i++;
+	j = 0;
+	while (i < len && node->var_value[j])
+		var[i++] = node->var_value[j++];
+	var[i] = '\0';
+	return (var);
+}
 
+char	**transfer_env(t_env **env)
+{
+	t_env	*current;
+	char	**my_env;
+	int		lst_len;
+	int		i;
+	
+	lst_len = ft_lstsize(*env);
+	i = 0;
+	my_env = malloc((lst_len + 1)* (sizeof(char *)));
+	if (!my_env)
+		return (NULL);
+	current = *env;
+	while (current && i < lst_len)
+	{
+		my_env[i] = build_env_variable(current);
+		if (!my_env[i])
+			return (NULL);
+		current = current->next;
+		i++;
+	}
+	my_env[i] = NULL;
+	return (my_env);
+}
+
+int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
+{
+	int pipefds[2] = {-1, -1};
+	pid_t pid;
+	char *path;
+	int status = 0;
+	char	**my_env;
+	
+	exec_list->command->prev_fd = *prev_fd;
+	my_env = transfer_env(env);
+	if (!my_env)
+		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
+	if (exec_list->next)
+	{
+		if (pipe(pipefds) == -1)
+			return (perror("pipe"), 1);
+	}
+
+	if (!is_builtin(exec_list))
+	{
+		path = set_command_path(exec_list, my_env);
+		if (!path)
+		{
+			print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+			if (pipefds[0] != -1) close(pipefds[0]);
+			if (pipefds[1] != -1) close(pipefds[1]);
+			return (127);
+		}
+	}
+
+	pid = fork();
+	if (pid == -1)
+	{
+		if (pipefds[0] != -1) close(pipefds[0]);
+		if (pipefds[1] != -1) close(pipefds[1]);
+		return (perror("fork"), 1);
+	}
+
+	if (pid == 0)
+	{
+		if (*prev_fd != -1)
+		{
+			if (dup2(*prev_fd, STDIN_FILENO) == -1)
+				exit(1);
+			close(*prev_fd);
+		}
+
+		if (exec_list->next)
+		{
+			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+				exit(1);
+			close(pipefds[1]);
+			close(pipefds[0]);
+		}
+
+		if (exec_list->is_subshell == TRUE)
+			exit(0);
+
+		if (is_builtin(exec_list))
+		{
+			status = built_in_exec(exec_list, env);
+			exit(status);
+		}
+		else
+		{
+			status = execve(path, exec_list->command->argv, my_env);
+			perror(exec_list->command->argv[0]);
+			exit(errno);
+		}
+	}
+	
+	pid_add_back(pids, pid);
+
+	if (*prev_fd != -1)
+	{
+		close(*prev_fd);
+		*prev_fd = -1;
+	}
+
+	if (exec_list->next)
+	{
+		if (pipefds[1] != -1)
+			close(pipefds[1]);
+		*prev_fd = pipefds[0];
+	}
+	else
+	{
+		if (pipefds[0] != -1) close(pipefds[0]);
+		if (pipefds[1] != -1) close(pipefds[1]);
+		*prev_fd = -1;
+	}
+
+	return (0);
+}

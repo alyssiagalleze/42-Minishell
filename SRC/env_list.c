@@ -81,15 +81,32 @@ int	update_variable(t_env **env, char *var, char *value)
 char	*get_var_value(t_env **env, char *var_name)
 {
 	t_env	*current;
-
+	char	*var_value;
 	current = *env;
 	while (current)
 	{
 		if (str_cmp(current->var_name, var_name, FALSE))
-			return (strdup(current->var_value));
+		{
+			var_value = ft_strdup(current->var_value);
+			if (!var_value)
+				return (print_err("malloc", ": get ", current->var_name, " : value."), NULL);
+			return (var_value);
+		}
 		current = current->next;
 	}
 	return (NULL);
 }
 
 
+int	ft_lstsize(t_env *lst)
+{
+	int	i;
+
+	i = 0;
+	while (lst)
+	{
+		lst = lst -> next;
+		i++;
+	}
+	return (i);
+}

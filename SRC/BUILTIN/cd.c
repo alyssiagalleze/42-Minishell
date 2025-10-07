@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/03 15:03:54 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/07 16:51:57 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,45 +16,73 @@
 
 //TODO : returns are not malloc safe 
 
-char	*find_target(char *path, t_env **env)
+char	*find_target(char *path, t_env **env, int *malloc_fail)
 {
 	char	*target;
 
 	target = NULL;
 	if (!path || path == NULL || str_cmp(path, "~", FALSE))
-		return (get_var_value(env, "HOME"));
+	{
+		target = get_var_value(env, "HOME");
+		if (!target || target[0] == 0)
+			return (printf("var value : %s\n", target), 
+			print_err(PROMPT, ": cd: ", "HOME not set\n", NULL), NULL);
+		else
+			return (target);
+	}
 	if (str_cmp(path, "-", FALSE))
-		return (get_var_value(env, "OLDPWD"));
-	target = strdup(path);
+	{
+		target = get_var_value(env, "OLDPWD");
+		if (target == NULL)
+			return (print_err(PROMPT, ": cd: ", "OLDPWD not set\n", NULL), 
+			NULL);
+		else
+			return (target);
+	}
+	target = ft_strdup(path);
+	if (!target)
+		return (*malloc_fail = 1, NULL);
 	return (target);
+}
+
+int	move_folders(char *target, t_env **env)
+{
+	char	*working_dir;
+
+	working_dir = getcwd(NULL, 0);
+	if (!working_dir)
+		return (perror("get working dir"), 1);
+	if (update_variable(env, "OLDPWD", working_dir) != 0)
+		return (free(working_dir), free(target), print_err(PROMPT
+				, ": cd: could not update OLDPWD", NULL, NULL), 0);
+	if (chdir(target) == -1)
+		return (free(working_dir), print_err(PROMPT, ": cd: ",
+				NULL, NULL), perror(target), free(target), 0);
+	free(working_dir);
+	free(target);
+	working_dir = getcwd(NULL, 0);
+	if (!working_dir)
+		return (perror("get working dir"), 1);
+	if (update_variable(env, "PWD", working_dir) != 0)
+		return (free(working_dir), free(target), print_err(PROMPT
+				, ": cd: could not update PWD", NULL, NULL), 0);
+	return (1);
 }
 
 int	cd(char **args, t_env **env)
 {
 	char	*target = NULL;
-	char	*working_dir;
-	
+	int		malloc_fail;
+
+	malloc_fail = 0;	
 	if (args[2] != NULL)
-		return (print_err(PROMPT, ": cd:", " too many arguments", NULL), 1);
-	working_dir = getcwd(NULL, 0); //mkdir a; cd a; rm ../a
-	if (working_dir == NULL)
-		return (perror("getcwd"), 1);
-	target = find_target(args[1], env);
-	if (!target)
-	{
-		free(working_dir);
-		return (2); // TODO : what is return if malloc fail ??
-	}
-	update_variable(env, "OLDPWD", working_dir);
-	if (chdir(target) == -1)
-		return (free(working_dir), perror(target), free(target), 1);
-	free(working_dir);
-	working_dir = getcwd(NULL, 0);
-	if (working_dir == NULL)
-		return (free(working_dir), free(target), perror("getcwd"), 1);
-	// printf("------------------ new dir : %s\n", working_dir);
-	update_variable(env, "PWD", working_dir);
-	free(working_dir);
-	free(target);
+		return (print_err(PROMPT, ": cd:", " too many arguments\n", NULL), 1);
+	target = find_target(args[1], env, &malloc_fail);
+	if (!target && malloc_fail)
+		return (2);
+	else if (target == NULL)
+		return (1);
+	if (!move_folders(target, env))
+		return (1);
 	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/06 15:41:58 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 15:09:06 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,12 +171,15 @@ void	env_add_node(t_env **top, t_env *node);
 t_env   *env_new_node(const char *var_name, const char *var_value, int exported);
 int		var_exists(t_env **env, char *name);
 int		unset_single(char *arg, t_env **env);
+char	**transfer_env(t_env **env);
+int	ft_lstsize(t_env *lst);
 
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
 // exec
-int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
+int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
+// int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
 int		is_builtin(t_exec *exec_list);
 int		built_in_exec(t_exec *exec_list, t_env **env);
 
@@ -196,7 +199,8 @@ void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum
 void	lexer(t_token **lexer, char *input);
 
 // lister.c
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd);
+// int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 
 //	string_manip.c
 int		is_white_space(const char c);

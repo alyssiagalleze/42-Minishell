@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand_dollar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 20:10:15 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 15:04:08 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ void	expand_dollar(t_token *token_list, t_env *env, int index)
 	}
 	if (is_str_empty_or_null(new_str, 0) && token_list->type == WORD_FILE)
 	{
+		printf("je suis la \n");
 		// TODO : if $var = "" -> ambiguous redirect
 	}
 	free(var_name);

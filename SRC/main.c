@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/03 15:47:43 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/07 15:12:14 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ void	get_input(char **input, int status)
 		add_history(*input);
 }
 
+// void	test_print_env(char **env)
+// {
+// 	int i = 0;
+	
+// 	while (env[i])
+// 		printf("%s\n", env[i++]);
+// }
+
 int	main(int ac, char **av, char **env)
 {
 	char	*input;
@@ -30,6 +38,7 @@ int	main(int ac, char **av, char **env)
 	t_token	*token_list_save; //find a way not to use it
 	t_env	*my_env;
 	int		status;
+	int prev_fd = -1;
 
 	my_env = init_env_list(env);
 	status = 2;
@@ -47,12 +56,12 @@ int	main(int ac, char **av, char **env)
 		token_list_save = token_list;
 		if (parser(&token_list))
 		{
-			status = lister(&token_list, &my_env, &input, &token_list_save);
+			status = lister(&token_list, &my_env, &input, &token_list_save, &prev_fd);
 		}
-		// else
-		// {
-		// 	cleaner(NULL, &input, &token_list_save);
-		// }
+		else
+		{
+			cleaner(NULL, &input, &token_list_save);
+		}
 		printf("+++exit status: %i\n", status);
 	}
 	cleaner(&my_env, &input, &token_list_save); // oblige ??
