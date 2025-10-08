@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 15:09:06 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/08 12:45:14 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,9 +225,9 @@ int		pid_wait_all(t_pid_list *list, int status);
 void 	clean_pid(t_pid_list **list);
 void	pid_add_back(t_pid_list **list, pid_t pid);
 
-// signals.c
-void sigint_handler(int sig, siginfo_t *info, void *context);
-void init_signals(void);
+// // signals.c
+// void sigint_handler(int sig, siginfo_t *info, void *context);
+// void init_signals(void);
 
 
 // token_list.c

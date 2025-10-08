@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/07 15:22:55 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/08 13:52:21 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -504,97 +504,225 @@ char	**transfer_env(t_env **env)
 	return (my_env);
 }
 
+// int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
+// {
+// 	int pipefds[2] = {-1, -1};
+// 	pid_t pid;
+// 	char *path;
+// 	int status = 0;
+// 	char	**my_env;
+	
+// 	if (!exec_list || exec_list->is_subshell || !exec_list->is_command || !exec_list->command)
+//         return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
+// 	exec_list->command->prev_fd = *prev_fd;
+// 	my_env = transfer_env(env);
+// 	if (!my_env)
+// 		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
+// 	if (exec_list->next)
+// 	{
+// 		if (pipe(pipefds) == -1)
+// 			return (perror("pipe"), 1);
+// 	}
+
+// 	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
+// 	{
+// 		path = set_command_path(exec_list, my_env);
+// 		if (!path)
+// 		{
+// 			print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+// 			if (pipefds[0] != -1) close(pipefds[0]);
+// 			if (pipefds[1] != -1) close(pipefds[1]);
+// 			return (127);
+// 		}
+// 	}
+
+// 	pid = fork();
+// 	if (pid == -1)
+// 	{
+// 		if (pipefds[0] != -1) close(pipefds[0]);
+// 		if (pipefds[1] != -1) close(pipefds[1]);
+// 		return (perror("fork"), 1);
+// 	}
+
+// 	if (pid == 0)
+// 	{
+// 		if (*prev_fd != -1)
+// 		{
+// 			if (dup2(*prev_fd, STDIN_FILENO) == -1)
+// 				exit(1);
+// 			close(*prev_fd);
+// 		}
+
+// 		if (exec_list->next)
+// 		{
+// 			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+// 				exit(1);
+// 			close(pipefds[1]);
+// 			close(pipefds[0]);
+// 		}
+
+// 		// if (exec_list->is_subshell == TRUE)
+// 		// 	exit(0);
+
+// 		if (is_builtin(exec_list))
+// 		{
+// 			status = built_in_exec(exec_list, env);
+// 			exit(status);
+// 		}
+// 		else
+// 		{
+// 			status = execve(path, exec_list->command->argv, my_env);
+// 			perror(exec_list->command->argv[0]);
+// 			exit(85);
+// 		}
+// 	}
+	
+// 	pid_add_back(pids, pid);
+
+// 	if (*prev_fd != -1)
+// 	{
+// 		close(*prev_fd);
+// 		// *prev_fd = -1;
+// 	}
+
+// 	if (exec_list->next)
+// 	{
+// 		if (pipefds[1] != -1)
+// 			close(pipefds[1]);
+// 		*prev_fd = pipefds[0];
+// 	}
+// 	else
+// 	{
+// 		if (pipefds[0] != -1) close(pipefds[0]);
+// 		if (pipefds[1] != -1) close(pipefds[1]);
+// 		// *prev_fd = -1;
+// 	}
+
+// 	return (0);
+// }
+
+static int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
+{
+    if (!exec_list || !env)
+        return (print_err(PROMPT, "internal: prepare_env_and_pipe bad args\n", NULL, NULL), 1);
+    *my_env = transfer_env(env);
+    if (!*my_env)
+        return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
+    if (exec_list->next)
+    {
+        if (pipe(pipefds) == -1)
+            return (perror("pipe"), 1);
+    }
+    return (0);
+}
+
+static char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
+{
+    char *path;
+
+    path = NULL;
+    if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
+    {
+        path = set_command_path(exec_list, my_env);
+        if (!path)
+        {
+            print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+            if (pipefds[0] != -1) close(pipefds[0]);
+            if (pipefds[1] != -1) close(pipefds[1]);
+            return (NULL);
+        }
+    }
+    return (path);
+}
+
+static void free_env_array(char **envp)
+{
+    int i;
+
+    i = 0;
+    if (!envp)
+        return ;
+    while (envp[i])
+        free(envp[i++]);
+    free(envp);
+}
+
+static void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2])
+{
+    int		prev;
+    int		status;
+    char	**my_env;
+
+    prev = exec_list->command->prev_fd;
+    if (prev != -1)
+    {
+        if (dup2(prev, STDIN_FILENO) == -1)
+            _exit(1);
+        close(prev);
+    }
+    if (exec_list->next)
+    {
+        if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+            _exit(1);
+        close(pipefds[1]);
+        close(pipefds[0]);
+    }
+    if (is_builtin(exec_list))
+    {
+        status = built_in_exec(exec_list, env);
+        _exit(status);
+    }
+    my_env = transfer_env(env);
+    status = execve(path, exec_list->command->argv, my_env);
+    perror(exec_list->command->argv[0]);
+    free_env_array(my_env);
+    _exit(85);
+}
+
+// ...existing code...
+static int	handle_fork_error(int pipefds[2], char **my_env)
+{
+    if (pipefds[0] != -1)
+        close(pipefds[0]);
+    if (pipefds[1] != -1)
+        close(pipefds[1]);
+    free_env_array(my_env);
+    perror("fork");
+    return (1);
+}
+
+static void	parent_after_fork(t_pid_list **pids, pid_t pid, int *prev_fd, int pipefds[2])
+{
+    pid_add_back(pids, pid);
+    if (*prev_fd != -1)
+        close(*prev_fd);
+    if (pipefds[1] != -1)
+        close(pipefds[1]);
+    *prev_fd = (pipefds[0] != -1) ? pipefds[0] : -1;
+}
+
 int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
 {
-	int pipefds[2] = {-1, -1};
-	pid_t pid;
-	char *path;
-	int status = 0;
-	char	**my_env;
-	
-	exec_list->command->prev_fd = *prev_fd;
-	my_env = transfer_env(env);
-	if (!my_env)
-		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
-	if (exec_list->next)
-	{
-		if (pipe(pipefds) == -1)
-			return (perror("pipe"), 1);
-	}
+    int		pipefds[2] = {-1, -1};
+    pid_t	pid;
+    char	*path;
+    char	**my_env;
 
-	if (!is_builtin(exec_list))
-	{
-		path = set_command_path(exec_list, my_env);
-		if (!path)
-		{
-			print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
-			if (pipefds[0] != -1) close(pipefds[0]);
-			if (pipefds[1] != -1) close(pipefds[1]);
-			return (127);
-		}
-	}
-
-	pid = fork();
-	if (pid == -1)
-	{
-		if (pipefds[0] != -1) close(pipefds[0]);
-		if (pipefds[1] != -1) close(pipefds[1]);
-		return (perror("fork"), 1);
-	}
-
-	if (pid == 0)
-	{
-		if (*prev_fd != -1)
-		{
-			if (dup2(*prev_fd, STDIN_FILENO) == -1)
-				exit(1);
-			close(*prev_fd);
-		}
-
-		if (exec_list->next)
-		{
-			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-				exit(1);
-			close(pipefds[1]);
-			close(pipefds[0]);
-		}
-
-		if (exec_list->is_subshell == TRUE)
-			exit(0);
-
-		if (is_builtin(exec_list))
-		{
-			status = built_in_exec(exec_list, env);
-			exit(status);
-		}
-		else
-		{
-			status = execve(path, exec_list->command->argv, my_env);
-			perror(exec_list->command->argv[0]);
-			exit(errno);
-		}
-	}
-	
-	pid_add_back(pids, pid);
-
-	if (*prev_fd != -1)
-	{
-		close(*prev_fd);
-		*prev_fd = -1;
-	}
-
-	if (exec_list->next)
-	{
-		if (pipefds[1] != -1)
-			close(pipefds[1]);
-		*prev_fd = pipefds[0];
-	}
-	else
-	{
-		if (pipefds[0] != -1) close(pipefds[0]);
-		if (pipefds[1] != -1) close(pipefds[1]);
-		*prev_fd = -1;
-	}
-
-	return (0);
+    if (!exec_list || exec_list->is_subshell || !exec_list->is_command || !exec_list->command)
+        return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
+    exec_list->command->prev_fd = *prev_fd;
+    if (prepare_env_and_pipe(exec_list, env, &my_env, pipefds) != 0)
+        return (1);
+    path = get_path_for_command(exec_list, my_env, pipefds);
+    if (!path && !is_builtin(exec_list))
+        return (free_env_array(my_env), 127);
+    pid = fork();
+    if (pid == -1)
+        return (handle_fork_error(pipefds, my_env));
+    if (pid == 0)
+        child_exec(exec_list, path, env, pipefds);
+    parent_after_fork(pids, pid, prev_fd, pipefds);
+    free_env_array(my_env);
+    return (0);
 }
+//

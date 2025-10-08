@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 15:12:14 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/08 12:45:20 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	main(int ac, char **av, char **env)
 
 	my_env = init_env_list(env);
 	status = 2;
-    init_signals();
+    // init_signals();
 	while (1)
 	{
 		input = NULL;

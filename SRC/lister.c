@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 11:32:48 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/08 12:27:23 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,125 +25,242 @@
 // 	}
 // }
 
+// ...existing code...
 int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
 {
+    int temp_res = TRUE;
+    pid_t pid;
+    int status;
+    t_token *sublist_save;
+    t_pid_list *pids = NULL;
+    // int pipefds[2];
 
-			// print_exec_list(exec_list);
+    while (exec_list != NULL)
+    {
+// ...existing code...
+        if (exec_list->is_subshell)
+        {
+            int pipefds[2] = {-1, -1};
+            int need_pipe = (exec_list->next && exec_list->next->is_command);
+    
+            if (need_pipe && pipe(pipefds) == -1)
+                return (perror("pipe"), 1);
+    
+            pid = fork();
+            if (pid == -1)
+            {
+                if (need_pipe)
+                {
+                    if (pipefds[0] != -1) close(pipefds[0]);
+                    if (pipefds[1] != -1) close(pipefds[1]);
+                }
+                return (perror("fork"), 1);
+            }
+    
+            if (pid == 0)
+            {
+                /* child: connect input if any */
+                if (*prev_fd != -1)
+                {
+                    if (dup2(*prev_fd, STDIN_FILENO) == -1)
+                        _exit(1);
+                    close(*prev_fd);
+                }
+    
+                /* child: only pipe stdout if next command expects input */
+                if (need_pipe)
+                {
+                    if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+                        _exit(1);
+                    close(pipefds[0]);
+                    close(pipefds[1]);
+                }
+    
+                /* run subshell tokens inside child */
+                sublist_save = exec_list->subshell->token_sublist;
+                {
+                    int sub_prev = -1;
+                    status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save, &sub_prev);
+                }
+    
+                /* child must exit with subshell status */
+                clean_token_list(&sublist_save);
+                clean_exec_list(&exec_list);
+                clean_env(env);
+                clean_input(input);
+                rl_clear_history();
+                _exit(status);
+            }
+    
+            /* parent */
+            if (*prev_fd != -1)
+                close(*prev_fd);
+    
+            if (need_pipe)
+            {
+                close(pipefds[1]);
+                *prev_fd = pipefds[0]; /* next command will read from this */
+            }
+            else
+            {
+                /* last in pipeline: no pipe created, output went to terminal */
+                *prev_fd = -1;
+            }
+    
+            waitpid(pid, &status, 0);
+            if (WIFEXITED(status))
+                temp_res = WEXITSTATUS(status);
+            else
+                temp_res = status;
+        }
+        else if (exec_list->is_command)
+        {
+            if ((!exec_list->next) && is_builtin(exec_list) == TRUE)
+            {
+                temp_res = built_in_exec(exec_list, env);
+            }
+            else
+            {
+                status = exec_pipeline(exec_list, &pids, env, prev_fd);
+                if (!exec_list->next || exec_list->next->is_command == FALSE)
+                {
+                    temp_res = pid_wait_all(pids, status);
+                    clean_pid(&pids);
+                }
+            }
+        }
+        else
+        {
+            /* unexpected node */
+        }
 
-	int temp_res = TRUE;
-	pid_t pid;
-	int status;
-	t_token *sublist_save;
-	t_pid_list *pids = NULL;
+        exec_list = exec_list->next;
+    }
 
-	while (exec_list != NULL)
-	{
-		if (exec_list->is_subshell)
-		{
-			int pipefds[2] = {-1, -1};
+    return (temp_res);
+}
 
-			// printf("to subshell -> ");
-			// debug_lexer_print_line(exec_list->subshell->token_sublist);
-			// printf("in subshell pfd (parent) : %d\n", *prev_fd);
+// ...existing code...
 
-			if (pipe(pipefds) == -1)
-				return (perror("pipe"), 1);
+// int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+// {
 
-			pid = fork();
-			if (pid == -1)
-			{
-				if (pipefds[0] != -1) close(pipefds[0]);
-				if (pipefds[1] != -1) close(pipefds[1]);
-				return (perror("fork"), 1);
-			}
+// 			// print_exec_list(exec_list);
 
-			if (pid == 0)
-			{
-				if (*prev_fd != -1)
-				{
-					if (dup2(*prev_fd, STDIN_FILENO) == -1)
-						_exit(1);
-					close(*prev_fd);
-				}
+// 	int temp_res = TRUE;
+// 	pid_t pid;
+// 	int status;
+// 	t_token *sublist_save;
+// 	t_pid_list *pids = NULL;
 
-				if (pipefds[1] != -1)
-				{
-					if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-						_exit(1);
-					close(pipefds[1]);
-					close(pipefds[0]);
-				}
+// 	while (exec_list != NULL)
+// 	{
+// 		if (exec_list->is_subshell)
+// 		{
+// 			int pipefds[2] = {-1, -1};
 
-				if (exec_list->next)
-					dup2(pipefds[1], STDOUT_FILENO);
+// 			// printf("to subshell -> ");
+// 			// debug_lexer_print_line(exec_list->subshell->token_sublist);
+// 			// printf("in subshell pfd (parent) : %d\n", *prev_fd);
 
-				*prev_fd = -1;
-				sublist_save = exec_list->subshell->token_sublist;
-				// fprintf(stderr, "[CHILD %d] avant lister()\n", getpid());
+// 			if (pipe(pipefds) == -1)
+// 				return (perror("pipe"), 1);
+
+// 			pid = fork();
+// 			if (pid == -1)
+// 			{
+// 				if (pipefds[0] != -1) close(pipefds[0]);
+// 				if (pipefds[1] != -1) close(pipefds[1]);
+// 				return (perror("fork"), 1);
+// 			}
+
+// 			if (pid == 0)
+// 			{
+// 				if (*prev_fd != -1)
+// 				{
+// 					if (dup2(*prev_fd, STDIN_FILENO) == -1)
+// 						_exit(1);
+// 					close(*prev_fd);
+// 				}
+
+// 				if (pipefds[1] != -1)
+// 				{
+// 					if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+// 						_exit(1);
+// 					close(pipefds[1]);
+// 					close(pipefds[0]);
+// 				}
+
+// 				if (exec_list->next)
+// 					dup2(pipefds[1], STDOUT_FILENO);
+
+// 				*prev_fd = -1;
+// 				sublist_save = exec_list->subshell->token_sublist;
+// 				// fprintf(stderr, "[CHILD %d] avant lister()\n", getpid());
 
 				
-				status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save, prev_fd);
-				// printf("ca dit quoi ???\n");
-				// fprintf(stderr, "[CHILD %d] retour lister() status=%d\n", getpid(), status);
-				// clean_token_list(&sublist_save);
-				// clean_env(env);
-				// clean_input(input);
-				// rl_clear_history();
+// 				status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save, prev_fd);
+// 				// printf("ca dit quoi ???\n");
+// 				// fprintf(stderr, "[CHILD %d] retour lister() status=%d\n", getpid(), status);
+// 				// clean_token_list(&sublist_save);
+// 				// clean_env(env);
+// 				// clean_input(input);
+// 				// rl_clear_history();
 
-				_exit(status);
-			}
-			else
-			{
-				if (*prev_fd != -1)
-					close(*prev_fd);
+// 				_exit(status);
+// 			}
+// 			else
+// 			{
+// 				if (*prev_fd != -1)
+// 					close(*prev_fd);
 
-				close(pipefds[1]);
+// 				close(pipefds[1]);
 
-    			if (exec_list->next)
-        			*prev_fd = pipefds[0];
-    			else
-    			    close(pipefds[0]);
-				waitpid(pid, &status, 0);
-				if (WIFEXITED(status))
-					temp_res = WEXITSTATUS(status);
-				else
-					temp_res = status;
-			}
-		}
-		else if (exec_list->is_command)
-		{
-			// printf("prev fd : %d, cmd : %s\n", *prev_fd, exec_list->command->argv[0]);
+//     			if (exec_list->next)
+//         			*prev_fd = pipefds[0];
+//     			else
+//     			    close(pipefds[0]);
+// 				waitpid(pid, &status, 0);
+// 				if (WIFEXITED(status))
+// 					temp_res = WEXITSTATUS(status);
+// 				else
+// 					temp_res = status;
+// 			}
+// 		}
+// 		else if (exec_list->is_command)
+// 		{
+// 			// printf("prev fd : %d, cmd : %s\n", *prev_fd, exec_list->command->argv[0]);
 
-			if ((!exec_list->next) && is_builtin(exec_list))
-			{
-				temp_res = built_in_exec(exec_list, env);
-			}
-			else
-			{
-				status = exec_pipeline(exec_list, &pids, env, prev_fd);
-				if (status != 0)
-				{
-					clean_pid(&pids);
-					return (status);
-				}
+// 			if ((!exec_list->next) && is_builtin(exec_list))
+// 			{
+// 				temp_res = built_in_exec(exec_list, env);
+// 			}
+// 			else
+// 			{
+// 				status = exec_pipeline(exec_list, &pids, env, prev_fd);
+// 				if (status != 0)
+// 				{
+// 					clean_pid(&pids);
+// 					return (status);
+// 				}
 
-				if (!exec_list->next || !exec_list->next->is_command)
-				{
-					temp_res = pid_wait_all(pids, status);
-					clean_pid(&pids);
-				}
-			}
-		}
-		else
-		{
-			printf("PROBLEM : EXEC NODE IS NOT A COMMAND NEITHER A SUBSHELL\n");
-		}
+// 				if (!exec_list->next || !exec_list->next->is_command)
+// 				{
+// 					temp_res = pid_wait_all(pids, status);
+// 					clean_pid(&pids);
+// 				}
+// 			}
+// 		}
+// 		else
+// 		{
+// 			printf("PROBLEM : EXEC NODE IS NOT A COMMAND NEITHER A SUBSHELL\n");
+// 		}
 
-		exec_list = exec_list->next;
-	}
+// 		exec_list = exec_list->next;
+// 	}
 
-	return (temp_res);
-}
+// 	return (temp_res);
+// }
 
 
 // int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)

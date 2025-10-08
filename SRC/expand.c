@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 12:52:26 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 20:06:40 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/08 11:21:10 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -319,7 +319,7 @@ void	check_expand_unquote(t_token *token_list)
 	while (token_list)
 	{
 		expand_unquote(token_list->str);
-		printf("%s\n", token_list->str);
+		// printf("%s\n", token_list->str);
 		token_list = token_list->next;
 	}
 }
