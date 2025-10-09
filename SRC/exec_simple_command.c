@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_simple_command.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/09 12:13:00 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/09 12:36:20 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -412,6 +412,47 @@ char	**transfer_env(t_env **env)
 // 	return (0);
 // }
 
+int	is_builtin(t_exec *exec_list)
+{
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
+		return (TRUE);
+	else
+		return (FALSE);
+}
+
+int	built_in_exec(t_exec *exec_list, t_env **env)
+{
+	int	exit_status;
+	
+	exit_status = 0;
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
+		exit_status = echo(exec_list->command->argv);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		exit_status = cd(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		exit_status = pwd();
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		exit_status = export(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		exit_status = unset(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		exit_status = print_env(env);
+	return (exit_status);
+}
+
+
 int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
 {
     if (!exec_list || !env)
@@ -481,13 +522,13 @@ void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2])
     if (is_builtin(exec_list))
     {
         status = built_in_exec(exec_list, env);
-        _exit(status);
+        exit(status);
     }
     my_env = transfer_env(env);
     status = execve(path, exec_list->command->argv, my_env);
     perror(exec_list->command->argv[0]);
     free_env_array(my_env);
-    _exit(85);
+    exit(85);
 }
 
 int	handle_fork_error(int pipefds[2], char **my_env)
