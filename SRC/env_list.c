@@ -17,7 +17,6 @@ t_env   *env_new_node(const char *var_name, const char *var_value, int exported)
 	t_env   *node;
 
 	node = malloc(sizeof(t_env));
-	// printf("malloc %p in env_new_node\n", node);
 	if (!node)
 		return (NULL);
 	node->var_name = strdup(var_name);

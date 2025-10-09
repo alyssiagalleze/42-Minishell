@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 12:52:26 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 12:14:07 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/09 13:10:34 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,7 +313,6 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 	return (ERR_SUCCESS);
 }
 
-// TODO : maoc abort
 int	expand_wordsplit(t_token *token_list)
 {
 	char	**tab;
@@ -344,7 +343,7 @@ int	check_expand_wordsplit(t_token *token_list)
 	{
 		if (should_expand_wordsplit(token_list))
 		{
-			if (!expand_wordsplit(token_list))
+			if (expand_wordsplit(token_list))
 				return (ERR_MALLOC);
 		}
 		token_list = token_list->next;

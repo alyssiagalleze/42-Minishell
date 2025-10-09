@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 12:17:27 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/09 12:28:14 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	main(int ac, char **av, char **env)
 			cleaner(NULL, &input, &token_list_save);
 		}
 		else if (parser(&token_list))
-			status = lister(&token_list, &my_env, &input, &token_list_save);
+			status = lister(&token_list, &my_env, &input, &token_list_save, &prev_fd);
 		else
 			cleaner(NULL, &input, &token_list_save);
 		printf("+++exit status: %i\n", status);

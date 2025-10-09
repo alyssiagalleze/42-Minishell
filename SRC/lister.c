@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 12:16:48 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/09 13:10:45 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -352,8 +352,7 @@ void	exec_list_init_command(t_command *command, int *prev_fd)
 
 // Rajoute un t_subshell a exec_list
 // Fait avancer a liste jusqu'au prochaine operateur exclus
-void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env, int *prev_fd)
-int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env)
+int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env, int *prev_fd)
 {
 	t_exec		*new_exec;
 	enum e_err	err;
@@ -365,7 +364,7 @@ int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_
 	new_exec->command = malloc(sizeof(t_command));
 	if (new_exec->command == NULL)
 		return (ERR_MALLOC);
-	exec_list_init_command(new_exec->command);
+	exec_list_init_command(new_exec->command, prev_fd);
 	err = lister_expand_command(*token_list, env);
 	if (err)
 	{
@@ -411,7 +410,7 @@ int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *e
 		if ((*token_list)->kind == BRACKET_O)
 			err = lister_create_exec_from_subshell(token_list, exec_list);
 		else
-			err = lister_create_exec_from_command(token_list, exec_list, env);
+			err = lister_create_exec_from_command(token_list, exec_list, env, prev_fd);
 		if (err == ERR_MALLOC)
 			return (ERR_MALLOC);
 		if (err == ERR_AMBIG)
@@ -424,7 +423,8 @@ int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *e
 	return (ERR_SUCCESS);
 }
 
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save)
+//TODO : 5 args
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
 {
 	int			status;
 	t_exec		*exec;
@@ -433,10 +433,9 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 	exec = NULL;
 	while (*token_list)
 	{
-		err = lister_simple(token_list, &exec, status, *env);
+		err = lister_simple(token_list, &exec, status, *env, prev_fd);
 		if (err)
 		{
-
 			status = 2;
 			if (err == ERR_MALLOC)
 			{
@@ -446,7 +445,7 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 		}
 		if (exec)
 		{
-			status = temp_exec(exec, env, input, token_list_save);
+			status = temp_exec(exec, env, input, token_list_save, prev_fd);
 			clean_exec_list(&exec); 
 		}
 	}
