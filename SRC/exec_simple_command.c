@@ -6,27 +6,13 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/08 13:52:21 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/09 11:52:52 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// int	ft_strncmp(const char *s1, const char *s2, size_t n)
-// {
-// 	size_t	i;
-
-// 	i = 0;
-// 	while (i < n && (s1[i] || s2[i]))
-// 	{
-// 		if (s1[i] != s2[i])
-// 			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
-// 		i++;
-// 	}
-// 	return (0);
-// }
-
-// int	here_doc_input(t_exec *exec_list, int i)
+// int	here_doc_input(int i, t_exec *exec_list)
 // {
 // 	int		pipefds[2];
 // 	char	*line;
@@ -53,14 +39,36 @@
 // 	return (pipefds[0]);
 // }
 
-// int	open_fd_in(t_exec *exec_list)
+// int	open_fd_in(int *i, t_exec *exec_list)
+// {
+// 	int fd;
+	
+// 	if (exec_list->command->redir_kind == IN)
+// 	{
+// 		fd = open(exec_list->command->redir[i], O_RDONLY);
+// 		if (fd == -1)
+// 			return (print_err(PROMPT, exec_list->command->redir_in[i], ": ", "No such file of directory"), -1);
+// 	}
+// 	else
+// 	{
+// 		fd = here_doc_input(*i, exec_list);
+		
+// 	}
+// 	return (fd);
+// }
+
+// int	open_fds(t_exec *exec_list)
 // {
 // 	int	i;
 // 	int	fd;
 	
 // 	i = 0;
-// 	while (exec_list->command->redir_in[i])
+// 	while (exec_list->command->redir[i])
 // 	{
+// 		if (exec_list->command->redir_kind[i] == IN || exec_list->command->redir_kind[i] == HDOC)
+// 			open_fd_in(&i, exec_list);
+// 		if (exec_list->command->redir_kind[i] == OUT || exec_list->command->redir_kind[i] == OUT_APP)
+		
 // 		if (exec_list->command->is_redir_in_heredoc[i])
 // 		{
 // 			fd = here_doc_input(exec_list, i);	
@@ -142,7 +150,6 @@
 
 char	**get_paths(char **env_tab)
 {
-	// t_env	*current;
 	char	**path_tab;
 	int		i;
 	
@@ -157,16 +164,6 @@ char	**get_paths(char **env_tab)
 		}
 		i++;
 	}
-	// current = *env;
-	// path_tab = NULL;
-	// while (current)
-	// {
-	// 	if (str_ncmp(current->var_name, "PATH", 3, FALSE))
-	// 		path_tab = ft_split(current->var_value, ':');
-	// 	current = current->next;
-	// }
-	// if (!path_tab)
-	// 	return (NULL);
 	return (path_tab);
 }
 
@@ -255,205 +252,6 @@ int	built_in_exec(t_exec *exec_list, t_env **env)
 		exit_status = print_env(env);
 	return (exit_status);
 }
-
-
-// int	fork_exec(t_exec *exec_list, t_env **env)
-// {
-// 	pid_t	pid;
-// 	char	*cmd_path;
-// 	int		status;
-// 	int		exit_status;
-	
-// 	cmd_path = set_command_path(exec_list, env);
-// 	if (!cmd_path)
-// 		return (print_err(exec_list->command->argv[0], ": command not found", NULL, NULL), 127);
-// 	exit_status = 0;
-// 	status = 0;
-// 	pid = fork();
-// 	if (pid == -1)
-// 		return (perror("fork"), 1);
-// 	if (!pid)
-// 	{
-// 		if (execv(cmd_path, exec_list->command->argv) == -1)
-// 			return (perror(exec_list->command->argv[0]), errno);
-// 		return (status);
-// 	}
-// 	else
-// 	{
-// 		free(cmd_path);
-// 		waitpid(pid, &status, 0);
-// 		if (WIFEXITED(status))
-// 			exit_status = WEXITSTATUS(status);
-// 		return (exit_status);
-// 	}
-// }
-
-// // int	write_in_pipe()
-// // {
-	
-// // }
-
-// int	exec_command(t_exec *exec_list, t_env **env)
-// {
-// 	int status;
-// 	int	initialfds[2];
-	
-// 	status = 0;
-// 	initialfds[0] = dup(STDIN_FILENO);
-// 	initialfds[1] = dup(STDOUT_FILENO);
-// 	if (initialfds[0] == -1 || initialfds[1] == -1)
-// 		return (/* print_err("could not duplicate STDOUT\n", NULL, NULL, NULL), */perror("DUPSTDOUT"), 1);
-// 	if (exec_list->command->redir_in[0] || exec_list->command->redir_out[0])
-// 		status = redirect_fds(exec_list);
-// 	if (!exec_list->command->argv[0])
-// 		return (status);
-// 	if (is_builtin(exec_list))
-// 	{
-// 		status = built_in_exec(exec_list, env);
-// 		if (!exec_list->next->is_command)
-// 		{
-// 			if (dup2(initialfds[0], STDIN_FILENO) == -1 || dup2(initialfds[1], STDOUT_FILENO) == -1)
-// 				return (print_err("could not restore STD fds\n", NULL, NULL, NULL), 1);
-// 		}
-// 	}
-// 	else
-// 	{
-// 		status = fork_exec(exec_list, env);
-// 		if (dup2(initialfds[0], STDIN_FILENO) == -1 || dup2(initialfds[1], STDOUT_FILENO) == -1)
-// 			return (print_err("could not restore STD fds\n", NULL, NULL, NULL), 1);
-// 	}
-// 	return (status);
-// }
-
-
-// /* pid_t	execute_pipe(char *cmd, char **env)
-// {
-// 	int		pipefds[2];
-// 	pid_t	process_id;
-// 	char	*path;
-
-// 	path = get_path(env);
-// 	if (path == NULL)
-// 		exit_pipex(127, "PATH variable not found");
-// 	if (pipe(pipefds) == -1)
-// 		exit_pipex(2, "pipe");
-// 	process_id = fork();
-// 	if (process_id == -1)
-// 		exit_pipex(2, "fork");
-// 	if (!process_id)
-// 	{
-// 		if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-// 			exit_pipex(2, "dup2");
-// 		close_fds();
-// 		empty_command(cmd, path);
-// 	}
-// 	if (dup2(pipefds[0], STDIN_FILENO) == -1)
-// 		exit_pipex(2, "dup2");
-// 	close_fds();
-// 	free(path);
-// 	return (process_id);
-// }
-//  */
-
-
-// int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
-// {
-// 	int		pipefds[2];
-// 	pid_t	pid;
-// 	char	*path;
-// 	int		status;
-
-// 	status = 0;
-// 	exec_list->command->prev_fd = *prev_fd;
-	
-// 	if (exec_list->next/*  && exec_list->next->is_command */)
-// 	{
-// 		// printf("cmd : %s je viens ici ?\n", exec_list->command->argv[0]);
-// 		if (pipe(pipefds) == -1)
-// 			return (printf("wsh ???\n"), 1);
-// 	}
-// 	if (!is_builtin(exec_list))
-// 	{
-// 		path = set_command_path(exec_list, env);
-// 		if (!path)
-// 		{
-// 			print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
-// 			return (127);	
-// 		}
-// 	}
-// 	pid = fork();
-// 	if (pid == -1)
-// 	return (1);
-// 	if (!pid)
-// 	{
-// 		// printf("pipe read : %d\n\n", pipefds[0]);
-// 		printf("cmd : %s, is subshell :%d\n", exec_list->command->argv[0], exec_list->is_command);
-// 			printf("redirected to %d\n", *prev_fd);
-// 		// printf("prev_fd : %d command : %s\n", exec_list->command->prev_fd, exec_list->command->argv[0]);
-// 		if (*prev_fd != -1)
-// 		{
-// 			if (dup2(*prev_fd, STDIN_FILENO) == -1)
-// 				return (print_err("dup2 for redirecting previous pipe read", NULL, NULL, NULL), 1);
-// 			close(exec_list->command->prev_fd);
-// 		}
-// 		if (exec_list->next/*  && exec_list->next->is_command */)
-// 		{
-// 			if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-// 				return (print_err("dup2 for writing in pipe", NULL, NULL, NULL), 1);
-// 			// printf("redirected to pipe write \n");
-// 			close(pipefds[1]);
-// 			close(pipefds[0]);
-// 		}
-
-// 		// appliquer redrection ici
-// 		if (exec_list->is_subshell == TRUE)
-// 			exit(status);
-// 		if (is_builtin(exec_list) == TRUE)
-// 		{
-// 			status = built_in_exec(exec_list, env);
-// 			exit(status);
-// 		}
-// 		else
-// 			if (execve(path, exec_list->command->argv, NULL) == -1)
-// 				return (perror(exec_list->command->argv[0]), errno);		
-// 			else
-// 				return (status);
-// 	}
-// 	else
-// 	{
-// 		if (*prev_fd != -1)
-// 			close(*prev_fd);
-// 		if (exec_list->next/*  && exec_list->next->is_command == TRUE */)
-// 		{
-// 			printf(" --------------cmd : %s, je viens icci? \n", exec_list->command->argv[0]);
-// 			// exec_list->next->command->prev_fd = pipefds[0];
-// 			close(pipefds[1]);
-// 			*prev_fd = pipefds[0];
-// 		}
-// 		else 
-// 		{
-			
-// 			close(pipefds[0]);
-// 			close(pipefds[1]);
-// 			*prev_fd = -1;
-// 		}
-// 		pid_add_back(pids, pid);
-
-// 		// printf("+++++cmd : %s, pid : %d\n", exec_list->command->argv[0], pid);
-// 	}
-// 	// printf("prev fd : %d, cmd : %s\n", *prev_fd, exec_list->command->argv[0]);
-// 	// close(pipefds[0]);
-// 	// close(pipefds[1]);
-// 	// waitpid(pid, NULL, 0);
-// 	return (1);
-// }
-
-// int	exec_last(t_exec *exec_list)
-// {
-// 	pid_t pid; 
-
-// 	pid =
-// }
 
 char	*build_env_variable(t_env *node)
 {
@@ -601,10 +399,10 @@ char	**transfer_env(t_env **env)
 // 	return (0);
 // }
 
-static int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
+int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
 {
     if (!exec_list || !env)
-        return (print_err(PROMPT, "internal: prepare_env_and_pipe bad args\n", NULL, NULL), 1);
+        return (print_err(PROMPT, ": internal: prepare_env_and_pipe bad args\n", NULL, NULL), 1);
     *my_env = transfer_env(env);
     if (!*my_env)
         return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
@@ -616,7 +414,7 @@ static int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, 
     return (0);
 }
 
-static char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
+char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
 {
     char *path;
 
@@ -635,7 +433,7 @@ static char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[
     return (path);
 }
 
-static void free_env_array(char **envp)
+void free_env_array(char **envp)
 {
     int i;
 
@@ -647,7 +445,7 @@ static void free_env_array(char **envp)
     free(envp);
 }
 
-static void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2])
+void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2])
 {
     int		prev;
     int		status;
@@ -679,8 +477,7 @@ static void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2
     _exit(85);
 }
 
-// ...existing code...
-static int	handle_fork_error(int pipefds[2], char **my_env)
+int	handle_fork_error(int pipefds[2], char **my_env)
 {
     if (pipefds[0] != -1)
         close(pipefds[0]);
@@ -691,7 +488,7 @@ static int	handle_fork_error(int pipefds[2], char **my_env)
     return (1);
 }
 
-static void	parent_after_fork(t_pid_list **pids, pid_t pid, int *prev_fd, int pipefds[2])
+void	parent_after_fork(t_pid_list **pids, pid_t pid, int *prev_fd, int pipefds[2])
 {
     pid_add_back(pids, pid);
     if (*prev_fd != -1)
@@ -725,4 +522,3 @@ int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_f
     free_env_array(my_env);
     return (0);
 }
-//
