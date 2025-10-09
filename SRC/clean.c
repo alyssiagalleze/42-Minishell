@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/03 14:27:38 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 13:42:00 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,7 @@ void	clean_exec_list(t_exec **exec_list)
 		else if ((*exec_list)->is_subshell)
 		{
 			if ((*exec_list)->subshell->token_sublist)
-			{
 				clean_token_list(&((*exec_list)->subshell->token_sublist));
-			}
 			free((*exec_list)->subshell);
 		}
 		free(*exec_list);

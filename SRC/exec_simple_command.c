@@ -1,16 +1,16 @@
-// /* ************************************************************************** */
-// /*                                                                            */
-// /*                                                        :::      ::::::::   */
-// /*   exec_simple_command.c                              :+:      :+:    :+:   */
-// /*                                                    +:+ +:+         +:+     */
-// /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
-// /*                                                +#+#+#+#+#+   +#+           */
-// /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-// /*   Updated: 2025/10/01 16:54:59 by agalleze         ###   ########.fr       */
-// /*                                                                            */
-// /* ************************************************************************** */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_simple_command.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/06 15:50:45 by tfiette          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// #include "minishell.h"
+#include "minishell.h"
 
 // int	ft_strncmp(const char *s1, const char *s2, size_t n)
 // {
@@ -140,48 +140,48 @@
 // 	return (0);
 // }
 
-// char	**get_paths(t_env **env)
-// {
-// 	t_env	*current;
-// 	char	**path_tab;
+char	**get_paths(t_env **env)
+{
+	t_env	*current;
+	char	**path_tab;
 	
-// 	current = *env;
-// 	path_tab = NULL;
-// 	while (current)
-// 	{
-// 		if (str_ncmp(current->var_name, "PATH", 3, FALSE))
-// 			path_tab = ft_split(current->var_value, ':');
-// 		current = current->next;
-// 	}
-// 	if (!path_tab)
-// 		return (NULL);
-// 	return (path_tab);
-// }
+	current = *env;
+	path_tab = NULL;
+	while (current)
+	{
+		if (str_ncmp(current->var_name, "PATH", 3, FALSE))
+			path_tab = ft_split(current->var_value, ':');
+		current = current->next;
+	}
+	if (!path_tab)
+		return (NULL);
+	return (path_tab);
+}
 
-// char	*append_exec_file(char *cmd_name, char *path)
-// {
-// 	char	*tmp;
-// 	char	*cmd_path;
+char	*append_exec_file(char *cmd_name, char *path)
+{
+	char	*tmp;
+	char	*cmd_path;
 	
-// 	tmp = NULL;
-// 	tmp = ft_strjoin(path, "/");
-// 	if (!tmp)
-// 		return (NULL);
-// 	cmd_path = ft_strjoin(tmp, cmd_name);
-// 	if (!cmd_path)
-// 	{
-// 		free(tmp);
-// 		return (NULL);
-// 	}
-// 	free(tmp);
-// 	return (cmd_path);
-// }
+	tmp = NULL;
+	tmp = ft_strjoin(path, "/");
+	if (!tmp)
+		return (NULL);
+	cmd_path = ft_strjoin(tmp, cmd_name);
+	if (!cmd_path)
+	{
+		free(tmp);
+		return (NULL);
+	}
+	free(tmp);
+	return (cmd_path);
+}
 
-// char	*set_command_path(t_exec *exec_list, t_env **env)
-// {
-// 	int		i;
-// 	char	**path_tab;
-// 	char	*cmd_path;
+char	*set_command_path(t_exec *exec_list, t_env **env)
+{
+	int		i;
+	char	**path_tab;
+	char	*cmd_path;
 	
 	path_tab = get_paths(env);
 	if (!path_tab)
@@ -204,45 +204,45 @@
 	return (NULL);
 }
 
-// int	is_builtin(t_exec *exec_list)
-// {
-// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-// 		return (TRUE);
-// 	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
-// 		return (TRUE);
-// 	else
-// 		return (FALSE);
-// }
+int	is_builtin(t_exec *exec_list)
+{
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		return (TRUE);
+	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
+		return (TRUE);
+	else
+		return (FALSE);
+}
 
-// int	built_in_exec(t_exec *exec_list, t_env **env)
-// {
-// 	int	exit_status;
+int	built_in_exec(t_exec *exec_list, t_env **env)
+{
+	int	exit_status;
 	
-// 	exit_status = 0;
-// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
-// 		exit_status = echo(exec_list->command->argv);
-// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-// 		exit_status = cd(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-// 		exit_status = pwd();
-// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-// 		exit_status = export(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-// 		exit_status = unset(exec_list->command->argv, env);
-// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-// 		exit_status = print_env(env);
-// 	return (exit_status);
-// }
+	exit_status = 0;
+	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
+		exit_status = echo(exec_list->command->argv);
+	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+		exit_status = cd(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+		exit_status = pwd();
+	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+		exit_status = export(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+		exit_status = unset(exec_list->command->argv, env);
+	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+		exit_status = print_env(env);
+	return (exit_status);
+}
 
 
 // int	fork_exec(t_exec *exec_list, t_env **env)

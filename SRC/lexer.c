@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:02:49 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 20:12:21 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 15:30:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,6 @@ void	lexer_create_token_from_input(
 		*input += len;
 }
 
-// TODO : limit to arg max
 void	lexer(t_token **token_list, char *input)
 {
 	int		len;
@@ -149,7 +148,7 @@ void	lexer(t_token **token_list, char *input)
 	{
 		len = lexer_scan_word(input);
 		if (len)
-			lexer_create_token_from_input(token_list, &input, len, WORD);
+		lexer_create_token_from_input(token_list, &input, len, WORD);
 		len = lexer_scan_operator(input);
 		if (len == -1)
 		{
@@ -157,8 +156,8 @@ void	lexer(t_token **token_list, char *input)
 			break;
 		}
 		else if (len)
-			lexer_create_token_from_input(token_list, &input, len, NONE);
+		lexer_create_token_from_input(token_list, &input, len, NONE);
 		while (*input && is_char_separator(*input))
-			input ++;
+		input ++;
 	}
 }

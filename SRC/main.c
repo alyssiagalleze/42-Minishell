@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/03 15:47:43 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/07 19:04:20 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,21 @@ void	get_input(char **input, int status)
 		clean_input(input);
 	else
 		add_history(*input);
+}
+
+int	token_list_size(t_token *token_list)
+{
+	int	i;
+
+	i = 0;
+	while (token_list)
+	{
+		i ++;
+		if (i == ARG_MAX)
+			return (ARG_MAX);
+		token_list = token_list->next;
+	}
+	return (i);
 }
 
 int	main(int ac, char **av, char **env)
@@ -42,17 +57,18 @@ int	main(int ac, char **av, char **env)
 		while (!input)
 			get_input(&input, status);
 		if (str_cmp(input, "exit", FALSE))
-			my_exit(status, &my_env, &input, &token_list_save);
+			my_exit(0, &my_env, &input, &token_list_save);
 		lexer(&token_list, input);
 		token_list_save = token_list;
-		if (parser(&token_list))
+		if (token_list_size(token_list) >= ARG_MAX)
 		{
-			status = lister(&token_list, &my_env, &input, &token_list_save);
+			print_err(PROMPT, PERR_ARG_MAX, NULL, NULL);
+			cleaner(NULL, &input, &token_list_save);
 		}
-		// else
-		// {
-		// 	cleaner(NULL, &input, &token_list_save);
-		// }
+		else if (parser(&token_list))
+			status = lister(&token_list, &my_env, &input, &token_list_save);
+		else
+			cleaner(NULL, &input, &token_list_save);
 		printf("+++exit status: %i\n", status);
 	}
 	cleaner(&my_env, &input, &token_list_save); // oblige ??

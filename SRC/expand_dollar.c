@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 20:10:15 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 18:15:43 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,7 @@ char	*expand_dollar_restring(char *str, int from, int len, char *substr)
 	return (new_str);
 }
 
-// TODO : find a way to retrive which error (enum SUCCESS, FAILURE MALOC, FAILURE AMBIG etc)
-void	expand_dollar(t_token *token_list, t_env *env, int index)
+int	expand_dollar(t_token *token_list, t_env *env, int index)
 {
 	int		len;
 	char	*var_name;
@@ -98,36 +97,46 @@ void	expand_dollar(t_token *token_list, t_env *env, int index)
 	var_name = extract_string(token_list->str + index, len); // MALLOC
 	if (var_name == NULL)
 	{
-		//TODO : malloc error
+		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		return (ERR_MALLOC);
 	}
 	var_value = get_expand_dollar_value(var_name, env); // NO MALLOC
 	new_str = expand_dollar_restring(token_list->str, index, len, var_value); //MALLOC
 	if (new_str == NULL)
 	{
-		//TODO : malloc error
+		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		free(var_name);
+		return (ERR_MALLOC);
 	}
-	if (is_str_empty_or_null(new_str, 0) && token_list->type == WORD_FILE)
+	else if (is_str_empty_or_null(new_str, 0) && token_list->type == WORD_FILE)
 	{
-		// TODO : if $var = "" -> ambiguous redirect
+		print_err(PROMPT, PERR_AMBIG, NULL, NULL);
+		free(var_name);
+		free(new_str);
+		return (ERR_AMBIG);
 	}
 	free(var_name);
 	free(token_list->str);
 	token_list->str = new_str;
+	return (ERR_SUCCESS);
 }
 
-void	check_expand_dollar(t_token *token_list, t_env *env)
+int	check_expand_dollar(t_token *token_list, t_env *env)
 {
 	int	index;
+	enum e_err	err;
 	
 	while (token_list)
-		//&& (token_list->type == WORD || token_list->type == REDIR_OPERATOR))
 	{
 		index = should_expand_dollar(token_list);
 		if (index == -1)
 			token_list = token_list->next;
 		else
 		{
-			expand_dollar(token_list, env, index);
+			err = expand_dollar(token_list, env, index);
+			if (err)
+				return (err);
 		}
 	}
+	return (ERR_SUCCESS);
 }

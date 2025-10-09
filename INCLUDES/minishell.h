@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/06 15:41:58 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 17:18:51 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,18 @@
 # define	FALSE	0
 # define	PROMPT	"\1\e[1;38;5;82m\2XxxM3g4sh311xxX:\1\e[0;38;5;82m\2 "
 # define	RESET_FONT	"\1\e[0m\2"
+
+# define	PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
+# define	PERR_AMBIG		"ambiguous redirect\n"
+# define	PERR_MALLOC		"Internal malloc failure. Abort.\n"
+# define	PERR_QUOTE		"unexpected EOF while looking for matching `\'\'\n"
+# define	PERR_QUOTES		"unexpected EOF while looking for matching `\"'\n"
+# define	PERR_BRA		"unexpected EOF while looking for matching `(\'\n"
+# define	PERR_STX_EOF	"syntax error: unexpected end of file\n"
+# define	PERR_STX_Q		"syntax error near unexpected token `"
+# define	PERR_STX_NL		"syntax error near unexpected token `newline'\n"
+# define	PERR_STX_BRA	"syntax error near unexpected token `('\n"
+# define	PERR_STX_OPE	"syntax error : invalid operator "
 
 //treat all metacharacters or only the one in subject ??
 //could also say input invalid if metacharacters we don't use ??
@@ -82,6 +94,13 @@ enum	e_kind
 	OUT_APP,
 	BRACKET_O,
 	BRACKET_C
+};
+
+enum	e_err
+{
+	ERR_SUCCESS,
+	ERR_MALLOC,
+	ERR_AMBIG
 };
 
 //STRUCTS
@@ -188,7 +207,7 @@ int		is_expandable_char(char c);
 int		check_expand_asterisk(t_token *token_list);
 
 // expand_dollar.c
-void	check_expand_dollar(t_token *token_list, t_env *env);
+int		check_expand_dollar(t_token *token_list, t_env *env);
 
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
