@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/22 16:49:04 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 16:48:32 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,12 @@ static int	parser_check_contr_operator(t_token *token, int prev_type, int prev_k
 	if (prev_type == NONE || prev_type == REDIR_OPERATOR
 		|| prev_type == CONTR_OPERATOR || prev_kind == BRACKET_O)
 	{
-		print_err(PROMPT, "syntax error near unexpected token `",
-			token->str, "\'\n");
+		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
 		return (TRUE);
 	}
 	if (token->next == NULL)
 	{
-		print_err(PROMPT, "syntax error: unexpected end of file\n",
-			NULL, NULL);
+		print_err(PROMPT, PERR_STX_EOF, NULL, NULL);
 		return (TRUE);
 	}
 	return (FALSE);
@@ -34,14 +32,12 @@ static int	parser_check_redir_operator(t_token *token, int prev_type)
 {
 	if (prev_type == REDIR_OPERATOR)
 	{
-		print_err(PROMPT, "syntax error near unexpected token `",
-			token->str, "\'\n");
+		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
 		return (TRUE);
 	}
 	if (token->next == NULL)
 	{
-		print_err(PROMPT, "syntax error near unexpected token `newline'\n",
-			NULL, NULL);
+		print_err(PROMPT, PERR_STX_NL, NULL, NULL);
 		return (TRUE);
 	}
 	return (FALSE);
@@ -56,8 +52,7 @@ static int	parser_check_bracket(
 		if (prev_type != NONE && prev_type != CONTR_OPERATOR
 			&& prev_kind != BRACKET_O)
 		{
-			print_err(PROMPT, "syntax error near unexpected token `('\n",
-				NULL, NULL);
+			print_err(PROMPT, PERR_STX_BRA, NULL, NULL);
 			return (TRUE);
 		}
 	}
@@ -67,8 +62,7 @@ static int	parser_check_bracket(
 		if (*open_brackets < 0 || prev_type == REDIR_OPERATOR
 			|| prev_type == CONTR_OPERATOR || prev_kind == BRACKET_O)
 		{
-			print_err(PROMPT, "syntax error near unexpected token `)'\n",
-				NULL, NULL);
+			print_err(PROMPT, PERR_STX_BRA, NULL, NULL);
 			return (TRUE);
 		}
 	}
@@ -85,8 +79,7 @@ static int	parser_check_token(
 	token = *token_list;
 	if (token->type == NONE)
 	{
-		print_err(PROMPT, "syntax error : invalid operator ",
-			token->str, "\n");
+		print_err(PROMPT, PERR_STX_OPE, token->str, "\n");
 		return (TRUE);
 	}
 	if (!prev_token)
@@ -135,8 +128,7 @@ int	parser(t_token **token_list)
 	}
 	if (brackets)
 	{
-		print_err(PROMPT, "unexpected EOF while looking for matching `(\'\n",
-			PROMPT, "syntax error: unexpected end of file\n");
+		print_err(PROMPT, PERR_BRA, PROMPT, PERR_STX_EOF);
 		return (FALSE);
 	}
 	return (TRUE);

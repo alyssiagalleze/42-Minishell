@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lister.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 11:55:29 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:16:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,6 +235,7 @@ t_token	*lister_scan_subshell(t_token **token_list)
 	int	open_bracket;
 	t_token	*sublist;
 	t_token	*subtoken;
+	char	*sub_str;
 	
 	open_bracket = 1;
 	sublist = NULL;
@@ -258,8 +259,14 @@ t_token	*lister_scan_subshell(t_token **token_list)
 			clean_token_list(&sublist);
 			return (NULL);
 		}
-		token_list_fill_node(subtoken, ft_strdup((*token_list)->str), (*token_list)->type, (*token_list)->kind);
-		//TODO check if strdup == NULL
+		sub_str = ft_strdup((*token_list)->str);
+		if (sub_str == NULL)
+		{
+			free(sub_str);
+			clean_token_list(&sublist);
+			return (NULL);
+		}
+		token_list_fill_node(subtoken, sub_str, (*token_list)->type, (*token_list)->kind);
 		*token_list = (*token_list)->next;
 	}
 	return (sublist);
@@ -267,25 +274,21 @@ t_token	*lister_scan_subshell(t_token **token_list)
 
 // Rajoute un t_subshell a exec_list
 // Fait avancer a liste jusqu'a la parenthese fermante inclue
-void	lister_create_exec_from_subshell(t_token **token_list, t_exec **exec_list)
+int	lister_create_exec_from_subshell(t_token **token_list, t_exec **exec_list)
 {
 	t_exec	*new_exec;
 	
 	new_exec = exec_list_add_node(exec_list);
 	if (new_exec == NULL)
-		return ;
+		return (ERR_MALLOC);
 	new_exec->is_subshell = TRUE;
 	new_exec->subshell = malloc(sizeof(t_subshell));
 	if (new_exec->subshell == NULL)
-	{
-		clean_exec_list(exec_list);
-		return ;
-	}
+		return (ERR_MALLOC);
 	new_exec->subshell->token_sublist = lister_scan_subshell(token_list);
 	if (new_exec->subshell->token_sublist == NULL)
-	{
-		//TODO : MALLOC ERROR
-	}
+		return (ERR_MALLOC);
+	return (ERR_SUCCESS);
 }
 
 // avancer dans ma token list tant que j'ai WORD ou REDIR OPERATEUR
@@ -293,7 +296,7 @@ void	lister_create_exec_from_subshell(t_token **token_list, t_exec **exec_list)
 // faire les expansions a chaque token
 // ajouter les infos dans la struct
 
-void	lister_scan_command(t_token **token_list, t_command *command)
+int	lister_scan_command(t_token **token_list, t_command *command)
 {
 	int	in_nbr;
 	int	out_nbr;
@@ -316,17 +319,20 @@ void	lister_scan_command(t_token **token_list, t_command *command)
 			if ((*token_list)->kind == WORD_COM)
 			{
 				command->argv[0] = ft_strdup((*token_list)->str);
+				if (command->argv[0] == NULL)
+					return (ERR_MALLOC);
 			}
-			// TODO check if ft_strdup est NULL
 			else if ((*token_list)->kind == WORD_ARG)
 			{
 				arg_number ++;
 				command->argv[arg_number] = ft_strdup((*token_list)->str);
-			// TODO check if ft_strdup est NULL
+				if (command->argv[arg_number] == NULL)
+					return (ERR_MALLOC);
 			}
 		}
 		*token_list = (*token_list)->next;
 	}
+	return (ERR_SUCCESS);
 }
 
 void	exec_list_init_command(t_command *command, int *prev_fd)
@@ -347,25 +353,31 @@ void	exec_list_init_command(t_command *command, int *prev_fd)
 // Rajoute un t_subshell a exec_list
 // Fait avancer a liste jusqu'au prochaine operateur exclus
 void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env, int *prev_fd)
+int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env)
 {
-	t_exec	*new_exec;
+	t_exec		*new_exec;
+	enum e_err	err;
 
 	new_exec = exec_list_add_node(exec_list);
 	if (new_exec == NULL)
-		return ;
+		return (ERR_MALLOC);
 	new_exec->is_command = TRUE;
 	new_exec->command = malloc(sizeof(t_command));
 	if (new_exec->command == NULL)
+		return (ERR_MALLOC);
+	exec_list_init_command(new_exec->command);
+	err = lister_expand_command(*token_list, env);
+	if (err)
 	{
-		clean_exec_list(exec_list); // TODO
-		return ;
+		if (err == ERR_AMBIG)
+			return (clean_exec_list(exec_list), ERR_AMBIG); //TODO : check if clear exec necessary
+		if (err == ERR_MALLOC)
+			return (ERR_MALLOC);
 	}
-	exec_list_init_command(new_exec->command, prev_fd);
-	if (!lister_expand_command(*token_list, env))
-		return (clean_exec_list(exec_list));
-	// printf("token list after expand : ");
-	// debug_lexer_print_line(*token_list);
-	lister_scan_command(token_list, new_exec->command);
+	err = lister_scan_command(token_list, new_exec->command);
+	if (err == ERR_MALLOC)
+		return (ERR_MALLOC);
+	return (ERR_SUCCESS);
 }
 
 // Le role de cette fonction est de dispatcher la token list en plusieurs listes de commandes a executer
@@ -383,61 +395,58 @@ void	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t
 // et faire les expansions a un moment
 int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *env, int *prev_fd) 
 {
-	// printf("\nlister_simple with : ");
-	// debug_lexer_print_line(*token_list);
-	// verifier si j'interprete ma liste
-	if (*token_list && !lister_is_valid(*token_list, lvalue)) // skip
+	enum e_err	err;
+	
+	if (*token_list && !lister_is_valid(*token_list, lvalue))
 	{
 		lister_skip_list(token_list);
-		return (TRUE);
+		return (ERR_SUCCESS);
 	}
-	// skip prev operator
 	if ((*token_list)->kind == AND || (*token_list)->kind == OR)
 		*token_list = (*token_list)->next;
-	// tant que je n'ai pas fini ma liste
 	while (*token_list && ((*token_list)->kind != AND && (*token_list)->kind != OR))
 	{
 		if ((*token_list)->kind == PIPE)
 			*token_list = (*token_list)->next;
 		if ((*token_list)->kind == BRACKET_O)
-			lister_create_exec_from_subshell(token_list, exec_list);
+			err = lister_create_exec_from_subshell(token_list, exec_list);
 		else
-			lister_create_exec_from_command(token_list, exec_list, env, prev_fd);	
-		if (*exec_list == NULL) // check malloc fail
+			err = lister_create_exec_from_command(token_list, exec_list, env);
+		if (err == ERR_MALLOC)
+			return (ERR_MALLOC);
+		if (err == ERR_AMBIG)
 		{
 			while (*token_list && ((*token_list)->kind != AND && (*token_list)->kind != OR))
 				*token_list = (*token_list)->next;
-			return (FALSE);
+			return (ERR_AMBIG);
 		}
 	}
-	return (TRUE);
+	return (ERR_SUCCESS);
 }
 
-
-
-// // Attention a ne pas relancer quand j'interprete un subshell
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save)
 {
 	int			status;
 	t_exec		*exec;
-	int			abort;
+	int			err;
 
-	status = 0;
 	exec = NULL;
-	abort = FALSE;
 	while (*token_list)
 	{
-		if (!lister_simple(token_list, &exec, status, *env, prev_fd))
+		err = lister_simple(token_list, &exec, status, *env);
+		if (err)
 		{
 
 			status = 2;
+			if (err == ERR_MALLOC)
+			{
+				clean_exec_list(&exec);
+				my_exit(status, env, input, token_list_save);
+			}
 		}
 		if (exec)
 		{
-			// printf("========================%s\n", exec->command->argv[0]);
-			// print_exec_list(exec);
-			status = temp_exec(exec, env, input, token_list_save, prev_fd); 
-			// printf("cmd : %d,yooo\n", exec->is_subshell);
+			status = temp_exec(exec, env, input, token_list_save);
 			clean_exec_list(&exec); 
 		}
 	}

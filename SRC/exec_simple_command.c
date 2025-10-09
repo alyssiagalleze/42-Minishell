@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_simple_command.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/09 11:52:52 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:13:00 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,6 +185,19 @@ char	*append_exec_file(char *cmd_name, char *path)
 	free(tmp);
 	return (cmd_path);
 }
+	tmp = NULL;
+	tmp = ft_strjoin(path, "/");
+	if (!tmp)
+		return (NULL);
+	cmd_path = ft_strjoin(tmp, cmd_name);
+	if (!cmd_path)
+	{
+		free(tmp);
+		return (NULL);
+	}
+	free(tmp);
+	return (cmd_path);
+}
 
 char	*set_command_path(t_exec *exec_list, char **env)
 {
@@ -213,25 +226,25 @@ char	*set_command_path(t_exec *exec_list, char **env)
 	return (NULL);
 }
 
-int	is_builtin(t_exec *exec_list)
-{
-	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
-		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
-		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
-		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
-		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
-		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
-		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
-		return (TRUE);
-	else
-		return (FALSE);
-}
+// int	is_builtin(t_exec *exec_list)
+// {
+// 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
+// 		return (TRUE);
+// 	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+// 		return (TRUE);
+// 	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+// 		return (TRUE);
+// 	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+// 		return (TRUE);
+// 	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+// 		return (TRUE);
+// 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+// 		return (TRUE);
+// 	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
+// 		return (TRUE);
+// 	else
+// 		return (FALSE);
+// }
 
 int	built_in_exec(t_exec *exec_list, t_env **env)
 {

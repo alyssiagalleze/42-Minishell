@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:47:41 by tfiette           #+#    #+#             */
-/*   Updated: 2025/09/21 15:50:41 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/07 16:42:06 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,9 @@ static int	parser_check_last_word(t_token *token)
 		i ++;
 	}
 	if (single_quotes)
-		print_err(PROMPT, "unexpected EOF while looking for matching `\'\'\n",
-			PROMPT, "syntax error: unexpected end of file\n");
+		print_err(PROMPT, PERR_QUOTE, PROMPT, PERR_STX_EOF);
 	if (double_quotes)
-		print_err(PROMPT, "unexpected EOF while looking for matching `\"\'\n",
-			PROMPT, "syntax error: unexpected end of file\n");
+		print_err(PROMPT, PERR_QUOTES, PROMPT, PERR_STX_EOF);
 	return (single_quotes || double_quotes);
 }
 

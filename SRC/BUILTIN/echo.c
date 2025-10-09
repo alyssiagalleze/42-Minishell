@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:29:30 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/26 16:58:00 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:56:20 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int is_n_enabled(char *arg)
 {
+	if (!arg)
+		return (FALSE);
 	if (*arg == '-')
 	{ 
 		arg++;

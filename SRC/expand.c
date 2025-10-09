@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 12:52:26 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/08 11:21:10 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:14:07 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,10 +203,77 @@ void	ws_free_tab(char **tab, int word_count)
 	free(tab);
 }
 
-void	sort_tab(char **tab)
+char	ft_to_lower(char c)
 {
-	(void)tab;
-	printf("todo sort\n");
+	if (c >= 'A' && c <= 'Z')
+		c -= 'A' - 'a';
+	return (c);
+}
+
+int		sort_tab_nocase(const char *str_1, const char *str_2)
+{
+	int	i;
+	int	diff;
+
+	i = 0;
+	while (str_1[i])
+	{
+		diff = ft_to_lower(str_1[i]) - ft_to_lower(str_2[i]);
+		if (diff)
+			return (diff);
+		i ++;
+	}
+	return (str_1[i] - str_2[i]); // might segfault
+}
+
+int		sort_tab_case(const char *str_1, const char *str_2)
+{
+	int i;
+	int	diff;
+
+	i = 0;
+	while (str_1[i])
+	{
+		diff = ft_to_lower(str_1[i]) - ft_to_lower(str_2[i]);
+		if (!diff && (str_1[i] != str_2[i]))
+			return (diff);
+		i ++;
+	}
+	return (str_1[i] - str_2[i]);
+}
+
+void	swap_ptr(void **ptr1, void **ptr2)
+{
+	void	*temp;
+	temp = *ptr1;
+	*ptr1 = *ptr2;
+	*ptr2 = temp;
+}
+
+void	sort_tab(char **tab, int word_count) 
+{
+	int		i;
+	int 	j;
+	int		diff;
+	
+	j = word_count - 1;
+	i = 0;
+	while (i < j)
+	{
+		diff = sort_tab_nocase(tab[i], tab[i + 1]);
+		if (diff > 0)
+		{
+			swap_ptr((void **)&tab[i], (void **)&tab[i + 1]);
+			i = 0;
+		}
+		else if (!diff && (sort_tab_case(tab[i], tab[i + 1]) > 0))
+		{
+			swap_ptr((void **)&tab[i], (void **)&tab[i + 1]);
+			i = 0;
+		}
+		else
+			i ++;
+	}
 }
 
 void	token_list_insert_list(t_token *token_from, t_token *new_list)
@@ -235,7 +302,7 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 		{
 			ws_free_tab(tab, word_count);
 			clean_token_list(&new_token_list);
-			return (FALSE);  // TODO : check correctly freed
+			return (ERR_MALLOC);
 		}
 		token_list_fill_node(new_node, tab[i], WORD, WORD_ARG);
 		i ++;
@@ -243,9 +310,10 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 	free(token_list->str);
 	token_list_fill_node(token_list, tab[0], WORD, token_list->kind);
 	token_list_insert_list(token_list, new_token_list);
-	return (TRUE);
+	return (ERR_SUCCESS);
 }
 
+// TODO : maoc abort
 int	expand_wordsplit(t_token *token_list)
 {
 	char	**tab;
@@ -253,9 +321,7 @@ int	expand_wordsplit(t_token *token_list)
 
 	tab = wordsplit(&word_count, token_list->str);
 	if (tab == NULL)
-		return (print_err(PROMPT, "malloc failed\n", NULL, NULL), FALSE);
-	if (token_list->wild_expanded)
-		sort_tab(tab); // TODO
+		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), ERR_MALLOC);
 	if (word_count == 1)
 	{
 		free(token_list->str);
@@ -263,12 +329,13 @@ int	expand_wordsplit(t_token *token_list)
 	}
 	else
 	{
-		if (!expand_wordsplit_tokenize(token_list, tab, word_count)) //TODO : check I free tab correctly here
-			return (FALSE);
+		if (token_list->wild_expanded)
+			sort_tab(tab, word_count);
+		if (expand_wordsplit_tokenize(token_list, tab, word_count))
+			return (ERR_MALLOC);
 	}
-	// ws_free_tab(tab);
 	free(tab);
-	return (TRUE);
+	return (ERR_SUCCESS);
 }
 
 int	check_expand_wordsplit(t_token *token_list)
@@ -278,11 +345,11 @@ int	check_expand_wordsplit(t_token *token_list)
 		if (should_expand_wordsplit(token_list))
 		{
 			if (!expand_wordsplit(token_list))
-				return (FALSE);
+				return (ERR_MALLOC);
 		}
 		token_list = token_list->next;
 	}
-	return (TRUE);
+	return (ERR_SUCCESS);
 }
 
 void	expand_unquote(char *str)
@@ -319,36 +386,24 @@ void	check_expand_unquote(t_token *token_list)
 	while (token_list)
 	{
 		expand_unquote(token_list->str);
-		// printf("%s\n", token_list->str);
 		token_list = token_list->next;
 	}
 }
 
-//iterer dans la list
-// /!\ attention a ne pas decaler le start
+// TODO : Stop if malloc failure
 int	lister_expand_command(t_token *token_list, t_env *env)
 {
-	check_expand_dollar(token_list, env);
-	if (!check_expand_asterisk(token_list))
-		return (FALSE);								// error check
-	if (!check_expand_wordsplit(token_list))		// TODO : malloc failure should stop process ??
-		return (FALSE);
-	check_expand_unquote(token_list);
-	return (TRUE);
-}
+	enum e_err	err;
 	
-	///////////////////////
-
-// avancer expansion de variable
-//
-// -> scan pour *
-// -> recuperer toutes les chaines et eventuellement les sort
-//		-> si une seule chaine, free str et rajouter nouveau dup
-//		-> si plusieurs chaines
-//			-> if word_file (redir) -> syntax error
-//			-> else : rajouter maillons et dup str -> /!\ premier peut-etre commande etc
-//
-// -> repartir debut
-// -> scan pour quotes et end quotes 
-//		-> ecrire ce que je trouve entre dans un buffer
-//		-> copier le contenu du buffer dans la str de base et ferme avec \0
+	err = check_expand_dollar(token_list, env);
+	if (err)
+		return (err);
+	err = check_expand_asterisk(token_list);
+	if (err)
+		return (err);
+	err = check_expand_wordsplit(token_list);
+	if (err)
+		return (err);
+	check_expand_unquote(token_list);
+	return (ERR_SUCCESS);
+}
