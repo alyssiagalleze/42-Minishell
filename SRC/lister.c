@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/10 16:07:19 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/10 16:49:03 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -504,7 +504,8 @@ int subcall_lister(t_exec *exec_list, t_env **env)
 	data_reset_pointers(&subdata);
 	subdata.token_list = exec_list->subshell->token_sublist;
 	subdata.token_list_save = subdata.token_list;
-	clean_exec_list(&exec_list, TRUE);
+	exec_list->subshell->token_sublist = NULL;
+	clean_exec_list(&exec_list, FALSE);
 	return (lister(&subdata));
 }
 
