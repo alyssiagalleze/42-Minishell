@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 12:13:36 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/09 14:53:25 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 		free(var_name);
 		return (ERR_MALLOC);
 	}
-	else if (is_str_empty_or_null(new_str, 0) && token_list->type == WORD_FILE)
+	else if (is_str_empty_or_null(new_str) && token_list->type == WORD_FILE)
 	{
 		print_err(PROMPT, PERR_AMBIG, NULL, NULL);
 		free(var_name);

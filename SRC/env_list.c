@@ -44,7 +44,7 @@ void	env_add_node(t_env **top, t_env *node)
 	}
 }
 
-t_env   *init_env_list(char **env)
+t_env   *init_env_list(char **env) //TODO : est ce qu'il y a du malloc qlq part, si oui err_malloc
 {
 	t_env   *top;
 	char	*var_name;
@@ -56,7 +56,7 @@ t_env   *init_env_list(char **env)
 	i = 0;
 	while (env[i])
 	{
-		sep = strchr(env[i], '=');
+		sep = strchr(env[i], '='); //TODO : fonction interdite 
 		if (sep)
 		{
 			*sep = '\0';

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 19:05:03 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/09 14:49:29 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,9 @@ int	is_char_in_string(const char c, const char *str, int accept_null)
 	}
 	return (FALSE);
 }
-//TODO : retirer status
-int	is_str_empty_or_null(const char *str, int status)
+
+int	is_str_empty_or_null(const char *str)
 {
-	(void)status;
-	// if (str == NULL)
-	// 	my_exit(status, NULL, NULL, NULL); // TODO
 	while (str && *str)
 	{
 		if (!is_white_space(*str))

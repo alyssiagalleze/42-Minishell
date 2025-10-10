@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 13:10:45 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/10 15:43:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,20 +25,58 @@
 // 	}
 // }
 
-int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+void	clean_exec_node(t_exec **exec_list)
 {
+	int	i;
+	t_exec	*next;
+
+	i = 0;
+	next = (*exec_list)->next;
+	if (exec_list && *exec_list)
+	{
+		if ((*exec_list)->is_command)
+		{
+			while ((*exec_list)->command->argv[i])
+			{
+				free((*exec_list)->command->argv[i]);
+				(*exec_list)->command->argv[i] = NULL;
+				i ++;
+			}
+			free((*exec_list)->command);
+		}
+		else if ((*exec_list)->is_subshell)
+		{
+			if ((*exec_list)->subshell->token_sublist)
+				clean_token_list(&((*exec_list)->subshell->token_sublist));
+			free((*exec_list)->subshell);
+		}
+		free(*exec_list);
+	}
+	*exec_list = next;
+}
+
+int subcall_lister(t_exec *exec_list, t_env **env);
+
+/*
+*	IMPORTANT : Il faut avancer et clean exec_list ici !!
+*
+*
+*/
+
+int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_save, int *prev_fd)
+{
+	
     int temp_res = TRUE;
     pid_t pid;
     int status;
-    t_token *sublist_save;
     t_pid_list *pids = NULL;
 
-    while (exec_list != NULL)
+    while (*exec_list != NULL)
     {
-        if (exec_list->is_subshell)
+        if ((*exec_list)->is_subshell)
         {
             int pipefds[2] = {-1, -1};
-            int need_pipe = (exec_list->next && exec_list->next->is_command);
+            int need_pipe = ((*exec_list)->next && (*exec_list)->next->is_command);
     
             if (need_pipe && pipe(pipefds) == -1)
                 return (perror("pipe"), 1);
@@ -51,38 +89,31 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
                     if (pipefds[0] != -1) close(pipefds[0]);
                     if (pipefds[1] != -1) close(pipefds[1]);
                 }
-                return (perror("fork"), 1);
+                return (perror("fork"), 1); // TODO : should return
             }
     
             if (pid == 0)
             {
-                if (*prev_fd != -1)
+				if (*prev_fd != -1)
                 {
-                    if (dup2(*prev_fd, STDIN_FILENO) == -1)
-                        _exit(1);
+					if (dup2(*prev_fd, STDIN_FILENO) == -1)
+					_exit(1);
                     close(*prev_fd);
                 }
-    
+				
                 if (need_pipe)
                 {
-                    if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-                        _exit(1);
+					if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+					_exit(1);
                     close(pipefds[0]);
                     close(pipefds[1]);
                 }
-    
-                sublist_save = exec_list->subshell->token_sublist;
-                {
-                    int sub_prev = -1;
-                    status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save, &sub_prev);
-                }
-    
-                clean_token_list(&sublist_save);
-                clean_exec_list(&exec_list);
+				
+				clean_token_list(token_list_save);
+				rl_clear_history();
+                status = subcall_lister(*exec_list, env);
                 clean_env(env);
-                clean_input(input);
-                rl_clear_history();
-                _exit(status);
+                _exit(status); //TODO : fonction interdite
             }
     
             if (*prev_fd != -1)
@@ -104,23 +135,25 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
             else
                 temp_res = status;
         }
-        else if (exec_list->is_command)
+        else if ((*exec_list)->is_command)
         {
-            if ((!exec_list->next) && is_builtin(exec_list) == TRUE)
+            if ((!(*exec_list)->next) && is_builtin((*exec_list)) == TRUE)
             {
-                temp_res = built_in_exec(exec_list, env);
+                temp_res = built_in_exec((*exec_list), env);
             }
             else
             {
-                status = exec_pipeline(exec_list, &pids, env, prev_fd);
-                if (!exec_list->next || exec_list->next->is_command == FALSE)
+                status = exec_pipeline((*exec_list), &pids, env, prev_fd);
+                if (!(*exec_list)->next || (*exec_list)->next->is_command == FALSE)
                 {
                     temp_res = pid_wait_all(pids, status);
                     clean_pid(&pids);
                 }
             }
         }
-        exec_list = exec_list->next;
+		t_exec *temp;
+		temp = (*exec_list)->next;
+		clean_exec_node(exec_list);
     }
 
     return (temp_res);
@@ -369,7 +402,7 @@ int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_
 	if (err)
 	{
 		if (err == ERR_AMBIG)
-			return (clean_exec_list(exec_list), ERR_AMBIG); //TODO : check if clear exec necessary
+			return (clean_exec_list(exec_list, FALSE), ERR_AMBIG); //TODO : check if clear exec necessary
 		if (err == ERR_MALLOC)
 			return (ERR_MALLOC);
 	}
@@ -392,7 +425,8 @@ int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_
 //
 // Je dois aussi recuperer le resutat de l'execution de la list
 // et faire les expansions a un moment
-int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *env, int *prev_fd) 
+
+int	lister_simple(t_token **token_list, t_env *env, t_exec **exec_list, int lvalue, int *prev_fd) 
 {
 	enum e_err	err;
 	
@@ -423,42 +457,79 @@ int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *e
 	return (ERR_SUCCESS);
 }
 
+// void	subclean_exec_list(t_exec **subexec, t_exec **exec_list)
+// {
+// 	t_exec	*temp;
+// 	int		i;
+	
+// 	while (exec_list && *exec_list)
+// 	{
+// 		temp = (*exec_list)->next;
+// 		while ((*exec))
+// 	}
+// }
+
+void	data_reset_pointers(struct s_data *data);
+
+int subcall_lister(t_exec *exec_list, t_env **env)
+{
+	struct s_data	subdata;
+	int				sub_fd;
+	
+	sub_fd = -1;
+	subdata.env = *env;
+	data_reset_pointers(&subdata);
+	subdata.token_list = exec_list->subshell->token_sublist;
+	subdata.token_list_save = subdata.token_list;
+	clean_exec_list(&exec_list, TRUE);
+	return (lister(&subdata, &sub_fd));
+}
+
 //TODO : 5 args
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+
+// struct s_data
+// {
+// 	t_token	*token_list;
+// 	t_token *token_list_save;
+// 	t_env	*env;
+// 	int		prev_fd;
+// };
+
+//TODO : BIG : est-ce que j'ai besoin de l'input ici ???
+// int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+int	lister(struct s_data *data, int *prev_fd)
 {
 	int			status;
 	t_exec		*exec;
 	int			err;
 
 	exec = NULL;
-	while (*token_list)
+	while (data->token_list)
 	{
-		err = lister_simple(token_list, &exec, status, *env, prev_fd);
+		err = lister_simple(&data->token_list, data->env, &exec, status, prev_fd);
 		if (err)
 		{
 			status = 2;
 			if (err == ERR_MALLOC)
 			{
-				clean_exec_list(&exec);
-				my_exit(status, env, input, token_list_save);
+				clean_exec_list(&exec, FALSE);
+				my_exit(status, &data->env, NULL, &data->token_list_save);
 			}
 		}
 		if (exec)
 		{
-			status = temp_exec(exec, env, input, token_list_save, prev_fd);
-			clean_exec_list(&exec); 
+			status = temp_exec(&exec, &data->env, &data->token_list_save, prev_fd);
+			clean_exec_list(&exec, FALSE); 
 		}
 	}
-	cleaner(NULL, input, token_list_save);
+	cleaner(NULL,NULL, &data->token_list_save);
 	return (status);
 }
 
-// faire plan des mallocs
 
 // nettoyer / ranger code
 
 //heredoc meme si skip ?
 
-//limiter a arg max
-
+// true | (true | (true)) | (true)
 
