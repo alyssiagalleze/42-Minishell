@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   lister.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/24 16:21:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 13:10:45 by tfiette          ###   ########.fr       */
-/*                                                                            */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   lister.c										   :+:	  :+:	:+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: agalleze <agalleze@student.42.fr>		  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2025/09/24 16:21:10 by tfiette		   #+#	#+#			 */
+/*   Updated: 2025/10/10 11:36:35 by agalleze		 ###   ########.fr	   */
+/*																			*/
 /* ************************************************************************** */
 
 # include "minishell.h"
@@ -25,105 +25,130 @@
 // 	}
 // }
 
-int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list_save)
 {
-    int temp_res = TRUE;
-    pid_t pid;
-    int status;
-    t_token *sublist_save;
-    t_pid_list *pids = NULL;
+	int temp_res = TRUE;
+	pid_t pid;
+	int status;
+	t_token *sublist_save;
+	t_pid_list *pids = NULL;
+	int saved_stdin;
+	int saved_stdout;
+	static int	prev_fd;
 
-    while (exec_list != NULL)
-    {
-        if (exec_list->is_subshell)
-        {
-            int pipefds[2] = {-1, -1};
-            int need_pipe = (exec_list->next && exec_list->next->is_command);
-    
-            if (need_pipe && pipe(pipefds) == -1)
-                return (perror("pipe"), 1);
-    
-            pid = fork();
-            if (pid == -1)
-            {
-                if (need_pipe)
-                {
-                    if (pipefds[0] != -1) close(pipefds[0]);
-                    if (pipefds[1] != -1) close(pipefds[1]);
-                }
-                return (perror("fork"), 1);
-            }
-    
-            if (pid == 0)
-            {
-                if (*prev_fd != -1)
-                {
-                    if (dup2(*prev_fd, STDIN_FILENO) == -1)
-                        _exit(1);
-                    close(*prev_fd);
-                }
-    
-                if (need_pipe)
-                {
-                    if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-                        _exit(1);
-                    close(pipefds[0]);
-                    close(pipefds[1]);
-                }
-    
-                sublist_save = exec_list->subshell->token_sublist;
-                {
-                    int sub_prev = -1;
-                    status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save, &sub_prev);
-                }
-    
-                clean_token_list(&sublist_save);
-                clean_exec_list(&exec_list);
-                clean_env(env);
-                clean_input(input);
-                rl_clear_history();
-                _exit(status);
-            }
-    
-            if (*prev_fd != -1)
-                close(*prev_fd);
-    
-            if (need_pipe)
-            {
-                close(pipefds[1]);
-                *prev_fd = pipefds[0]; 
-            }
-            else
-            {
-                *prev_fd = -1;
-            }
-    
-            waitpid(pid, &status, 0);
-            if (WIFEXITED(status))
-                temp_res = WEXITSTATUS(status);
-            else
-                temp_res = status;
-        }
-        else if (exec_list->is_command)
-        {
-            if ((!exec_list->next) && is_builtin(exec_list) == TRUE)
-            {
-                temp_res = built_in_exec(exec_list, env);
-            }
-            else
-            {
-                status = exec_pipeline(exec_list, &pids, env, prev_fd);
-                if (!exec_list->next || exec_list->next->is_command == FALSE)
-                {
-                    temp_res = pid_wait_all(pids, status);
-                    clean_pid(&pids);
-                }
-            }
-        }
-        exec_list = exec_list->next;
-    }
+	// printf("modifying prev_fd value\n");
+	prev_fd = -1;
+	saved_stdin = dup(STDIN_FILENO);
+	if (saved_stdin == -1)
+		return (perror("dup"), 1);
+	saved_stdout = dup(STDOUT_FILENO);
+	if (saved_stdout == -1)
+		return (perror("dup"), 1);
+	while (exec_list != NULL)
+	{
+		if (exec_list->is_subshell)
+		{
+			// printf("in subshell node\n");
+			int pipefds[2] = {-1, -1};
+			if (pipe(pipefds) == -1)
+				return (perror("pipe"), 1);
+			
+			pid = fork();
+			if (pid == -1)
+			{
+				if (pipefds[0] != -1)
+					close(pipefds[0]);
+				if (pipefds[1] != -1)
+					close(pipefds[1]);
+				return (perror("fork"), 1);
+			}
 
-    return (temp_res);
+			if (pid == 0)
+			{
+			// printf("in child subshell\n");
+
+				if (prev_fd != -1)
+				{
+					// printf("in subshell node, prev_fd is %d\n", prev_fd);
+					if (dup2(prev_fd, STDIN_FILENO) == -1)
+						exit(1);
+					close(prev_fd);
+				}
+				if (pipefds[1] != -1)
+				{
+					// printf("in subshell node, setting up pipe for next command at fd %d\n", pipefds[1]);
+					if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+						exit(1);
+					close(pipefds[1]);
+				}
+				if (!exec_list->next)
+				{
+					if (dup2(saved_stdout, STDOUT_FILENO) == -1)
+						exit(1);
+					close(pipefds[1]);
+				}
+				if (pipefds[0] != -1)
+					close(pipefds[0]);
+				if (pipefds[1] != -1)
+					close(pipefds[1]);
+				// printf("Launching subshell\n");
+				sublist_save = exec_list->subshell->token_sublist;
+				{
+					status = lister(&(exec_list->subshell->token_sublist), env, input, token_list_save);
+				}
+				// printf("Subshell exited with status %d\n", status);
+				clean_token_list(&sublist_save);
+				clean_exec_list(&exec_list);
+				clean_env(env);
+				clean_input(input);
+				rl_clear_history();
+				exit(status);
+			}
+			if (prev_fd != -1)
+				close(prev_fd);
+			if (exec_list->next)
+			{
+				// printf("Parent process setting up for next command, fd set to %d\n", pipefds[0]);
+				prev_fd = pipefds[0];
+				if (pipefds[1] != -1)
+					close(pipefds[1]);
+			}
+			else
+			{
+				if (pipefds[0] != -1)
+					close(pipefds[0]);
+				if (pipefds[1] != -1)
+					close(pipefds[1]);
+				prev_fd = -1;
+			}
+			waitpid(pid, &status, 0);
+			if (WIFEXITED(status))
+				temp_res = WEXITSTATUS(status);
+			else
+				temp_res = status;
+		}
+		else if (exec_list->is_command)
+		{
+			if ((!exec_list->next) && is_builtin(exec_list) == TRUE)
+			{
+				temp_res = built_in_exec(exec_list, env);
+			}
+			else
+			{
+				status = exec_pipeline(exec_list, &pids, env, &prev_fd);
+				if (!exec_list->next || exec_list->next->is_command == FALSE)
+				{
+					temp_res = pid_wait_all(pids, status);
+					clean_pid(&pids);
+				}
+			}
+		}
+		exec_list = exec_list->next;
+	}
+	if (dup2(saved_stdin, STDIN_FILENO) == -1)
+		perror("dup2 restore stdin");
+	close(saved_stdin);
+	return (temp_res);
 }
 
 void	lister_init_exec(t_exec *exec)
@@ -335,12 +360,11 @@ int	lister_scan_command(t_token **token_list, t_command *command)
 	return (ERR_SUCCESS);
 }
 
-void	exec_list_init_command(t_command *command, int *prev_fd)
+void	exec_list_init_command(t_command *command)
 {
 	int	i;
 	
 	i = 0;
-	command->prev_fd = *prev_fd;
 	while (i < ARG_MAX)
 	{
 		command->argv[i] = 0;
@@ -352,7 +376,7 @@ void	exec_list_init_command(t_command *command, int *prev_fd)
 
 // Rajoute un t_subshell a exec_list
 // Fait avancer a liste jusqu'au prochaine operateur exclus
-int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env, int *prev_fd)
+int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_env *env)
 {
 	t_exec		*new_exec;
 	enum e_err	err;
@@ -364,7 +388,7 @@ int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_
 	new_exec->command = malloc(sizeof(t_command));
 	if (new_exec->command == NULL)
 		return (ERR_MALLOC);
-	exec_list_init_command(new_exec->command, prev_fd);
+	exec_list_init_command(new_exec->command);
 	err = lister_expand_command(*token_list, env);
 	if (err)
 	{
@@ -392,7 +416,7 @@ int	lister_create_exec_from_command(t_token **token_list, t_exec **exec_list, t_
 //
 // Je dois aussi recuperer le resutat de l'execution de la list
 // et faire les expansions a un moment
-int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *env, int *prev_fd) 
+int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *env) 
 {
 	enum e_err	err;
 	
@@ -410,7 +434,7 @@ int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *e
 		if ((*token_list)->kind == BRACKET_O)
 			err = lister_create_exec_from_subshell(token_list, exec_list);
 		else
-			err = lister_create_exec_from_command(token_list, exec_list, env, prev_fd);
+			err = lister_create_exec_from_command(token_list, exec_list, env);
 		if (err == ERR_MALLOC)
 			return (ERR_MALLOC);
 		if (err == ERR_AMBIG)
@@ -424,7 +448,7 @@ int	lister_simple(t_token **token_list, t_exec **exec_list, int lvalue, t_env *e
 }
 
 //TODO : 5 args
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd)
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save)
 {
 	int			status;
 	t_exec		*exec;
@@ -433,7 +457,7 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 	exec = NULL;
 	while (*token_list)
 	{
-		err = lister_simple(token_list, &exec, status, *env, prev_fd);
+		err = lister_simple(token_list, &exec, status, *env);
 		if (err)
 		{
 			status = 2;
@@ -445,7 +469,7 @@ int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list
 		}
 		if (exec)
 		{
-			status = temp_exec(exec, env, input, token_list_save, prev_fd);
+			status = temp_exec(exec, env, input, token_list_save);
 			clean_exec_list(&exec); 
 		}
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 12:10:05 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/10 11:55:18 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum
 void	lexer(t_token **lexer, char *input);
 
 // lister.c
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save, int *prev_fd);
+int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 // int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 
 //	string_manip.c

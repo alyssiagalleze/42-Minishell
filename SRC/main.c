@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 12:28:14 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/10 15:23:39 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,18 @@ int	main(int ac, char **av, char **env)
 	t_token	*token_list_save; //find a way not to use it
 	t_env	*my_env;
 	int		status;
-	int prev_fd = -1;
 
 	my_env = init_env_list(env);
 	status = 2;
-    // init_signals();
 	while (1)
 	{
 		input = NULL;
 		token_list = NULL;
 		token_list_save = NULL;
 		while (!input)
+		{
 			get_input(&input, status);
+		}
 		if (str_cmp(input, "exit", FALSE))
 			my_exit(0, &my_env, &input, &token_list_save);
 		lexer(&token_list, input);
@@ -67,7 +67,7 @@ int	main(int ac, char **av, char **env)
 			cleaner(NULL, &input, &token_list_save);
 		}
 		else if (parser(&token_list))
-			status = lister(&token_list, &my_env, &input, &token_list_save, &prev_fd);
+			status = lister(&token_list, &my_env, &input, &token_list_save);
 		else
 			cleaner(NULL, &input, &token_list_save);
 		printf("+++exit status: %i\n", status);
