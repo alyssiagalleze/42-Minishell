@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*																			*/
-/*														:::	  ::::::::   */
-/*   exec_simple_command.c							  :+:	  :+:	:+:   */
-/*													+:+ +:+		 +:+	 */
-/*   By: agalleze <agalleze@student.42.fr>		  +#+  +:+	   +#+		*/
-/*												+#+#+#+#+#+   +#+		   */
-/*   Created: 2025/09/26 14:00:42 by agalleze		  #+#	#+#			 */
-/*   Updated: 2025/10/09 15:54:50 by agalleze		 ###   ########.fr	   */
-/*																			*/
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_simple_command.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/10 16:19:56 by tfiette          ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
@@ -41,12 +41,9 @@ char	*append_exec_file(char *cmd_name, char *path)
 	if (!tmp)
 		return (NULL);
 	cmd_path = ft_strjoin(tmp, cmd_name);
-	if (!cmd_path)
-	{
-		free(tmp);
-		return (NULL);
-	}
 	free(tmp);
+	if (!cmd_path)
+		return (NULL);
 	return (cmd_path);
 }
 
@@ -165,7 +162,6 @@ int	built_in_exec(t_exec *exec_list, t_env **env)
 		exit_status = print_env(env);
 	return (exit_status);
 }
-
 
 int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
 {
@@ -302,5 +298,6 @@ int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_f
 	parent_after_fork(exec_list, prev_fd, pipefds);
 	pid_add_back(pids, pid);
 	free_env_array(my_env);
+	free(path);
 	return (0);
 }

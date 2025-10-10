@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 13:42:00 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/10 14:23:28 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,16 +71,16 @@ void	exec_cleaner(char **path_tab, char *path)
 		free(path);
 }
 
-void	clean_exec_list(t_exec **exec_list)
+void	clean_exec_list(t_exec **exec_list, int is_sublist)
 {
 	t_exec	*temp;
 	int		i;
 	
-	while (*exec_list)
+	while (exec_list && *exec_list)
 	{
 		temp = (*exec_list)->next;
 		i = 0;
-		if ((*exec_list)->is_command)
+		if ((*exec_list)->is_command && (*exec_list)->command)
 		{
 			while ((*exec_list)->command->argv[i])
 			{
@@ -89,10 +89,11 @@ void	clean_exec_list(t_exec **exec_list)
 				i ++;
 			}
 			free((*exec_list)->command);
+			(*exec_list)->command = NULL;
 		}
 		else if ((*exec_list)->is_subshell)
 		{
-			if ((*exec_list)->subshell->token_sublist)
+			if (!is_sublist && (*exec_list)->subshell->token_sublist)
 				clean_token_list(&((*exec_list)->subshell->token_sublist));
 			free((*exec_list)->subshell);
 		}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/10 11:55:18 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:03:13 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,14 @@ typedef struct s_exec
 } t_exec;
 
 
+struct s_data
+{
+	t_token	*token_list;
+	t_token *token_list_save;
+	t_env	*env;
+	int		prev_fd;
+};
+
 // PROTOTYPES
 
 // built-ins
@@ -170,7 +178,7 @@ void	clean_input(char **input);
 void	clean_env(t_env **env);
 void	clean_token_list(t_token	**lexer);
 void	exec_cleaner(char **path_tab, char *path);
-void	clean_exec_list(t_exec **exec_list);
+void	clean_exec_list(t_exec **exec_list, int	is_sublist);
 void	cleaner(t_env **my_env, char **input, t_token **token_list);
 
 
@@ -218,7 +226,7 @@ void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum
 void	lexer(t_token **lexer, char *input);
 
 // lister.c
-int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
+int	lister(struct s_data *data);
 // int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 
 //	string_manip.c
@@ -226,7 +234,7 @@ int		is_white_space(const char c);
 int		is_char_operator(const char c);
 int		is_char_separator(const char c);
 int		is_char_in_string(const char c, const char *str, int accept_null);
-int		is_str_empty_or_null(const char *str, int status);
+int		is_str_empty_or_null(const char *str);
 int		ft_strlen(const char *str);
 int		str_cmp(char *str1, char *str2, int accept_null);
 int		str_ncmp(char *str1, char *str2, int n, int accept_null);
