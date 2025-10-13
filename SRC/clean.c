@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/10 16:44:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 19:01:07 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,54 +56,14 @@ void	clean_env(t_env **env)
 	env = NULL;
 }
 
-void	exec_cleaner(char **path_tab, char *path)
+void	exit_clean(struct s_data *data)
 {
-	int	i;
-
-	i = 0;
-	if (path_tab)
-	{
-		while (path_tab[i])
-			free(path_tab[i++]);
-		free(path_tab);
-	}
-	if (path)
-		free(path);
+	cleaner(&data->env, NULL, &data->token_list_head);
+	rl_clear_history();
+	printf("%s", RESET_FONT);
 }
 
-void	clean_exec_list(t_exec **exec_list, int is_sublist)
-{
-	t_exec	*temp;
-	int		i;
-	
-	while (exec_list && *exec_list)
-	{
-		temp = (*exec_list)->next;
-		i = 0;
-		if ((*exec_list)->is_command && (*exec_list)->command)
-		{
-			while ((*exec_list)->command->argv[i])
-			{
-				free((*exec_list)->command->argv[i]);
-				(*exec_list)->command->argv[i] = NULL;
-				i ++;
-			}
-			free((*exec_list)->command);
-			(*exec_list)->command = NULL;
-		}
-		else if ((*exec_list)->is_subshell)
-		{
-			if (!is_sublist && (*exec_list)->subshell->token_sublist)
-				clean_token_list(&((*exec_list)->subshell->token_sublist));
-			free((*exec_list)->subshell);
-		}
-		free(*exec_list);
-		*exec_list = temp;
-	}
-	*exec_list = NULL;
-}
-
-void cleaner(t_env **my_env, char **input, t_token **token_list)
+void	cleaner(t_env **my_env, char **input, t_token **token_list)
 {
 	if (my_env && *my_env)
 		clean_env(my_env);

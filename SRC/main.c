@@ -6,45 +6,29 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/10 16:03:31 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 15:39:17 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	get_input(char **input)
+void	check_exit(char *input, struct s_data *data) // TODO : built in only
 {
-	*input = readline(PROMPT);
-	if (is_str_empty_or_null(*input))
-		clean_input(input);
-	else
-		add_history(*input);
+	if (str_cmp(input, "exit", FALSE))
+		my_exit(0, &data->env, &input, NULL);
 }
 
-int	token_list_size(t_token *token_list)
+void	get_input(char **input, struct s_data *data)
 {
-	int	i;
-
-	i = 0;
-	while (token_list)
+	while (!*input)
 	{
-		i ++;
-		if (i == ARG_MAX)
-			return (ARG_MAX);
-		token_list = token_list->next;
+		*input = readline(PROMPT);
+		if (is_str_empty_or_null(*input))
+			clean_input(input);
+		else
+			add_history(*input);
 	}
-	return (i);
-}
-
-void	data_reset_pointers(struct s_data *data)
-{
-	data->token_list = NULL;
-	data->token_list_save = NULL;
-}
-
-void	data_save_token_list(struct s_data *data)
-{
-	data->token_list_save = data->token_list;
+	check_exit(*input, data);
 }
 
 void	shell_loop(struct s_data *data, int *status)
@@ -53,35 +37,23 @@ void	shell_loop(struct s_data *data, int *status)
 
 	while (1)
 	{
-		input = NULL;	
+		input = NULL;
 		data_reset_pointers(data);
-		while (!input)
-			get_input(&input);
-		if (str_cmp(input, "exit", FALSE))
-			my_exit(0, &data->env, &input, &data->token_list_save); // TODO : normalement pas besoin de free sauf input
-		lexer(&data->token_list, input);
-		data_save_token_list(data);
-		free(input);
+		get_input(&input, data);
+		lexer(&data->token_list, input, data);
 		if (token_list_size(data->token_list) >= ARG_MAX)
 		{
 			print_err(PROMPT, PERR_ARG_MAX, NULL, NULL);
-			cleaner(NULL, NULL, &data->token_list_save);
+			cleaner(NULL, NULL, &data->token_list_head);
 		}
 		else if (parser(&data->token_list))
-			*status = lister(data);
+			*status = token_list_to_exec(data);
 		else
-			cleaner(NULL, NULL, &data->token_list_save);
+			cleaner(NULL, NULL, &data->token_list_head);
 		printf("+++exit status: %i\n", *status);
 	}
 }
 
-void	exit_clean(struct s_data *data)
-{
-	cleaner(&data->env, NULL, &data->token_list_save);
-	rl_clear_history();
-}
-
-// est ce que j'envoie le pointeur ou le pointeur sur pointeur ?
 int	main(int ac, char **av, char **env)
 {
 	struct s_data	data;
@@ -92,8 +64,15 @@ int	main(int ac, char **av, char **env)
     // init_signals();
 	shell_loop(&data, &status);
 	exit_clean(&data);
-	printf("%s", RESET_FONT);
 	return(status);
 	(void)ac;
 	(void)av;
 }
+
+/*
+*	norminette first passe
+*	passe builtin
+*	words type etc in parser
+*	rendre claire pipeline exec
+*
+*/

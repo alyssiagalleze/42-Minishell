@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/09 14:49:29 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 19:41:38 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
+// TODOLONG
 char	*str_append_sq(char *from, char *app)
 {
 	char	*new_str;

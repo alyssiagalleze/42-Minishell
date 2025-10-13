@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 14:00:42 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/10 16:19:56 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 16:37:44 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ char	**get_paths(char **env_tab)
 {
 	char	**path_tab;
 	int		i;
-	
+
 	i = 0;
 	while (env_tab[i])
 	{
@@ -35,7 +35,7 @@ char	*append_exec_file(char *cmd_name, char *path)
 {
 	char	*tmp;
 	char	*cmd_path;
-	
+
 	tmp = NULL;
 	tmp = ft_strjoin(path, "/");
 	if (!tmp)
@@ -52,7 +52,7 @@ char	*set_command_path(t_exec *exec_list, char **env)
 	int		i;
 	char	**path_tab;
 	char	*cmd_path;
-	
+
 	path_tab = get_paths(env);
 	if (!path_tab)
 		return (NULL);
@@ -63,7 +63,7 @@ char	*set_command_path(t_exec *exec_list, char **env)
 		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
 		if (!access(cmd_path, F_OK | X_OK))
 			return (exec_cleaner(path_tab, NULL), cmd_path);
-		free(cmd_path);	
+		free(cmd_path);
 		i++;
 	}
 	exec_cleaner(path_tab, NULL);
@@ -80,7 +80,7 @@ char	*build_env_variable(t_env *node)
 	int		len;
 	int		i;
 	int		j;
-	
+
 	len = ft_strlen(node->var_name) + ft_strlen(node->var_value) + 2;
 	var = malloc(len);
 	if (!var)
@@ -104,10 +104,10 @@ char	**transfer_env(t_env **env)
 	char	**my_env;
 	int		lst_len;
 	int		i;
-	
+
 	lst_len = ft_lstsize(*env);
 	i = 0;
-	my_env = malloc((lst_len + 1)* (sizeof(char *)));
+	my_env = malloc((lst_len + 1) * (sizeof(char *)));
 	if (!my_env)
 		return (NULL);
 	current = *env;
@@ -146,7 +146,7 @@ int	is_builtin(t_exec *exec_list)
 int	built_in_exec(t_exec *exec_list, t_env **env)
 {
 	int	exit_status;
-	
+
 	exit_status = 0;
 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)
 		exit_status = echo(exec_list->command->argv);
@@ -163,7 +163,8 @@ int	built_in_exec(t_exec *exec_list, t_env **env)
 	return (exit_status);
 }
 
-int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
+int	prepare_env_and_pipe(
+	t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2])
 {
 	pipefds[0] = -1;
 	pipefds[1] = -1;
@@ -174,17 +175,15 @@ int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pip
 		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
 	if (exec_list->next)
 	{
-		// printf("Check fds for command %s\n", exec_list->command->argv[0]);
 		if (pipe(pipefds) == -1)
 			return (perror("pipe"), 1);
 	}
-	// printf("pipefd[0] = %d, pipefd[1] = %d\n", pipefds[0], pipefds[1]);
 	return (0);
 }
 
-char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
+char	*get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
 {
-	char *path;
+	char	*path;
 
 	path = NULL;
 	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
@@ -203,7 +202,7 @@ char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
 	return (path);
 }
 
-void free_env_array(char **envp)
+void	free_env_array(char **envp)
 {
 	int i;
 
@@ -215,12 +214,14 @@ void free_env_array(char **envp)
 	free(envp);
 }
 
-void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2], int prev_fd)
+// TODO : Too many args
+void child_exec(
+	t_exec *exec_list, char *path, t_env **env, int pipefds[2], int prev_fd)
 {
 	int		status;
 	char	**my_env;
 
-	if ( prev_fd != -1)
+	if (prev_fd != -1)
 	{
 		if (dup2(prev_fd, STDIN_FILENO) == -1)
 			exit(1);
@@ -242,7 +243,7 @@ void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2], int 
 	status = execve(path, exec_list->command->argv, my_env);
 	perror(exec_list->command->argv[0]);
 	free_env_array(my_env);
-	exit(85);
+	exit(85); //TODO : pas sur du code retour
 }
 
 int	handle_fork_error(int pipefds[2], char **my_env)
@@ -276,7 +277,7 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 	}
 }
 
-int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
+int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
 {
 	int		pipefds[2];
 	pid_t	pid;

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 16:48:32 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 17:18:30 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,25 +69,19 @@ static int	parser_check_bracket(
 	return (FALSE);
 }
 
-static int	parser_check_token(
-	t_token **token_list, t_token *prev_token, int *open_brackets, int *line_has_cmd)
+static int	parser_check_token_dispatch(t_token *token, t_token *prev_token, int *open_brackets, int *line_has_cmd)
 {
-	t_token	*token;
-	enum	e_type	prev_type;
-	enum	e_kind 	prev_kind;
-
-	token = *token_list;
+	enum e_type	prev_type;
+	enum e_kind	prev_kind;
+	
+	prev_type = NONE;
+	prev_kind = UNKNOWN;
 	if (token->type == NONE)
 	{
 		print_err(PROMPT, PERR_STX_OPE, token->str, "\n");
 		return (TRUE);
 	}
-	if (!prev_token)
-	{
-		prev_type = NONE;
-		prev_kind = UNKNOWN;
-	}
-	else
+	if (prev_token)
 	{
 		prev_type = prev_token->type;
 		prev_kind = prev_token->kind;
@@ -111,18 +105,14 @@ int	parser(t_token **token_list)
 	int					brackets;
 	int					line_has_cmd;
 
-	if (token_list == NULL)
-		printf("ATT : PARSER RECEIVED AN EMPTY TOKEN_LIST!");
 	token = *token_list;
 	prev_token = NULL;
 	brackets = 0;
 	line_has_cmd = FALSE;
 	while (token)
 	{
-		if (parser_check_token(&token, prev_token, &brackets, &line_has_cmd))
-		{
+		if (parser_check_token_dispatch(token, prev_token, &brackets, &line_has_cmd))
 			return (FALSE);
-		}
 		prev_token = token;
 		token = token->next;
 	}

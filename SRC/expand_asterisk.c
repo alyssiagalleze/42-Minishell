@@ -6,11 +6,11 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 17:27:05 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 17:03:43 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 19:40:36 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "minishell.h"
+#include "minishell.h"
 
 int	should_expand_asterisk(t_token *token_list)
 {
@@ -40,101 +40,41 @@ int	should_expand_asterisk(t_token *token_list)
 	return (FALSE);
 }
 
-int	match_asterisk_pattern_bt(char *str, char *pattern)
+int	exp_asterisk_core(
+	int token_kind, char **new_str, char *pattern, char *file_name)
 {
-	if (!*pattern && !*str)
-		return (TRUE);
-	if (*pattern != '*')
+	if (token_kind == WORD_FILE && *new_str)
 	{
-		if (*pattern == *str)
-			return (match_asterisk_pattern_bt(str + 1, pattern + 1));
-		else
-			return (FALSE);
+		print_err(PROMPT, pattern, ": ", PERR_AMBIG);
+		free(*new_str);
+		return (ERR_AMBIG);
 	}
-	while (*pattern == '*')
+	*new_str = str_append_sq(*new_str, file_name);
+	if (*new_str == NULL)
 	{
-		pattern ++;
-		if (!*pattern)
-			return (TRUE);
+		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		return (ERR_MALLOC);
 	}
- 	while (*str)
-	{
-		if (match_asterisk_pattern_bt(str++, pattern))
-			return (TRUE);
-	}
-	return (FALSE);
+	return (ERR_SUCCESS);
 }
 
-int	hide_file(char *file, char *pattern)
-{
-	while (*pattern == '*')
-		pattern++;
-	if (*file == '.' && *pattern != '.')
-		return (TRUE);
-	return (FALSE);
-}
-
-int	is_dir_only(char **pattern)
-{
-	char	*ptr;
-
-	ptr = *pattern;
-	while (*ptr)
-		ptr++;
-	ptr--;
-	if (ptr >= *pattern)
-	{
-		if (ptr >= *pattern && *ptr == '/')
-		{
-			while (ptr >= *pattern && *ptr == '/')
-			{
-				*ptr = '\0';
-				ptr --;
-			}
-			return (TRUE);
-		}
-	}
-	return (FALSE);
-}
-
-int	is_dir(struct dirent *file_info)
-{
-	if (file_info->d_type == 0 || file_info->d_type == 4)
-		return (TRUE);
-	return (FALSE);
-}
-
-int	expand_asterisk_process(DIR *dir, char **new_str, char *pattern, int token_kind)
+int	exp_asterisk_loop(DIR *dir, char **new_str, char *pattern, int token_kind)
 {
 	struct dirent	*curr_file;
 	char			*file_name;
 	int				dir_only;
-	
+	enum e_err		err;
+
 	dir_only = is_dir_only(&pattern);
 	curr_file = readdir(dir);
 	while (curr_file)
 	{
 		file_name = curr_file->d_name;
-		if (match_asterisk_pattern_bt(file_name, pattern))
+		if (should_expand_file(file_name, pattern, dir_only, curr_file))
 		{
-			if (hide_file(file_name, pattern)
-				|| (dir_only == TRUE && !is_dir(curr_file)))
-			{
-				curr_file = readdir(dir);
-				continue;
-			}
-			if (token_kind == WORD_FILE && *new_str)
-			{
-				print_err(PROMPT, pattern, ": ", PERR_AMBIG);
-				free(*new_str);
-				return (ERR_AMBIG);
-			}
-			*new_str = str_append_sq(*new_str, file_name);
-			if (*new_str == NULL)
-			{
-				print_err(PROMPT, PERR_MALLOC, NULL, NULL);
-				return (ERR_MALLOC);
-			}
+			err = exp_asterisk_core(token_kind, new_str, pattern, file_name);
+			if (err)
+				return (err);
 		}
 		curr_file = readdir(dir);
 	}
@@ -147,7 +87,7 @@ int	expand_asterisk(t_token *token_list)
 	DIR			*dir;
 	char		*new_str;
 	enum e_err	err;
-	
+
 	new_str = NULL;
 	cwd = getcwd(0, 0);
 	if (!cwd)
@@ -158,7 +98,7 @@ int	expand_asterisk(t_token *token_list)
 		free (cwd);
 		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), ERR_MALLOC);
 	}
-	err = expand_asterisk_process(dir, &new_str, token_list->str, token_list->kind);
+	err = exp_asterisk_loop(dir, &new_str, token_list->str, token_list->kind);
 	if (err)
 		return (closedir(dir), free(cwd), err);
 	if (new_str)
@@ -173,7 +113,7 @@ int	expand_asterisk(t_token *token_list)
 int	check_expand_asterisk(t_token *token_list)
 {
 	enum e_err	err;
-	
+
 	while (token_list
 		&& (token_list->type == WORD || token_list->type == REDIR_OPERATOR))
 	{

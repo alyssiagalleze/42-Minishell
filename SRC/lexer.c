@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:02:49 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 15:30:18 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 16:47:11 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,19 @@
 
 static int	match_an_operator_pattern(char *str, int length)
 {
-	if (str_ncmp(str,_OR, length, FALSE))
+	if (str_ncmp(str, _OR, length, FALSE))
 		return (TRUE);
-	if (str_ncmp(str,_AND, length, FALSE))
+	if (str_ncmp(str, _AND, length, FALSE))
 		return (TRUE);
-	if (str_ncmp(str,_PIPE, length, FALSE))
+	if (str_ncmp(str, _PIPE, length, FALSE))
 		return (TRUE);
-	if (str_ncmp(str,_OUT, length, FALSE))
+	if (str_ncmp(str, _OUT, length, FALSE))
 		return (TRUE);
 	if (str_ncmp(str, _IN, length, FALSE))
 		return (TRUE);
 	if (str_ncmp(str, _HDOC, length, FALSE))
 		return (TRUE);
-	if (str_ncmp(str,_OUT_APP, length, FALSE))
+	if (str_ncmp(str, _OUT_APP, length, FALSE))
 		return (TRUE);
 	if (str_ncmp(str, _BRACKET_O, length, FALSE))
 		return (TRUE);
@@ -37,30 +37,36 @@ static int	match_an_operator_pattern(char *str, int length)
 
 static int	get_operator_type(char *str)
 {
-	if (str_cmp(str,_OR, TRUE) || str_cmp(str,_AND, TRUE) || str_cmp(str,_PIPE, TRUE))
+	if (str_cmp(str, _OR, TRUE)
+		|| str_cmp(str, _AND, TRUE)
+		|| str_cmp(str, _PIPE, TRUE))
 		return (CONTR_OPERATOR);
-	if (str_cmp(str,_OUT, TRUE) || str_cmp(str, _IN, TRUE) ||str_cmp(str, _HDOC, TRUE) || str_cmp(str,_OUT_APP, TRUE))
+	if (str_cmp(str, _OUT, TRUE)
+		|| str_cmp(str, _IN, TRUE)
+		|| str_cmp(str, _HDOC, TRUE)
+		|| str_cmp(str, _OUT_APP, TRUE))
 		return (REDIR_OPERATOR);
-	if (str_cmp(str, _BRACKET_O, TRUE) || str_cmp(str, _BRACKET_C, TRUE))
+	if (str_cmp(str, _BRACKET_O, TRUE)
+		|| str_cmp(str, _BRACKET_C, TRUE))
 		return (BRACKET);
 	return (NONE);
 }
 
 static int	get_operator_kind(char *str)
 {
-	if (str_cmp(str,_OR, TRUE))
+	if (str_cmp(str, _OR, TRUE))
 		return (OR);
-	if (str_cmp(str,_AND, TRUE))
+	if (str_cmp(str, _AND, TRUE))
 		return (AND);
-	if (str_cmp(str,_PIPE, TRUE))
+	if (str_cmp(str, _PIPE, TRUE))
 		return (PIPE);
-	if (str_cmp(str,_OUT, TRUE))
+	if (str_cmp(str, _OUT, TRUE))
 		return (OUT);
 	if (str_cmp(str, _IN, TRUE))
 		return (IN);
 	if (str_cmp(str, _HDOC, TRUE))
 		return (HDOC);
-	if (str_cmp(str,_OUT_APP, TRUE))
+	if (str_cmp(str, _OUT_APP, TRUE))
 		return (OUT_APP);
 	if (str_cmp(str, _BRACKET_O, TRUE))
 		return (BRACKET_O);
@@ -140,24 +146,28 @@ void	lexer_create_token_from_input(
 		*input += len;
 }
 
-void	lexer(t_token **token_list, char *input)
+void	lexer(t_token **token_list, char *input, struct s_data *data)
 {
 	int		len;
+	char	*input_save;
 
+	input_save = input;
 	while (*input)
 	{
 		len = lexer_scan_word(input);
 		if (len)
-		lexer_create_token_from_input(token_list, &input, len, WORD);
+			lexer_create_token_from_input(token_list, &input, len, WORD);
 		len = lexer_scan_operator(input);
 		if (len == -1)
 		{
 			lexer_create_token_from_input(token_list, NULL, 0, NONE);
-			break;
+			break ;
 		}
 		else if (len)
-		lexer_create_token_from_input(token_list, &input, len, NONE);
+			lexer_create_token_from_input(token_list, &input, len, NONE);
 		while (*input && is_char_separator(*input))
-		input ++;
+			input ++;
 	}
+	free(input_save);
+	data_save_head(data);
 }

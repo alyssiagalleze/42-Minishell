@@ -7,13 +7,18 @@ D_BUILD=.build/
 
 SRC=	SRC/main.c \
 		SRC/clean.c \
+		SRC/clean_bis.c \
+		SRC/data.c \
 		SRC/debug.c \
 		SRC/env_list.c \
 		SRC/error.c	\
+		SRC/exec_list.c \
 		SRC/exec_simple_command.c \
 		SRC/expand.c \
 		SRC/expand_asterisk.c \
+		SRC/expand_asterisk_bis.c \
 		SRC/expand_dollar.c \
+		SRC/expand_wordsplit.c \
 		SRC/lexer.c \
 		SRC/lister.c \
 		SRC/parser.c \
@@ -23,6 +28,8 @@ SRC=	SRC/main.c \
 		SRC/string_manip.c \
 		SRC/token_list.c \
 		SRC/pid_list.c \
+		SRC/wordsplit_sort.c \
+		SRC/wordsplit_utils.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \

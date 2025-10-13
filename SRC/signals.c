@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/30 16:21:33 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/11 17:59:31 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,33 +64,32 @@ void	set_signal_action(void)
 	sigaction(SIGINT, &act, NULL);
 	
 } */
-int g_exit_status = 0;
+int	g_exit_status = 0; //TODO : global var ???
 
-void sigint_handler(int sig, siginfo_t *info, void *context)
+void	sigint_handler(int sig, siginfo_t *info, void *context)
 {
-    (void)sig;
-    (void)info;
-    (void)context;
-    g_exit_status = 130; // convention bash : 128 + SIGINT
-    write(STDOUT_FILENO, "\n", 1);
-    rl_on_new_line();
-    rl_replace_line("", 0);
-    rl_redisplay();
+	(void)sig;
+	(void)info;
+	(void)context;
+	g_exit_status = 130; // convention bash : 128 + SIGINT
+	write(STDOUT_FILENO, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
-void init_signals(void)
+void	init_signals(void)
 {
-    struct sigaction sa;
+	struct sigaction	sa;
 
-    sa.sa_sigaction = sigint_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO; // pour utiliser la version à 3 arguments
-    sigaction(SIGINT, &sa, NULL);
-
-    sa.sa_handler = SIG_IGN;  // ignorer complètement
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGQUIT, &sa, NULL);
+	sa.sa_sigaction = sigint_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO; // pour utiliser la version à 3 arguments
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN; // ignorer complètement
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 /* int main(void)

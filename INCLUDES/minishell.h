@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/10 16:03:13 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 19:37:36 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ typedef struct s_exec
 struct s_data
 {
 	t_token	*token_list;
-	t_token *token_list_save;
+	t_token *token_list_head;
 	t_env	*env;
 	int		prev_fd;
 };
@@ -171,16 +171,21 @@ int		print_env(t_env **env);
 int 	pwd(void);
 int		echo(char **args);
 int		export(char **args, t_env **env);
-void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_save);
+void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head);
 
-//	clean.c
+//	clean.c  + clean_bis.c
 void	clean_input(char **input);
 void	clean_env(t_env **env);
 void	clean_token_list(t_token	**lexer);
 void	exec_cleaner(char **path_tab, char *path);
-void	clean_exec_list(t_exec **exec_list, int	is_sublist);
+void	clean_exec_list(t_exec **exec_list);
+void	clean_exec_node(t_exec **exec_list);
+void	exit_clean(struct s_data *data);
 void	cleaner(t_env **my_env, char **input, t_token **token_list);
 
+//	data.c
+void	data_reset_pointers(struct s_data *data);
+void	data_save_head(struct s_data *data);
 
 //	debug.c
 void	debug_lexer_print_type(t_token *lexer_node);
@@ -199,35 +204,49 @@ t_env   *env_new_node(const char *var_name, const char *var_value, int exported)
 int		var_exists(t_env **env, char *name);
 int		unset_single(char *arg, t_env **env);
 char	**transfer_env(t_env **env);
-int	ft_lstsize(t_env *lst);
+int		ft_lstsize(t_env *lst);
 
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
 // exec
-int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
+int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
 // int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
 int		is_builtin(t_exec *exec_list);
 int		built_in_exec(t_exec *exec_list, t_env **env);
 
+// exec_list.c
+void	exec_list_init_command(t_command *command);
+void	exec_list_init_node(t_exec *exec);
+t_exec	*exec_list_add_node(t_exec **exec_list_start);
+
 // expand.c
-int		lister_expand_command(t_token *token_list, t_env *env);
+int		expand_command(t_token *token_list, t_env *env);
 int		is_expandable_char(char c);
 
-// expand_asterisk.c
+// expand_asterisk.c + expand_aterisk_bis
 int		check_expand_asterisk(t_token *token_list);
+//
+int	hide_file(char *file, char *pattern);
+int	is_dir_only(char **pattern);
+int	is_dir(struct dirent *file_info);
+int	should_expand_file(
+	char *file_name, char *pattern, int dir_only, struct dirent	*file);
 
 // expand_dollar.c
 int		check_expand_dollar(t_token *token_list, t_env *env);
 
+//expand_wordsplit.c
+int		check_expand_wordsplit(t_token *token_list);
+
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
 void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind kind);
-void	lexer(t_token **lexer, char *input);
+void	lexer(t_token **lexer, char *input, struct s_data *data);
 
-// lister.c
-int	lister(struct s_data *data);
-// int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
+// token_list_to_exec.c
+int 	handle_subshell_execution(t_exec *exec_list, t_env **env);
+int		token_list_to_exec(struct s_data *data);
 
 //	string_manip.c
 int		is_white_space(const char c);
@@ -256,10 +275,21 @@ void	pid_add_back(t_pid_list **list, pid_t pid);
 // void sigint_handler(int sig, siginfo_t *info, void *context);
 // void init_signals(void);
 
-
 // token_list.c
 void	token_list_empty_node(t_token *token);
 t_token	*token_list_add_node(t_token **token_list_start);
 void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
+int		token_list_size(t_token *token_list);
+void	token_list_insert_list(t_token *token_from, t_token *new_list);
+
+//	wordsplit_sort.c
+void	sort_tab(char **tab, int word_count);
+
+//	wordsplit_utils.c
+int		ws_count_words(char *str);
+int		ws_allocate_string(char **tab, char *str, int curr_char, int curr_word);
+int		ws_fill_string(char *to, char *from, int curr_char);
+void	check_wordsplit_failure(char **tab, const int word_count);
+void	ws_free_tab(char **tab, int word_count);
 
 #endif

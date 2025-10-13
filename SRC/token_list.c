@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:54:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/04 14:41:04 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/11 18:00:56 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@ t_token	*token_list_add_node(t_token **token_list_start)
 	return (new_node);
 }
 
-void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind)
+void	token_list_fill_node(
+	t_token *token, char *str, enum e_type type, enum e_kind kind)
 {	
 	if (!token)
 		write(2, "err : trying to reach an empty token node !\n", 45);
@@ -57,4 +58,30 @@ void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_ki
 	token->str = str;
 	token->type = type;
 	token->kind = kind;
+}
+
+int	token_list_size(t_token *token_list)
+{
+	int	i;
+
+	i = 0;
+	while (token_list)
+	{
+		i ++;
+		if (i == ARG_MAX)
+			return (ARG_MAX);
+		token_list = token_list->next;
+	}
+	return (i);
+}
+
+void	token_list_insert_list(t_token *token_from, t_token *new_list)
+{
+	t_token	*pivot;
+
+	pivot = token_from->next;
+	token_from->next = new_list;
+	while (new_list->next)
+		new_list = new_list->next;
+	new_list->next = pivot;
 }

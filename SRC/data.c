@@ -1,21 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit.c                                             :+:      :+:    :+:   */
+/*   data.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/24 14:53:12 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/10 18:02:39 by tfiette          ###   ########.fr       */
+/*   Created: 2025/10/10 17:20:51 by tfiette           #+#    #+#             */
+/*   Updated: 2025/10/11 16:25:55 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head)
+void	data_reset_pointers(struct s_data *data)
 {
-	cleaner(my_env, input, token_list_head);
-	write(1, "exit\n", 5);
-	printf("%s", RESET_FONT);
-	exit(status);
+	data->token_list = NULL;
+	data->token_list_head = NULL;
+}
+
+void	data_save_head(struct s_data *data)
+{
+	data->token_list_head = data->token_list;
 }

@@ -12,9 +12,9 @@
 
 #include "minishell.h"
 
-t_env   *env_new_node(const char *var_name, const char *var_value, int exported)
+t_env	*env_new_node(const char *var_name, const char *var_value, int exported)
 {
-	t_env   *node;
+	t_env	*node;
 
 	node = malloc(sizeof(t_env));
 	if (!node)
@@ -31,7 +31,7 @@ t_env   *env_new_node(const char *var_name, const char *var_value, int exported)
 
 void	env_add_node(t_env **top, t_env *node)
 {
-	t_env   *tmp;
+	t_env	*tmp;
 
 	if (!*top)
 		*top = node;
@@ -44,13 +44,15 @@ void	env_add_node(t_env **top, t_env *node)
 	}
 }
 
-t_env   *init_env_list(char **env) //TODO : est ce qu'il y a du malloc qlq part, si oui err_malloc
+//TODO : est ce qu'il y a du malloc qlq part, si oui err_malloc
+//TODO : 5 variables
+t_env	*init_env_list(char **env)
 {
-	t_env   *top;
+	t_env	*top;
 	char	*var_name;
 	char	*var_value;
 	char	*sep;
-	int	 i;
+	int		i;
 
 	top = NULL;
 	i = 0;
@@ -70,6 +72,7 @@ t_env   *init_env_list(char **env) //TODO : est ce qu'il y a du malloc qlq part,
 	return (top);
 }
 
+//TODO : ne retourne que 0 ?? Pourquoi retourner un int alors ?
 int	update_variable(t_env **env, char *var, char *value)
 {
 	unset_single(var, env);
@@ -81,6 +84,7 @@ char	*get_var_value(t_env **env, char *var_name)
 {
 	t_env	*current;
 	char	*var_value;
+
 	current = *env;
 	while (current)
 	{
@@ -88,14 +92,14 @@ char	*get_var_value(t_env **env, char *var_name)
 		{
 			var_value = ft_strdup(current->var_value);
 			if (!var_value)
-				return (print_err("malloc", ": get ", current->var_name, " : value."), NULL);
+				return (print_err("malloc", ": get ",
+						current->var_name, " : value."), NULL);
 			return (var_value);
 		}
 		current = current->next;
 	}
 	return (NULL);
 }
-
 
 int	ft_lstsize(t_env *lst)
 {
