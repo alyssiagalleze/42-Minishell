@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 19:37:36 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 12:54:51 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,11 +209,17 @@ int		ft_lstsize(t_env *lst);
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
-// exec
+// exec_builtins.c
+int	is_builtin(t_exec *exec_list);
+int	built_in_exec(t_exec *exec_list, t_env **env);
+
+// exec_pipeline.c
 int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
-// int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
 int		is_builtin(t_exec *exec_list);
 int		built_in_exec(t_exec *exec_list, t_env **env);
+
+// exec_utils.c
+char	*set_command_path(t_exec *exec_list, char **env);
 
 // exec_list.c
 void	exec_list_init_command(t_command *command);
@@ -248,6 +254,14 @@ void	lexer(t_token **lexer, char *input, struct s_data *data);
 int 	handle_subshell_execution(t_exec *exec_list, t_env **env);
 int		token_list_to_exec(struct s_data *data);
 
+// pipe_utils.c
+void free_env_array(char **envp);
+int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2]);
+int	handle_fork_error(int pipefds[2], char **my_env);
+
+// redirection_utils.c
+void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out);
+
 //	string_manip.c
 int		is_white_space(const char c);
 int		is_char_operator(const char c);
@@ -270,6 +284,9 @@ int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind,
 int		pid_wait_all(t_pid_list *list, int status);
 void 	clean_pid(t_pid_list **list);
 void	pid_add_back(t_pid_list **list, pid_t pid);
+
+// redirections.c
+int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
 
 // // signals.c
 // void sigint_handler(int sig, siginfo_t *info, void *context);
