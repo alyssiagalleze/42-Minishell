@@ -10,7 +10,9 @@ SRC=	SRC/main.c \
 		SRC/debug.c \
 		SRC/env_list.c \
 		SRC/error.c	\
-		SRC/exec_simple_command.c \
+		SRC/exec_builtins.c \
+		SRC/exec_pipeline.c \
+		SRC/exec_utils.c \
 		SRC/expand.c \
 		SRC/expand_asterisk.c \
 		SRC/expand_dollar.c \
@@ -18,11 +20,14 @@ SRC=	SRC/main.c \
 		SRC/lister.c \
 		SRC/parser.c \
 		SRC/parser_bis.c \
+		SRC/pid_list.c \
+		SRC/pipe_utils.c \
+		SRC/redirection_utils.c \
+		SRC/redirections.c \
 		SRC/signals.c \
 		SRC/split.c \
 		SRC/string_manip.c \
 		SRC/token_list.c \
-		SRC/pid_list.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \

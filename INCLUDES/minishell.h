@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/10 11:55:18 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 12:00:15 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,16 +191,22 @@ t_env   *env_new_node(const char *var_name, const char *var_value, int exported)
 int		var_exists(t_env **env, char *name);
 int		unset_single(char *arg, t_env **env);
 char	**transfer_env(t_env **env);
-int	ft_lstsize(t_env *lst);
+int		ft_lstsize(t_env *lst);
 
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
-// exec
-int	exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
-// int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env);
+// exec_builtins.c
+int	is_builtin(t_exec *exec_list);
+int	built_in_exec(t_exec *exec_list, t_env **env);
+
+// exec_pipeline.c
+int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
 int		is_builtin(t_exec *exec_list);
 int		built_in_exec(t_exec *exec_list, t_env **env);
+
+// exec_utils.c
+char	*set_command_path(t_exec *exec_list, char **env);
 
 // expand.c
 int		lister_expand_command(t_token *token_list, t_env *env);
@@ -220,6 +226,14 @@ void	lexer(t_token **lexer, char *input);
 // lister.c
 int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
 // int	lister(t_token **token_list, t_env **env, char **input, t_token **token_list_save);
+
+// pipe_utils.c
+void free_env_array(char **envp);
+int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2]);
+int	handle_fork_error(int pipefds[2], char **my_env);
+
+// redirection_utils.c
+void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out);
 
 //	string_manip.c
 int		is_white_space(const char c);
@@ -243,6 +257,9 @@ int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind,
 int		pid_wait_all(t_pid_list *list, int status);
 void 	clean_pid(t_pid_list **list);
 void	pid_add_back(t_pid_list **list, pid_t pid);
+
+// redirections.c
+int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
 
 // // signals.c
 // void sigint_handler(int sig, siginfo_t *info, void *context);

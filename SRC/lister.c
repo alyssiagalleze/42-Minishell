@@ -85,7 +85,7 @@ int temp_exec(t_exec *exec_list, t_env **env, char **input, t_token **token_list
 				{
 					if (dup2(saved_stdout, STDOUT_FILENO) == -1)
 						exit(1);
-					close(pipefds[1]);
+					close(saved_stdout);
 				}
 				if (pipefds[0] != -1)
 					close(pipefds[0]);
