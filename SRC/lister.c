@@ -22,7 +22,7 @@ int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_head)
 	int saved_stdout;
 	static int	prev_fd;
 
-	// printf("modifying prev_fd value\n");
+	// //printf("modifying prev_fd value\n");
 	prev_fd = -1;
 	saved_stdin = dup(STDIN_FILENO);
 	if (saved_stdin == -1)
@@ -34,7 +34,7 @@ int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_head)
 	{
 		if ((*exec_list)->is_subshell)
 		{
-			// printf("in subshell node\n");
+			// //printf("in subshell node\n");
 			int pipefds[2] = {-1, -1};
 			if (pipe(pipefds) == -1)
 				return (perror("pipe"), 1);
@@ -51,18 +51,18 @@ int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_head)
 
 			if (pid == 0)
 			{
-			// printf("in child subshell\n");
+			// //printf("in child subshell\n");
 
 				if (prev_fd != -1)
 				{
-					// printf("in subshell node, prev_fd is %d\n", prev_fd);
+					// //printf("in subshell node, prev_fd is %d\n", prev_fd);
 					if (dup2(prev_fd, STDIN_FILENO) == -1)
 						exit(1);
 					close(prev_fd);
 				}
 				if (pipefds[1] != -1)
 				{
-					// printf("in subshell node, setting up pipe for next command at fd %d\n", pipefds[1]);
+					// //printf("in subshell node, setting up pipe for next command at fd %d\n", pipefds[1]);
 					if (dup2(pipefds[1], STDOUT_FILENO) == -1)
 						exit(1);
 					close(pipefds[1]);
@@ -77,11 +77,11 @@ int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_head)
 					close(pipefds[0]);
 				if (pipefds[1] != -1)
 					close(pipefds[1]);
-				// printf("Launching subshell\n");
+				// //printf("Launching subshell\n");
 				clean_token_list(token_list_head);
 				rl_clear_history();
 				status = handle_subshell_execution(*exec_list, env);
-				// printf("Subshell exited with status %d\n", status);
+				// //printf("Subshell exited with status %d\n", status);
 				clean_env(env);
 				exit(status);
 			}
@@ -89,7 +89,7 @@ int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_head)
 				close(prev_fd);
 			if ((*exec_list)->next)
 			{
-				// printf("Parent process setting up for next command, fd set to %d\n", pipefds[0]);
+				// //printf("Parent process setting up for next command, fd set to %d\n", pipefds[0]);
 				prev_fd = pipefds[0];
 				if (pipefds[1] != -1)
 					close(pipefds[1]);
@@ -195,13 +195,34 @@ void	skip_pipeline_tokens(t_token **token_list)
 	}
 }
 
-//TODOLONG
+t_token	*create_and_fill_subtoken(
+	t_token **sublist, t_token *token)
+{
+	char	*sub_str;
+	t_token	*subtoken;
+
+	subtoken = token_list_add_node(sublist);
+	if (subtoken == NULL)
+	{
+		clean_token_list(sublist);
+		return (NULL);
+	}
+	sub_str = ft_strdup(token->str);
+	if (sub_str == NULL)
+	{
+		free(sub_str);
+		clean_token_list(sublist);
+		return (NULL);
+	}
+	token_list_fill_node(subtoken, sub_str, token->type, token->kind);
+	return (subtoken);
+}
+
 t_token	*scan_subshell_tokens(t_token **token_list)
 {
 	int		open_bracket;
 	t_token	*sublist;
 	t_token	*subtoken;
-	char	*sub_str;
 
 	open_bracket = 1;
 	sublist = NULL;
@@ -211,29 +232,15 @@ t_token	*scan_subshell_tokens(t_token **token_list)
 		if ((*token_list)->kind == BRACKET_O)
 			open_bracket ++;
 		if ((*token_list)->kind == BRACKET_C)
-		{
 			open_bracket --;
-			if (!open_bracket)
-			{
-				*token_list = (*token_list)->next;
-				break ;
-			}
-		}
-		subtoken = token_list_add_node(&sublist);
-		if (subtoken == NULL)
+		if (!open_bracket)
 		{
-			clean_token_list(&sublist);
-			return (NULL);
+			*token_list = (*token_list)->next;
+			break ;
 		}
-		sub_str = ft_strdup((*token_list)->str);
-		if (sub_str == NULL)
-		{
-			free(sub_str);
-			clean_token_list(&sublist);
+		subtoken = create_and_fill_subtoken(&sublist, *token_list);
+		if (!subtoken)
 			return (NULL);
-		}
-		token_list_fill_node(subtoken, sub_str,
-			(*token_list)->type, (*token_list)->kind);
 		*token_list = (*token_list)->next;
 	}
 	return (sublist);
@@ -257,41 +264,70 @@ int	build_exec_subshell_node(t_token **token_list, t_exec **exec_list)
 }
 
 //TODOLONG
+void	scan_command_redirs(
+	t_token **token_list, t_command *command, int *redir_count)
+{
+	command->redir_kind[*redir_count] = (*token_list)->kind;
+	*token_list = (*token_list)->next;
+	command->redir[*redir_count] = (*token_list)->str;
+	*redir_count += 1;
+}
+
+int	scan_command_words(
+	t_token **token_list, t_command *command, int *arg_count, char *var)
+{
+	if ((*token_list)->kind == WORD_VAR)
+		var = (*token_list)->str;
+	else if ((*token_list)->kind == WORD_COM)
+	{
+		command->argv[0] = ft_strdup((*token_list)->str);
+		if (command->argv[0] == NULL)
+			return (ERR_MALLOC);
+	}
+	else if ((*token_list)->kind == WORD_ARG)
+	{
+		*arg_count += 1;
+		command->argv[*arg_count] = ft_strdup((*token_list)->str);
+		if (command->argv[*arg_count] == NULL)
+			return (ERR_MALLOC);
+	}
+	return (ERR_SUCCESS);
+}
+
+int set_command_as_var_assign(t_token **token_list, t_command *command)
+{
+	command->argv[0] = ft_strdup((*token_list)->str);
+	if (command->argv[0] == NULL)
+		return (ERR_MALLOC);
+	command->is_var = TRUE;
+	return (ERR_SUCCESS);
+}
+
 int	scan_command_tokens(t_token **token_list, t_command *command)
 {
-	int	in_count;
-	int	out_count;
-	int	arg_count;
+	int			redir_count;
+	int			arg_count;
+	char		*var;
+	enum e_err	err; 
 
-	in_count = 0;
-	out_count = 0;
+	redir_count = 0;
 	arg_count = 0;
-	while (*token_list && ((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
+	var = NULL;
+	while (*token_list &&
+		((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
 	{
 		if ((*token_list)->type == REDIR_OPERATOR)
-		{
-			command->redir_kind[in_count] = (*token_list)->kind;
-			*token_list = (*token_list)->next;
-			command->redir[in_count] = (*token_list)->str;
-			in_count ++;
-		}
+			scan_command_redirs(token_list, command, &redir_count);
 		else if ((*token_list)->type == WORD)
 		{
-			if ((*token_list)->kind == WORD_COM)
-			{
-				command->argv[0] = ft_strdup((*token_list)->str);
-				if (command->argv[0] == NULL)
-					return (ERR_MALLOC);
-			}
-			else if ((*token_list)->kind == WORD_ARG)
-			{
-				arg_count ++;
-				command->argv[arg_count] = ft_strdup((*token_list)->str);
-				if (command->argv[arg_count] == NULL)
-					return (ERR_MALLOC);
-			}
+			err = scan_command_words(token_list, command, &arg_count, var);
+			if (err)
+				return (err);
 		}
 		*token_list = (*token_list)->next;
+		if (command->argv[0] == NULL && var)
+			if (set_command_as_var_assign(token_list, command))
+				return (ERR_MALLOC);
 	}
 	return (ERR_SUCCESS);
 }
@@ -387,5 +423,6 @@ int	token_list_to_exec(struct s_data *data)
 			clean_exec_list(&exec);
 		}
 	}
-	return (cleaner(NULL,NULL, &data->token_list_head), status);
+	cleaner(NULL,NULL, &data->token_list_head);
+	return (status);
 }

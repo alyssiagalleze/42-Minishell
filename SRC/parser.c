@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 17:18:30 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/14 11:29:40 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,13 @@ static int	parser_check_contr_operator(t_token *token, int prev_type, int prev_k
 	return (FALSE);
 }
 
-static int	parser_check_redir_operator(t_token *token, int prev_type)
+static int	parser_check_redir_operator(t_token *token, int prev_type, int prev_kind)
 {
+	if (prev_kind == BRACKET_C)
+	{
+		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
+		return (TRUE);
+	}
 	if (prev_type == REDIR_OPERATOR)
 	{
 		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
@@ -87,7 +92,7 @@ static int	parser_check_token_dispatch(t_token *token, t_token *prev_token, int 
 		prev_kind = prev_token->kind;
 	}
 	if (token->type == REDIR_OPERATOR)
-		return (parser_check_redir_operator(token, prev_type));
+		return (parser_check_redir_operator(token, prev_type, prev_kind));
 	if (token->type == WORD)
 		return (parser_check_and_assign_word(&token, prev_type, prev_kind, line_has_cmd));
 	*line_has_cmd = FALSE;

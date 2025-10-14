@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 19:01:07 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 13:37:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	exit_clean(struct s_data *data)
 {
 	cleaner(&data->env, NULL, &data->token_list_head);
 	rl_clear_history();
-	printf("%s", RESET_FONT);
+	//printf("%s", RESET_FONT);
 }
 
 void	cleaner(t_env **my_env, char **input, t_token **token_list)

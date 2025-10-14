@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/07 15:03:14 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 15:55:11 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	var_exists(t_env **env, char *name)
+t_env	*var_exists(t_env **env, char *name)
 {
 	t_env *current;
 
@@ -20,10 +20,10 @@ int	var_exists(t_env **env, char *name)
 	while (current)
 	{
 		if (str_cmp(current->var_name, name, FALSE))
-		return (TRUE);
+			break;
 		current = current->next;
 	}
-	return (FALSE);
+	return (current);
 }
 
 int	is_string_valid(char *str)
@@ -63,6 +63,7 @@ int	print_exported(t_env **env)
 	return (0);
 }
 
+//TODO: malloc fail
 int	export(char **args, t_env **env)
 {
 	int		i;
@@ -71,7 +72,7 @@ int	export(char **args, t_env **env)
 	
 	i = 1;
 
-	printf("coucou\n");
+	//printf("coucou\n");
 	if (/* !args ||  */args[i] == NULL)
 	{
 		print_exported(env);
@@ -99,7 +100,7 @@ int	export(char **args, t_env **env)
 			}
 			if (var_exists(env, args[i]))
 			{
-				printf("var : %s exists\n", args[i]);
+				//printf("var : %s exists\n", args[i]);
 				unset_single(args[i], env);
 			}
 			new_node = env_new_node(args[i], sep + 1, FALSE);

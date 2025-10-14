@@ -12,6 +12,7 @@
 
 #include "minishell.h"
 
+//TODO : malloc fail
 t_env	*env_new_node(const char *var_name, const char *var_value, int exported)
 {
 	t_env	*node;
@@ -19,9 +20,9 @@ t_env	*env_new_node(const char *var_name, const char *var_value, int exported)
 	node = malloc(sizeof(t_env));
 	if (!node)
 		return (NULL);
-	node->var_name = strdup(var_name);
+	node->var_name = ft_strdup(var_name);
 	if (var_value)
-		node->var_value = strdup(var_value);
+		node->var_value = ft_strdup(var_value);
 	else
 		node->var_value = NULL;
 	node->is_exported = exported;

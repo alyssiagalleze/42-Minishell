@@ -23,6 +23,16 @@
 
 					usefull functions, chdir (see authorized functions document)
 
+case 1:
+cwd$ mkdir a && cd a
+cwd/a$ mkdir b
+cwd/a$ rm -rf ../a
+cwd/a$ cd b
+bash: cd: b: No such file or directory
+cwd/a$ cd .
+cd: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+cwd/a/.$ cd ..
+
 - pwd (print working directory)
 	pwd							->print env variable PWD
 	pwd inside a symlink		-> displays the symbolic path

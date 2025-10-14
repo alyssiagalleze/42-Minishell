@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 12:54:51 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 19:31:54 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ typedef struct s_command
 	char				*redir[ARG_MAX];
 	int					prev_fd;
 	enum e_kind			redir_kind[ARG_MAX];
+	int					is_var;
 } t_command;
 
 typedef struct s_subshell
@@ -201,7 +202,7 @@ int		update_variable(t_env **env, char *var, char *value);
 char	*get_var_value(t_env **env, char *var_name);
 void	env_add_node(t_env **top, t_env *node);
 t_env   *env_new_node(const char *var_name, const char *var_value, int exported);
-int		var_exists(t_env **env, char *name);
+t_env	*var_exists(t_env **env, char *name);
 int		unset_single(char *arg, t_env **env);
 char	**transfer_env(t_env **env);
 int		ft_lstsize(t_env *lst);
@@ -298,6 +299,9 @@ t_token	*token_list_add_node(t_token **token_list_start);
 void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
 int		token_list_size(t_token *token_list);
 void	token_list_insert_list(t_token *token_from, t_token *new_list);
+
+// utils.c
+char	*ft_itoa(int n);
 
 //	wordsplit_sort.c
 void	sort_tab(char **tab, int word_count);

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 12:44:36 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/14 11:50:22 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ int	should_expand_dollar(t_token *token_list)
 			while (str[i] != '\'')
 				i ++;
 		}
+		else if (str_ncmp(str + i, "$?", 2, FALSE))
+			return (i);
 		else if (str[i] == '$' && is_expandable_char(str[i + 1]))
 			return (i);
 		i ++;
@@ -78,7 +80,24 @@ char	*expand_dollar_restring(char *str, int from, int len, char *substr)
 	return (new_str);
 }
 
-//TODOLONG
+int	expand_dollar_check_error(t_token *token_list, char *expanded)
+{
+	if (expanded == NULL)
+	{
+		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		return (ERR_MALLOC);
+	}
+	else if (is_str_empty_or_null(expanded) && token_list->kind == WORD_FILE)
+	{
+		print_err(PROMPT, PERR_AMBIG, NULL, NULL);
+		free(expanded);
+		return (ERR_AMBIG);
+	}
+	free(token_list->str);
+	token_list->str = expanded;
+	return (ERR_SUCCESS);
+}
+
 int	expand_dollar(t_token *token_list, t_env *env, int index)
 {
 	int		len;
@@ -88,8 +107,11 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 
 	len = 1;
 	var_name = NULL;
-	while (is_expandable_char(token_list->str[index + len]))
-		len ++;
+	if (str_ncmp(token_list->str + index, "$?", 2, FALSE))
+		len = 2;
+	else
+		while (is_expandable_char(token_list->str[index + len]))
+			len ++;
 	var_name = extract_string(token_list->str + index, len);
 	if (var_name == NULL)
 	{
@@ -98,23 +120,8 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 	}
 	var_value = get_expand_dollar_value(var_name, env);
 	new_str = expand_dollar_restring(token_list->str, index, len, var_value);
-	if (new_str == NULL)
-	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
-		free(var_name);
-		return (ERR_MALLOC);
-	}
-	else if (is_str_empty_or_null(new_str) && token_list->kind == WORD_FILE)
-	{
-		print_err(PROMPT, PERR_AMBIG, NULL, NULL);
-		free(var_name);
-		free(new_str);
-		return (ERR_AMBIG);
-	}
 	free(var_name);
-	free(token_list->str);
-	token_list->str = new_str;
-	return (ERR_SUCCESS);
+	return (expand_dollar_check_error(token_list, new_str));
 }
 
 int	check_expand_dollar(t_token *token_list, t_env *env)

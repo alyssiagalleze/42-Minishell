@@ -4,7 +4,7 @@
 -rl_replace_line
 -rl_redisplay
 -add_history
--printf
+-//printf
 -malloc
 -free
 -write
@@ -107,7 +107,7 @@
         // Ensure correct argument count.
 
         if (argc != 2) {
-            printf ("Usage: testprog <dirname>\n");
+            //printf ("Usage: testprog <dirname>\n");
             return 1;
         }
 
@@ -115,14 +115,14 @@
 
         pDir = opendir (argv[1]);
         if (pDir == NULL) {
-            printf ("Cannot open directory '%s'\n", argv[1]);
+            //printf ("Cannot open directory '%s'\n", argv[1]);
             return 1;
         }
 
         // Process each entry.
 
         while ((pDirent = readdir(pDir)) != NULL) {
-            printf ("[%s]\n", pDirent->d_name);
+            //printf ("[%s]\n", pDirent->d_name);
         }
 
         // Close directory and exit.
@@ -231,21 +231,21 @@
 	int main(void) {
     	char *term = getenv("TERM");
     	if (!term) {
-        	fprintf(stderr, "La variable TERM n'est pas définie.\n");
+        	f//printf(stderr, "La variable TERM n'est pas définie.\n");
         	return 1;
     	}
 
     	if (tgetent(NULL, term) != 1) {
-        	fprintf(stderr, "Impossible de charger la base pour %s\n", term);
+        	f//printf(stderr, "Impossible de charger la base pour %s\n", term);
         	return 1;
     	}
 
     	// Récupérer la séquence "clear screen"
     	char *clear = tgetstr("cl", NULL);
     	if (clear) {
-        	printf("%s", clear); // Écrit la séquence → efface l’écran
+        	//printf("%s", clear); // Écrit la séquence → efface l’écran
     	} else {
-        	fprintf(stderr, "Le terminal ne supporte pas 'clear screen'.\n");
+        	f//printf(stderr, "Le terminal ne supporte pas 'clear screen'.\n");
     	}	
 
     	return 0;
@@ -268,25 +268,25 @@
 	int main(void) {
     	char *term = getenv("TERM");
     	if (!term) {
-        	fprintf(stderr, "La variable TERM n'est pas définie.\n");
+        	f//printf(stderr, "La variable TERM n'est pas définie.\n");
         	return 1;
     	}
 
     	if (tgetent(NULL, term) != 1) {
-        	fprintf(stderr, "Impossible de charger la base pour %s\n", term);
+        	f//printf(stderr, "Impossible de charger la base pour %s\n", term);
         	return 1;
     	}
 
     	// Récupérer la capacité "cursor motion"
     	char *cm = tgetstr("cm", NULL);
     	if (!cm) {
-        	fprintf(stderr, "Le terminal ne supporte pas 'cursor motion'.\n");
+        	f//printf(stderr, "Le terminal ne supporte pas 'cursor motion'.\n");
         	return 1;
     	}
 
     	// Construire la séquence pour aller à (ligne=10, col=20)
     	char *seq = tgoto(cm, 20, 10);
-    	printf("%sHello ici !\n", seq);
+    	//printf("%sHello ici !\n", seq);
 
     	return 0;
 	}
@@ -298,14 +298,14 @@
 
 	sends a control sequence to the terminal(obtained with tgetstr or generated with tgoto), 
 	manages padding breaks(old constraints limnked to the efficiency of the terminal, rarely usefull nowadays)
-	equivalent to "printf("%s", str)" that respects termcap conventions
+	equivalent to "//printf("%s", str)" that respects termcap conventions
 
 	example :
 
     if (cm) {
         char *seq = tgoto(cm, 20, 10); // colonne=20, ligne=10
         tputs(seq, 1, putchar);
-        printf("Hello ici !");
+        //printf("Hello ici !");
     }
 
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 12:45:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 13:37:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 
 int exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd)
 {
-	printf("-> in exec_pipeline\n");
+	//printf("-> in exec_pipeline\n");
 	int		pipefds[2];
 	pid_t	pid;
 	char	*path;

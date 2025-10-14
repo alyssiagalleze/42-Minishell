@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:33:55 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 11:34:59 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 13:37:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	open_fd_in(int i, t_exec *exec_list)
 
 void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out)
 {
-	printf("in open fds \n");
+	//printf("in open fds \n");
 	int i;
 	
 	i = 0;
