@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/07 16:51:57 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 13:03:14 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ char	*find_target(char *path, t_env **env, int *malloc_fail)
 	char	*target;
 
 	target = NULL;
-	if (!path || path == NULL || str_cmp(path, "~", FALSE))
+	if (path == NULL || str_cmp(path, "~", FALSE))
 	{
 		target = get_var_value(env, "HOME");
 		if (!target || target[0] == 0)
 			return (printf("var value : %s\n", target), 
-			print_err(PROMPT, ": cd: ", "HOME not set\n", NULL), NULL);
+				print_err(PROMPT, ": cd: ", "HOME not set\n", NULL), NULL);
 		else
 			return (target);
 	}
@@ -35,7 +35,7 @@ char	*find_target(char *path, t_env **env, int *malloc_fail)
 		target = get_var_value(env, "OLDPWD");
 		if (target == NULL)
 			return (print_err(PROMPT, ": cd: ", "OLDPWD not set\n", NULL), 
-			NULL);
+				NULL);
 		else
 			return (target);
 	}

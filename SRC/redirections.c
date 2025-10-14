@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 15:12:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 12:56:55 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/14 11:49:30 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ int	out_redirections(t_exec *exec_list)
 	i = 0;
 	while (exec_list->command->redir[i])
 	{
+		printf("-------------------redir : %s\n", exec_list->command->redir[i]);
 		if (exec_list->command->redir_kind[i] == OUT || exec_list->command->redir_kind[i] == OUT_APP)
 			return (1);
 		i++;
@@ -42,6 +43,7 @@ int	out_redirections(t_exec *exec_list)
 
 int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd)
 {
+	printf("in redirect in\n");
 	if (in_redirections(exec_list) == TRUE)
 	{
 		printf("in redirect ?\n");
@@ -79,17 +81,13 @@ int	redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out)
 
 int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 {
-	printf("in redirect fds\n");
-	int fd_in;
-	int fd_out;
+	printf("in redirect fds for cmd : %s\n", exec_list->command->argv[0]);
+	static int fd_in = -1;
+	static int fd_out = -1;
 
 	if (exec_list->command->redir[0])
 	{
 		open_fds(exec_list, &fd_in, &fd_out);
-		if (fd_in == -1)
-			return (1);
-		if (fd_out == -1)
-			return (1);
 		printf("updated fd_in value : %d\n", fd_in);
 		printf("updated fd_out value : %d\n", fd_out);
 	}

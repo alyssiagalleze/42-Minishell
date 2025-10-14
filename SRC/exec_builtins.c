@@ -6,11 +6,33 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 11:54:13 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/14 12:35:41 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	built_in_redirections( t_exec *exec_list)
+{
+	int fd_in;
+	int fd_out;
+	
+	fd_in = -1;
+	fd_out = -1;
+	if (exec_list->command->redir[0])
+		open_fds(exec_list, &fd_in, &fd_out);
+	printf("found fd_out : %d", fd_out);
+	printf("found fd_in : %d", fd_in);
+	if (in_redirections(exec_list))
+		if (dup2(fd_in, STDIN_FILENO) == -1)
+			return (perror("dup2 fd_in"));
+	if (out_redirections(exec_list))
+	{
+		printf("moi ici ????\n");
+		if (dup2(fd_out, STDOUT_FILENO) == -1)
+			return (perror("dup2 fd_out"));		
+	}
+}
 
 int	is_builtin(t_exec *exec_list)
 {
@@ -30,6 +52,18 @@ int	is_builtin(t_exec *exec_list)
 		return (TRUE);
 	else
 		return (FALSE);
+}
+
+int exec_single_builtin(t_exec *exec_list, t_env **env, int saved_stds[2])
+{
+	int exit_status;
+
+	exit_status = 0;
+	built_in_redirections(exec_list);
+	exit_status = built_in_exec(exec_list, env);
+	if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
+		return (perror("dup2 restore stdin"), 1);
+	return (exit_status);
 }
 
 int	built_in_exec(t_exec *exec_list, t_env **env)

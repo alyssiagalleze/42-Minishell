@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pid_list.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 15:22:39 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/11 17:53:16 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 17:02:36 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,19 +57,19 @@ void	clean_pid(t_pid_list **list)
 	}
 }
 
-int	pid_wait_all(t_pid_list *list, int status)
-{
-	int	exit_status;
+// int	pid_wait_all(t_pid_list *list, int status)
+// {
+// 	int	exit_status;
 
-	exit_status = 0;
-	while (list)
-	{
-		waitpid(list->pid, &status, 0);
-		list = list->next;
-	}
-	if (WIFEXITED(status))
-		exit_status = WEXITSTATUS(status);
-	else
-		exit_status = status;
-	return (exit_status);
-}
+// 	exit_status = 0;
+// 	while (list)
+// 	{
+// 		waitpid(list->pid, &status, 0);
+// 		list = list->next;
+// 	}
+// 	if (WIFEXITED(status))
+// 		exit_status = WEXITSTATUS(status);
+// 	else
+// 		exit_status = status;
+// 	return (exit_status);
+// }

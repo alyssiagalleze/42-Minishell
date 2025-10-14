@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 12:54:51 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/14 12:44:51 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ typedef struct s_command
 	char				*redir[ARG_MAX];
 	int					prev_fd;
 	enum e_kind			redir_kind[ARG_MAX];
+	int					is_var;
 } t_command;
 
 typedef struct s_subshell
@@ -157,7 +158,7 @@ struct s_data
 	t_token	*token_list;
 	t_token *token_list_head;
 	t_env	*env;
-	int		prev_fd;
+	int		std_fds[2];
 };
 
 // PROTOTYPES
@@ -212,14 +213,19 @@ void	print_err(const char *str1, const char *str2, const char *str3, const char 
 // exec_builtins.c
 int	is_builtin(t_exec *exec_list);
 int	built_in_exec(t_exec *exec_list, t_env **env);
+int exec_single_builtin(t_exec *exec_list, t_env **env, int saved_stds[2]);
 
 // exec_pipeline.c
-int		exec_pipeline(t_exec *exec_list, t_pid_list **pids, t_env **env, int *prev_fd);
+int		exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd);
 int		is_builtin(t_exec *exec_list);
-int		built_in_exec(t_exec *exec_list, t_env **env);
 
+// exec_subshell.c
+pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int saved_stds[2]);
 // exec_utils.c
 char	*set_command_path(t_exec *exec_list, char **env);
+
+// exec.c
+int 	execute_list(t_exec **exec_list, struct s_data *data);
 
 // exec_list.c
 void	exec_list_init_command(t_command *command);
@@ -261,6 +267,12 @@ int	handle_fork_error(int pipefds[2], char **my_env);
 
 // redirection_utils.c
 void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out);
+void	init_std_fds(struct s_data *subshell_data);
+
+// redirections.c
+int in_redirections(t_exec *exec_list);
+int	out_redirections(t_exec *exec_list);
+int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd);
 
 //	string_manip.c
 int		is_white_space(const char c);
@@ -276,12 +288,15 @@ char	*ft_strdup(const char *s);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*str_append_sq(char *from, char *app);
 
+// subshell_redirections.c
+int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd, int saved_stdout);
+
 // parser.c
 int		parser(t_token **lexer);
 int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind, int *line_has_cmd);
 
 // pids
-int		pid_wait_all(t_pid_list *list, int status);
+int		pid_wait_all(int exec_count, pid_t pid);
 void 	clean_pid(t_pid_list **list);
 void	pid_add_back(t_pid_list **list, pid_t pid);
 

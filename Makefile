@@ -15,7 +15,9 @@ SRC=	SRC/main.c \
 		SRC/exec_list.c \
 		SRC/exec_builtins.c \
 		SRC/exec_pipeline.c \
+		SRC/exec_subshell.c \
 		SRC/exec_utils.c \
+		SRC/exec.c \
 		SRC/expand.c \
 		SRC/expand_asterisk.c \
 		SRC/expand_asterisk_bis.c \
@@ -32,6 +34,7 @@ SRC=	SRC/main.c \
 		SRC/signals.c \
 		SRC/split.c \
 		SRC/string_manip.c \
+		SRC/subshell_redirections.c \
 		SRC/token_list.c \
 		SRC/wordsplit_sort.c \
 		SRC/wordsplit_utils.c \

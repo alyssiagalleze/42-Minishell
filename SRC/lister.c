@@ -12,126 +12,6 @@
 
 # include "minishell.h"
 
-int temp_exec(t_exec **exec_list, t_env **env, t_token **token_list_head)
-{
-	int temp_res = TRUE;
-	pid_t pid;
-	int status;
-	t_pid_list *pids = NULL;
-	int saved_stdin;
-	int saved_stdout;
-	static int	prev_fd;
-
-	// printf("modifying prev_fd value\n");
-	prev_fd = -1;
-	saved_stdin = dup(STDIN_FILENO);
-	if (saved_stdin == -1)
-		return (perror("dup"), 1);
-	saved_stdout = dup(STDOUT_FILENO);
-	if (saved_stdout == -1)
-		return (perror("dup"), 1);
-	while (*exec_list != NULL)
-	{
-		if ((*exec_list)->is_subshell)
-		{
-			// printf("in subshell node\n");
-			int pipefds[2] = {-1, -1};
-			if (pipe(pipefds) == -1)
-				return (perror("pipe"), 1);
-			
-			pid = fork();
-			if (pid == -1)
-			{
-				if (pipefds[0] != -1)
-					close(pipefds[0]);
-				if (pipefds[1] != -1)
-					close(pipefds[1]);
-				return (perror("fork"), 1);
-			}
-
-			if (pid == 0)
-			{
-			// printf("in child subshell\n");
-
-				if (prev_fd != -1)
-				{
-					// printf("in subshell node, prev_fd is %d\n", prev_fd);
-					if (dup2(prev_fd, STDIN_FILENO) == -1)
-						exit(1);
-					close(prev_fd);
-				}
-				if (pipefds[1] != -1)
-				{
-					// printf("in subshell node, setting up pipe for next command at fd %d\n", pipefds[1]);
-					if (dup2(pipefds[1], STDOUT_FILENO) == -1)
-						exit(1);
-					close(pipefds[1]);
-				}
-				if (!(*exec_list)->next)
-				{
-					if (dup2(saved_stdout, STDOUT_FILENO) == -1)
-						exit(1);
-					close(saved_stdout);
-				}
-				if (pipefds[0] != -1)
-					close(pipefds[0]);
-				if (pipefds[1] != -1)
-					close(pipefds[1]);
-				// printf("Launching subshell\n");
-				clean_token_list(token_list_head);
-				rl_clear_history();
-				status = handle_subshell_execution(*exec_list, env);
-				// printf("Subshell exited with status %d\n", status);
-				clean_env(env);
-				exit(status);
-			}
-			if (prev_fd != -1)
-				close(prev_fd);
-			if ((*exec_list)->next)
-			{
-				// printf("Parent process setting up for next command, fd set to %d\n", pipefds[0]);
-				prev_fd = pipefds[0];
-				if (pipefds[1] != -1)
-					close(pipefds[1]);
-			}
-			else
-			{
-				if (pipefds[0] != -1)
-					close(pipefds[0]);
-				if (pipefds[1] != -1)
-					close(pipefds[1]);
-				prev_fd = -1;
-			}
-			waitpid(pid, &status, 0);
-			if (WIFEXITED(status))
-				temp_res = WEXITSTATUS(status);
-			else
-				temp_res = status;
-		}
-		else if ((*exec_list)->is_command)
-		{
-			if ((!(*exec_list)->next) && is_builtin(*exec_list) == TRUE)
-			{
-				temp_res = built_in_exec(*exec_list, env);
-			}
-			else
-			{
-				status = exec_pipeline(*exec_list, &pids, env, &prev_fd);
-				if (!(*exec_list)->next || (*exec_list)->next->is_command == FALSE)
-				{
-					temp_res = pid_wait_all(pids, status);
-					clean_pid(&pids);
-				}
-			}
-		}
-		clean_exec_node(exec_list);
-	}
-	if (dup2(saved_stdin, STDIN_FILENO) == -1)
-		perror("dup2 restore stdin");
-	close(saved_stdin);
-	return (temp_res);
-}
-
 int	is_and_or(t_token *token_list)
 {
 	if (!token_list)
@@ -383,7 +263,8 @@ int	token_list_to_exec(struct s_data *data)
 		}
 		else if (exec)
 		{
-			status = temp_exec(&exec, &data->env, &data->token_list_head);
+
+			status = execute_list(&exec, data);
 			clean_exec_list(&exec);
 		}
 	}

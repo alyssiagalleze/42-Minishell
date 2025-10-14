@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 19:41:38 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/14 11:05:50 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,8 +175,11 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	if (!s1 || !s2) //TODO : FALSE, and malloc can break
+	// printf("+++++++++++++s1 : %s, s2 : %s\n", s1, s2);
+	if (!s1) //TODO : FALSE, and malloc can break
 		s1 = ft_strdup("");
+	if (!s2)
+		return (ft_strdup(s1));
 	len = ft_strlen(s1) + ft_strlen(s2);
 	str = malloc((len + 1) * sizeof(char));
 	if (!str)
