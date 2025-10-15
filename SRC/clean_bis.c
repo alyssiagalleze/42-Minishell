@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 19:01:11 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 16:40:16 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 19:14:23 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,8 @@ void	clean_exec_list(t_exec **exec_list)
 
 void	clean_exec_node(t_exec **exec_list)
 {
-	int		i;
 	t_exec	*next;
 
-	i = 0;
 	next = (*exec_list)->next;
 	if (exec_list && *exec_list)
 	{

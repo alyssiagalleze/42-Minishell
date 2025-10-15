@@ -267,9 +267,7 @@ int	pipeline_to_exec(t_token **token_list, t_env **env, t_exec **exec_list, int 
 int	handle_subshell_execution(t_exec *exec_list, t_env **env)
 {
 	struct s_data	subshell_data;
-	int				sub_fd;
 
-	sub_fd = -1;
 	subshell_data.env = *env;
 	data_reset_pointers(&subshell_data);
 	subshell_data.token_list = exec_list->subshell->token_sublist;

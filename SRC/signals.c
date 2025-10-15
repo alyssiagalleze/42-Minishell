@@ -6,12 +6,61 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 19:31:49 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 18:53:14 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	sa_readline_handler(int	sig)
+{
+	if (sig == SIGINT)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		g_signal = SIGINT;
+	}
+}
+
+void	init_readline_signals(void)
+{
+	struct sigaction	sa;
+	
+	sa.sa_handler = sa_readline_handler;
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+void	sa_exec_child_handler(int	sig)
+{
+	if (sig == SIGINT)
+	{
+		exit(sig + 228);
+	}
+	if (sig == SIGQUIT)
+	{
+		exit(sig + 228);
+	}
+}
+
+void	init_exec_father_signals(void)
+{
+	struct sigaction	sa;
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+void	init_exec_child_signals()
+{
+	struct sigaction	sa;
+	sa.sa_handler = sa_exec_child_handler;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+}
 /* // doit prendre en argument le pid du process en cours pour pouvoir le stopper sans quitter minishell 
 void	sigint_handler(int signal)
 {
@@ -64,33 +113,33 @@ void	set_signal_action(void)
 	sigaction(SIGINT, &act, NULL);
 	
 } */
-int	g_exit_status = 0; //TODO : global var ???
+// int	g_exit_status = 0; //TODO : global var ???
 
-void	sigint_handler(int sig, siginfo_t *info, void *context)
-{
-	(void)sig;
-	(void)info;
-	(void)context;
-	g_exit_status = 130; // convention bash : 128 + SIGINT
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
+// void	sigint_handler(int sig, siginfo_t *info, void *context)
+// {
+// 	(void)sig;
+// 	(void)info;
+// 	(void)context;
+// 	g_exit_status = 130; // convention bash : 128 + SIGINT
+// 	write(STDOUT_FILENO, "\n", 1);
+// 	rl_on_new_line();
+// 	rl_replace_line("", 0);
+// 	rl_redisplay();
+// }
 
-void	init_signals(void)
-{
-	struct sigaction	sa;
+// void	init_signals(void)
+// {
+// 	struct sigaction	sa;
 
-	sa.sa_sigaction = sigint_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_SIGINFO; // pour utiliser la version à 3 arguments
-	sigaction(SIGINT, &sa, NULL);
-	sa.sa_handler = SIG_IGN; // ignorer complètement
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGQUIT, &sa, NULL);
-}
+// 	sa.sa_sigaction = sigint_handler;
+// 	sigemptyset(&sa.sa_mask);
+// 	sa.sa_flags = SA_SIGINFO; // pour utiliser la version à 3 arguments
+// 	sigaction(SIGINT, &sa, NULL);
+// 	sa.sa_handler = SIG_IGN; // ignorer complètement
+// 	sigemptyset(&sa.sa_mask);
+// 	sa.sa_flags = 0;
+// 	sigaction(SIGQUIT, &sa, NULL);
+// }
 
 /* int main(void)
 {
@@ -114,4 +163,21 @@ void	init_signals(void)
     }
     return 0;
 }
+ */
+
+
+ /*
+ *	signaux en tty ->
+ *		^C : rajoute "^C\n" a la line et propose un nouveau prompt (no history)
+ * 		^D : exit (ecrit exit ?)
+ * 		^\ : nothing
+ *	signaux en exec ->
+ *		^C : ^C + rend la main
+ * 		^D : nothing
+ * 		^\ : ^\Quit (core dumped)
+ *	signaux en heredoc ->
+ *		^C : 
+ * 		^D :
+ * 		^\ : nothing
+ * 
  */

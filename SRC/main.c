@@ -6,29 +6,32 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/14 19:51:22 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 19:31:24 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	check_exit(char *input, struct s_data *data) // TODO : built in only
+void	check_exit(char **input, struct s_data *data, int status)
 {
-	if (str_cmp(input, "exit", FALSE))
-		my_exit(0, &data->env, &input, NULL);
+	if (!*input)
+		my_exit(status, &data->env, NULL, NULL);
+	if (str_cmp(*input, "exit", FALSE))
+		my_exit(status, &data->env, input, NULL);
 }
 
-void	get_input(char **input, struct s_data *data)
+//TODO : check quel std
+void	get_input(char **input, struct s_data *data, int status)
 {
 	while (!*input)
 	{
 		*input = readline(PROMPT);
+		check_exit(input, data, status);
 		if (is_str_empty_or_null(*input))
 			clean_input(input);
 		else
 			add_history(*input);
 	}
-	check_exit(*input, data);
 }
 
 //TODO : move in correct spot
@@ -67,10 +70,29 @@ void	shell_loop(struct s_data *data, int *status)
 
 	while (1)
 	{
+		if (g_signal == SIGINT || *status == SIGINT + 128)
+		{
+			write(STDIN_FILENO, "\n", 1);
+			rl_on_new_line();
+			rl_replace_line("", 0);
+		}
+		if (g_signal == SIGQUIT || *status == SIGQUIT + 128)
+		{
+			write(STDIN_FILENO, "Quit (core dumped)\n", 20);
+			rl_on_new_line();
+			rl_replace_line("", 0);
+		}
+		g_signal = 0;
 		save_last_status(status, &data->env);
 		input = NULL;
 		data_reset_pointers(data);
-		get_input(&input, data);
+		get_input(&input, data, *status);
+		if (g_signal)
+		{
+			*status = g_signal + 128;
+			save_last_status(status, &data->env);
+			g_signal = 0;
+		}
 		lexer(&data->token_list, input, data);
 		if (token_list_size(data->token_list) >= ARG_MAX)
 		{
@@ -82,19 +104,19 @@ void	shell_loop(struct s_data *data, int *status)
 			*status = token_list_to_exec(data);
 		else
 			cleaner(NULL, NULL, &data->token_list_head);
-		//printf("+++exit status: %i\n", *status);
-		// debug_print_env(data->env);
 	}
 }
+
+int g_signal = 0;
 
 int	main(int ac, char **av, char **env)
 {
 	struct s_data	data;
 	int				status;
 
+	init_readline_signals();
 	data.env = init_env_list(env);
 	status = 0;
-    // init_signals();
 	shell_loop(&data, &status);
 	exit_clean(&data);
 	return(status);
@@ -103,11 +125,9 @@ int	main(int ac, char **av, char **env)
 }
 
 /*
+*	exit must be a built in
 *	copy env sans local
 *	signaux
-*	readm
-*	var= dans l'env
+*	readme
 *	passe builtin
-*	words type etc in parser
-*	rendre claire pipeline exec
 */

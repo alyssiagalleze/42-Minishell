@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 12:43:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 17:43:02 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 18:14:55 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,10 @@ void	launch_subshell(t_exec *exec_list, struct s_data *data)
 	rl_clear_history();
 	status = handle_subshell_execution(exec_list, &data->env);
 	clean_env(&data->env);
+	if (g_signal == SIGINT)
+		status = 130;
+	if (g_signal == SIGQUIT)
+		status = 131;
 	exit(status);
 }
 
@@ -69,10 +73,11 @@ void	save_prev_fd(t_exec *exec_list, int pipefds[2], int *prev_fd)
 	}
 }
 
+//TODO : we don't use status anymore, find a way to signal error and cleanup
 pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int saved_stds[2])
 {
 	int pipefds[2] = {-1, -1};
-	int status = 0;
+	// int status = 0;
 	int pid;
 	
 	if (pipe(pipefds) == -1)
@@ -86,5 +91,5 @@ pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int sa
 		launch_subshell(exec_list, data);
 	}
 	save_prev_fd(exec_list, pipefds, prev_fd);
-	return (status);
+	return (pid);
 }

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:25:58 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 16:57:41 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 12:07:07 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,8 @@ int	should_expand_wordsplit(t_token *token_list)
 
 int	check_expand_wordsplit(t_token *token_list)
 {
-	while (token_list)
+	while (token_list
+		&& token_list->type != REDIR_OPERATOR && token_list->type != BRACKET)
 	{
 		if (should_expand_wordsplit(token_list))
 		{

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 15:52:07 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 16:26:36 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
 	char *path;
 
 	path = NULL;
-	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
+	if (exec_list->is_subshell == FALSE
+		&& !is_builtin(exec_list) && !exec_list->command->is_var)
 	{
 		path = set_command_path(exec_list, my_env);
 		if (!path)
@@ -91,6 +92,7 @@ pid_t exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd)
 		return (handle_fork_error(pipefds, my_env));
 	if (pid == 0)
 	{
+		init_exec_child_signals();
 		path = get_path_for_command(exec_list, my_env, pipefds);
 		if (!path && !is_builtin(exec_list))
 		{

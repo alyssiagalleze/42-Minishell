@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/14 11:50:22 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 12:06:28 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ int	check_expand_dollar(t_token *token_list, t_env *env)
 	int			index;
 	enum e_err	err;
 
-	while (token_list)
+	while (token_list && token_list->type != CONTR_OPERATOR && token_list->type != BRACKET)
 	{
 		index = should_expand_dollar(token_list);
 		if (index == -1)

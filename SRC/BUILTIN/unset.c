@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:25:01 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/07 15:59:30 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/15 19:18:30 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@ int	unset_single(char *arg, t_env **env)
 {
 	t_env	*prev;
 	t_env	*current;
-	int		i;
 	
-	i = 0;
 	prev = NULL;
 	current = *env;
 	while (current)

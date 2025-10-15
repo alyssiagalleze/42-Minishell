@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 11:43:31 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 17:01:32 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@
 # define	PERR_STX_NL		"syntax error near unexpected token `newline'\n"
 # define	PERR_STX_BRA	"syntax error near unexpected token `('\n"
 # define	PERR_STX_OPE	"syntax error : invalid operator "
+# define	PERR_ASSIGN		"malloc error, failed assignement of "
 
 //treat all metacharacters or only the one in subject ??
 //could also say input invalid if metacharacters we don't use ??
@@ -68,6 +69,12 @@
 # define	_OUT_APP	">>"
 # define	_BRACKET_O	"("
 # define	_BRACKET_C	")"
+
+//	GLOBAL
+
+extern int		g_signal;
+
+//	ENUMS
 
 enum	e_type
 {
@@ -165,6 +172,9 @@ struct s_data
 
 // PROTOTYPES
 
+
+int	is_and_or(t_token *token_list);
+
 // built-ins
 void	ft_putstr_fd(const char *s, int fd);
 char	**ft_split(char const *s, char c);
@@ -241,11 +251,11 @@ int		is_expandable_char(char c);
 // expand_asterisk.c + expand_aterisk_bis
 int		check_expand_asterisk(t_token *token_list);
 //
-int	hide_file(char *file, char *pattern);
-int	is_dir_only(char **pattern);
-int	is_dir(struct dirent *file_info);
-int	should_expand_file(
-	char *file_name, char *pattern, int dir_only, struct dirent	*file);
+int		hide_file(char *file, char *pattern);
+int		is_dir_only(char **pattern);
+int		is_dir(struct dirent *file_info);
+int		should_expand_file(
+char	*file_name, char *pattern, int dir_only, struct dirent	*file);
 
 // expand_dollar.c
 int		check_expand_dollar(t_token *token_list, t_env *env);
@@ -308,6 +318,9 @@ int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
 // // signals.c
 // void sigint_handler(int sig, siginfo_t *info, void *context);
 // void init_signals(void);
+void	init_readline_signals(void);
+void	init_exec_father_signals(void);
+void	init_exec_child_signals(void);
 
 // token_list.c
 void	token_list_empty_node(t_token *token);

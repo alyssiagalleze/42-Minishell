@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 11:41:21 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 19:17:58 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ char	*extract_string(const char *start, int len)
 	int		i;
 	char	*new_str;
 
-	if (start <= 0 || start == NULL )
+	if (start == NULL)
 		return (NULL);
 	new_str = malloc(sizeof(char) * (len + 1));
 	if (new_str == NULL)
