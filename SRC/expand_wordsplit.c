@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:25:58 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 16:43:42 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 16:57:41 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 	return (ERR_SUCCESS);
 }
 
+//TODO : LONG
 char	**wordsplit(int *word_count, char *str)
 {
 	char	**tab;
@@ -50,9 +51,20 @@ char	**wordsplit(int *word_count, char *str)
 	tab = malloc(sizeof(*tab) * (*word_count + 1));
 	if (tab == NULL)
 		return (tab);
+	while (curr_word <= *word_count)
+	{
+		tab[curr_word] = NULL;
+		curr_word ++;
+	}
+	curr_word = 0;
 	while (curr_word < *word_count)
 	{
 		curr_char = ws_allocate_string(tab, str, curr_char, curr_word);
+		if (curr_char == -1)
+		{
+			ws_free_tab(tab, *word_count);
+			return (NULL);
+		}
 		curr_word ++;
 	}
 	tab[curr_word] = NULL;

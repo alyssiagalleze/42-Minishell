@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 12:52:26 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 16:44:58 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 11:42:56 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,11 @@ void	check_expand_unquote(t_token *token_list)
 	}
 }
 
-int	expand_command(t_token *token_list, t_env *env)
+int	expand_command(t_token *token_list, t_env **env)
 {
 	enum e_err	err;
 
-	err = check_expand_dollar(token_list, env);
+	err = check_expand_dollar(token_list, *env);
 	if (err)
 		return (err);
 	err = check_expand_asterisk(token_list);

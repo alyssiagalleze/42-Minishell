@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:52:46 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 16:31:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 18:50:21 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	exec_list_init_command(t_command *command)
 		command->redir_kind[i] = 0;
 		i ++;
 	}
+	command->is_var = FALSE;
 }
 
 void	exec_list_init_node(t_exec *exec)

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:47:41 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/07 16:42:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 11:41:06 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	parser_check_and_assign_word(
 		(*token)->kind = WORD_FILE;
 	}
 	else if ((prev_kind != WORD_COM && prev_kind != WORD_ARG)
-		&& is_char_in_string('=', (*token)->str, FALSE))
+		&& is_char_in_string('=', (*token)->str, FALSE, FALSE))
 	{
 		(*token)->kind = WORD_VAR;
 	}

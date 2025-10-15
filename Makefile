@@ -36,6 +36,7 @@ SRC=	SRC/main.c \
 		SRC/string_manip.c \
 		SRC/subshell_redirections.c \
 		SRC/token_list.c \
+		SRC/utils.c \
 		SRC/wordsplit_sort.c \
 		SRC/wordsplit_utils.c \
 		SRC/BUILTIN/cd.c \

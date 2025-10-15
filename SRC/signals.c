@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/11 17:59:31 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 19:31:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	sigquit_handler(int signal)
 void	eof_handler(int signal)
 {
 	if (signal == EOF)
-		printf("\nEOF\n");
+		//printf("\nEOF\n");
 }
 
 void	set_signal_action_eof(void)
@@ -103,13 +103,13 @@ void	init_signals(void)
         line = readline("minishell> ");
         if (!line) // Ctrl+D => readline renvoie NULL
         {
-            printf("exit\n");
+            //printf("exit\n");
             break;
         }
         if (*line)
             add_history(line);
 
-        printf("Tu as tapé: %s\n", line);
+        //printf("Tu as tapé: %s\n", line);
         free(line);
     }
     return 0;

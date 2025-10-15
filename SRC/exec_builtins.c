@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 12:35:41 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/14 16:09:43 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@ void	built_in_redirections( t_exec *exec_list)
 	fd_out = -1;
 	if (exec_list->command->redir[0])
 		open_fds(exec_list, &fd_in, &fd_out);
-	printf("found fd_out : %d", fd_out);
-	printf("found fd_in : %d", fd_in);
 	if (in_redirections(exec_list))
 		if (dup2(fd_in, STDIN_FILENO) == -1)
 			return (perror("dup2 fd_in"));
@@ -54,6 +52,7 @@ int	is_builtin(t_exec *exec_list)
 		return (FALSE);
 }
 
+//TODO pid ???
 int exec_single_builtin(t_exec *exec_list, t_env **env, int saved_stds[2])
 {
 	int exit_status;

@@ -1,30 +1,34 @@
 /* ************************************************************************** */
-/*																			*/
-/*														:::	  ::::::::   */
-/*   my_env_list.c									  :+:	  :+:	:+:   */
-/*													+:+ +:+		 +:+	 */
-/*   By: agalleze <agalleze@student.42.fr>		  +#+  +:+	   +#+		*/
-/*												+#+#+#+#+#+   +#+		   */
-/*   Created: 2025/09/16 10:50:49 by agalleze		  #+#	#+#			 */
-/*   Updated: 2025/09/16 12:24:03 by agalleze		 ###   ########.fr	   */
-/*																			*/
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_list.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/14 16:18:02 by tfiette           #+#    #+#             */
+/*   Updated: 2025/10/14 16:21:08 by tfiette          ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
+
 
 #include "minishell.h"
 
-t_env	*env_new_node(const char *var_name, const char *var_value, int exported)
+//TODO : malloc fail
+t_env	*env_new_node(
+	const char *var_name, const char *var_value, int is_exported, int is_local)
 {
 	t_env	*node;
 
 	node = malloc(sizeof(t_env));
 	if (!node)
 		return (NULL);
-	node->var_name = strdup(var_name);
+	node->var_name = ft_strdup(var_name);
 	if (var_value)
-		node->var_value = strdup(var_value);
+		node->var_value = ft_strdup(var_value);
 	else
 		node->var_value = NULL;
-	node->is_exported = exported;
+	node->is_exported = is_exported;
+	node->is_local = is_local;
 	node->next = NULL;
 	return (node);
 }
@@ -64,7 +68,7 @@ t_env	*init_env_list(char **env)
 			*sep = '\0';
 			var_name = env[i];
 			var_value = sep + 1;
-			env_add_node(&top, env_new_node(var_name, var_value, FALSE));
+			env_add_node(&top, env_new_node(var_name, var_value, FALSE, FALSE));
 			*sep = '=';
 		}
 		i++;
@@ -76,7 +80,7 @@ t_env	*init_env_list(char **env)
 int	update_variable(t_env **env, char *var, char *value)
 {
 	unset_single(var, env);
-	env_add_node(env, env_new_node(var, value, FALSE));
+	env_add_node(env, env_new_node(var, value, FALSE, FALSE));
 	return (0);
 }
 

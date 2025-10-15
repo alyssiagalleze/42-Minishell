@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/14 11:05:50 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/15 11:41:21 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,16 @@ int	is_white_space(const char c)
 
 int	is_char_operator(const char c)
 {
-	return (is_char_in_string(c, METACHARACTERS, FALSE));
+	return (is_char_in_string(c, METACHARACTERS, FALSE, FALSE));
 }
 
 int	is_char_separator(const char c)
 {
-	return (is_char_in_string(c, METASEPARATORS, FALSE));
+	return (is_char_in_string(c, METASEPARATORS, FALSE, FALSE));
 }
 
-int	is_char_in_string(const char c, const char *str, int accept_null)
+int	is_char_in_string(
+	const char c, const char *str, int accept_null, int give_index)
 {
 	int	i;
 
@@ -35,12 +36,16 @@ int	is_char_in_string(const char c, const char *str, int accept_null)
 	if (!accept_null && !str)
 	{
 		write(2, "err : sending a null string in is_char_in_string !\n", 52);
+		if (give_index)
+			return (-1);
 		return (FALSE);
 	}
 	while (str[i])
 	{
 		if (c == str[i])
 		{
+			if (give_index)
+				return (i);
 			return (TRUE);
 		}
 		i ++;
@@ -198,7 +203,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-// TODOLONG
 char	*str_append_sq(char *from, char *app)
 {
 	char	*new_str;
@@ -219,12 +223,9 @@ char	*str_append_sq(char *from, char *app)
 	if (from)
 		new_str[i++] = ' ';
 	new_str[i++] = '\'';
-	j = 0;
-	while (app[j])
-	{
+	j = -1;
+	while (app[++j])
 		new_str[i + j] = app[j];
-		j ++;
-	}
 	new_str[i + j++] = '\'';
 	new_str[i + j++] = '\0';
 	free(from);

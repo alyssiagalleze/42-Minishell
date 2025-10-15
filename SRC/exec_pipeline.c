@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 12:43:01 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/14 15:52:07 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2])
 				close(pipefds[0]);
 			if (pipefds[1] != -1)
 				close(pipefds[1]);
-			exit (127);
 		}
 	}
 	return (path);
@@ -78,7 +77,6 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 
 pid_t exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd)
 {
-	// printf("-> in exec_pipeline\n");
 	int		pipefds[2];
 	pid_t	pid;
 	char	*path;
@@ -88,14 +86,19 @@ pid_t exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd)
 		return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
 	if (prepare_env_and_pipe(exec_list, env, &my_env, pipefds) != 0)
 		return (1);
-	path = get_path_for_command(exec_list, my_env, pipefds);
-	if (!path && !is_builtin(exec_list))
-		return (free_env_array(my_env), 127);
 	pid = fork();
 	if (pid == -1)
 		return (handle_fork_error(pipefds, my_env));
 	if (pid == 0)
+	{
+		path = get_path_for_command(exec_list, my_env, pipefds);
+		if (!path && !is_builtin(exec_list))
+		{
+			free_env_array(my_env);
+			exit (127);
+		}
 		child_exec(exec_list, path, env, pipefds, *prev_fd);
+	}
 	parent_after_fork(exec_list, prev_fd, pipefds);
 	// pid_add_back(pids, pid);
 	free_env_array(my_env);

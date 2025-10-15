@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:29:30 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/06 15:56:20 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 13:17:25 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,27 +35,25 @@ int  echo(char **args)
 {
 	int i;
 	int	count;
-	
+	int	newline;
+
 	count = 0;
 	while (args[count])
 		count++;
 	i = 1;
+	newline = TRUE;
 	if (is_n_enabled(args[i]))
 	{
 		i++;
-		while (args[i])
-		{
-			ft_putstr_fd(args[i++], 1);
-			if (i != count)
-				write(1, " ", 1);
-		}
-		return (0);
+		newline = FALSE;
 	}
 	while (args[i])
 	{
 		ft_putstr_fd(args[i++], 1);
 		if (i != count)
-			write(1, " ", 1);			
+			write(STDOUT_FILENO, " ", 1);			
 	}
-	return (write(1, "\n", 1), 0);
+	if (newline)
+		write(STDOUT_FILENO, "\n", 1);
+	return (0);
 }

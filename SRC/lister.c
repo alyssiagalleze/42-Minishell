@@ -75,13 +75,34 @@ void	skip_pipeline_tokens(t_token **token_list)
 	}
 }
 
-//TODOLONG
+t_token	*create_and_fill_subtoken(
+	t_token **sublist, t_token *token)
+{
+	char	*sub_str;
+	t_token	*subtoken;
+
+	subtoken = token_list_add_node(sublist);
+	if (subtoken == NULL)
+	{
+		clean_token_list(sublist);
+		return (NULL);
+	}
+	sub_str = ft_strdup(token->str);
+	if (sub_str == NULL)
+	{
+		free(sub_str);
+		clean_token_list(sublist);
+		return (NULL);
+	}
+	token_list_fill_node(subtoken, sub_str, token->type, token->kind);
+	return (subtoken);
+}
+
 t_token	*scan_subshell_tokens(t_token **token_list)
 {
 	int		open_bracket;
 	t_token	*sublist;
 	t_token	*subtoken;
-	char	*sub_str;
 
 	open_bracket = 1;
 	sublist = NULL;
@@ -91,29 +112,15 @@ t_token	*scan_subshell_tokens(t_token **token_list)
 		if ((*token_list)->kind == BRACKET_O)
 			open_bracket ++;
 		if ((*token_list)->kind == BRACKET_C)
-		{
 			open_bracket --;
-			if (!open_bracket)
-			{
-				*token_list = (*token_list)->next;
-				break ;
-			}
-		}
-		subtoken = token_list_add_node(&sublist);
-		if (subtoken == NULL)
+		if (!open_bracket)
 		{
-			clean_token_list(&sublist);
-			return (NULL);
+			*token_list = (*token_list)->next;
+			break ;
 		}
-		sub_str = ft_strdup((*token_list)->str);
-		if (sub_str == NULL)
-		{
-			free(sub_str);
-			clean_token_list(&sublist);
+		subtoken = create_and_fill_subtoken(&sublist, *token_list);
+		if (!subtoken)
 			return (NULL);
-		}
-		token_list_fill_node(subtoken, sub_str,
-			(*token_list)->type, (*token_list)->kind);
 		*token_list = (*token_list)->next;
 	}
 	return (sublist);
@@ -137,46 +144,75 @@ int	build_exec_subshell_node(t_token **token_list, t_exec **exec_list)
 }
 
 //TODOLONG
-int	scan_command_tokens(t_token **token_list, t_command *command)
+void	scan_command_redirs(
+	t_token **token_list, t_command *command, int *redir_count)
 {
-	int	in_count;
-	int	out_count;
-	int	arg_count;
+	command->redir_kind[*redir_count] = (*token_list)->kind;
+	*token_list = (*token_list)->next;
+	command->redir[*redir_count] = (*token_list)->str;
+	*redir_count += 1;
+}
 
-	in_count = 0;
-	out_count = 0;
-	arg_count = 0;
-	while (*token_list && ((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
+int	scan_command_words(
+	t_token **token_list, t_command *command, int *arg_count, char **var)
+{
+	if ((*token_list)->kind == WORD_VAR)
+		*var = (*token_list)->str;
+	else if ((*token_list)->kind == WORD_COM)
 	{
-		if ((*token_list)->type == REDIR_OPERATOR)
-		{
-			command->redir_kind[in_count] = (*token_list)->kind;
-			*token_list = (*token_list)->next;
-			command->redir[in_count] = (*token_list)->str;
-			in_count ++;
-		}
-		else if ((*token_list)->type == WORD)
-		{
-			if ((*token_list)->kind == WORD_COM)
-			{
-				command->argv[0] = ft_strdup((*token_list)->str);
-				if (command->argv[0] == NULL)
-					return (ERR_MALLOC);
-			}
-			else if ((*token_list)->kind == WORD_ARG)
-			{
-				arg_count ++;
-				command->argv[arg_count] = ft_strdup((*token_list)->str);
-				if (command->argv[arg_count] == NULL)
-					return (ERR_MALLOC);
-			}
-		}
-		*token_list = (*token_list)->next;
+		command->argv[0] = ft_strdup((*token_list)->str);
+		if (command->argv[0] == NULL)
+			return (ERR_MALLOC);
+	}
+	else if ((*token_list)->kind == WORD_ARG)
+	{
+		*arg_count += 1;
+		command->argv[*arg_count] = ft_strdup((*token_list)->str);
+		if (command->argv[*arg_count] == NULL)
+			return (ERR_MALLOC);
 	}
 	return (ERR_SUCCESS);
 }
 
-int	build_exec_command_node(t_token **token_list, t_exec **exec_list, t_env *env)
+int set_command_as_var_assign(char *var, t_command *command)
+{
+	command->argv[0] = ft_strdup(var);
+	if (command->argv[0] == NULL)
+		return (ERR_MALLOC);
+	command->is_var = TRUE;
+	return (ERR_SUCCESS);
+}
+
+int	scan_command_tokens(t_token **token_list, t_command *command)
+{
+	int			redir_count;
+	int			arg_count;
+	char		*var;
+	enum e_err	err; 
+
+	redir_count = 0;
+	arg_count = 0;
+	var = NULL;
+	while (*token_list &&
+		((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
+	{
+		if ((*token_list)->type == REDIR_OPERATOR)
+			scan_command_redirs(token_list, command, &redir_count);
+		else if ((*token_list)->type == WORD)
+		{
+			err = scan_command_words(token_list, command, &arg_count, &var);
+			if (err)
+				return (err);
+		}
+		*token_list = (*token_list)->next;
+	}
+	if (command->argv[0] == NULL && var)
+		if (set_command_as_var_assign(var, command))
+			return (ERR_MALLOC);
+	return (ERR_SUCCESS);
+}
+
+int	build_exec_command_node(t_token **token_list, t_exec **exec_list, t_env **env)
 {
 	t_exec		*new_exec;
 	enum e_err	err;
@@ -201,7 +237,7 @@ int	build_exec_command_node(t_token **token_list, t_exec **exec_list, t_env *env
 	return (err);
 }
 
-int	pipeline_to_exec(t_token **token_list, t_env *env, t_exec **exec_list, int lvalue)
+int	pipeline_to_exec(t_token **token_list, t_env **env, t_exec **exec_list, int lvalue)
 {
 	enum e_err	err;
 
@@ -253,7 +289,7 @@ int	token_list_to_exec(struct s_data *data)
 	status = 0;
 	while (data->token_list)
 	{
-		err = pipeline_to_exec(&data->token_list, data->env, &exec, status);
+		err = pipeline_to_exec(&data->token_list, &data->env, &exec, status);
 		if (err)
 		{
 			status = 2;
@@ -263,10 +299,10 @@ int	token_list_to_exec(struct s_data *data)
 		}
 		else if (exec)
 		{
-
 			status = execute_list(&exec, data);
 			clean_exec_list(&exec);
 		}
 	}
-	return (cleaner(NULL,NULL, &data->token_list_head), status);
+	cleaner(NULL,NULL, &data->token_list_head);
+	return (status);
 }

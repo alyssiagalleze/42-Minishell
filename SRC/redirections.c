@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 15:12:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 11:49:30 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/14 17:32:42 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ int	out_redirections(t_exec *exec_list)
 
 int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd)
 {
-	printf("in redirect in\n");
+	// printf("in redirect in\n");
 	if (in_redirections(exec_list) == TRUE)
 	{
-		printf("in redirect ?\n");
+		//printf("in redirect ?\n");
 		if (dup2(*fd_in, STDIN_FILENO) == -1)
 			return (perror("dup2 fd_in"), 1);
 		close(*fd_in);
@@ -64,8 +64,8 @@ int	redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out)
 {
 	if (out_redirections(exec_list) == TRUE)
 	{
-		printf("out redirect ?\n");
-		printf("fd_out : %d\n", *fd_out);
+		//printf("out redirect ?\n");
+		//printf("fd_out : %d\n", *fd_out);
 		if (dup2(*fd_out, STDOUT_FILENO) == -1)
 			return (perror("dup2 fd_out"), 1);
 		close(*fd_out);
@@ -81,15 +81,16 @@ int	redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out)
 
 int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 {
-	printf("in redirect fds for cmd : %s\n", exec_list->command->argv[0]);
 	static int fd_in = -1;
 	static int fd_out = -1;
 
 	if (exec_list->command->redir[0])
 	{
 		open_fds(exec_list, &fd_in, &fd_out);
-		printf("updated fd_in value : %d\n", fd_in);
-		printf("updated fd_out value : %d\n", fd_out);
+		// if (fd_in == -1)
+		// 	return (1);
+		// if (fd_out == -1)
+		// 	return (1);
 	}
 	if (redirect_in(exec_list, &fd_in, prev_fd))
 		return (1);

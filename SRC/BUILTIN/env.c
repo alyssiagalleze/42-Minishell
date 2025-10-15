@@ -19,7 +19,7 @@ int print_env(t_env **env)
 	current = *env;
 	while (current)
 	{
-		if (!current->is_exported)
+		if (!current->is_exported && !current->is_local)
 		{
 			ft_putstr_fd(current->var_name, 1);
 			write(1, "=", 1);

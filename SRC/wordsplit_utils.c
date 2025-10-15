@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:30:18 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 18:02:51 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/13 16:52:34 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ int	ws_allocate_string(char **tab, char *str, int curr_char, int curr_word)
 		i ++;
 	}
 	tab[curr_word] = malloc(sizeof(**tab) * (i + 1));
+	if (tab[curr_word] == NULL)
+		return (-1);
 	return (str_ptr - str + i);
 }
 
@@ -111,6 +113,7 @@ void	check_wordsplit_failure(char **tab, const int word_count)
 	}
 	if (failure == TRUE)
 	{
+		printf("Found failure\n");
 		while (words)
 		{
 			words--;

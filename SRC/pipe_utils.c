@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:43:08 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 11:50:51 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/13 13:37:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pip
 		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), 2);
 	if (exec_list->next)
 	{
-		// printf("Check fds for command %s\n", exec_list->command->argv[0]);
+		// //printf("Check fds for command %s\n", exec_list->command->argv[0]);
 		if (pipe(pipefds) == -1)
 			return (perror("pipe"), 1);
 	}
-	// printf("pipefd[0] = %d, pipefd[1] = %d\n", pipefds[0], pipefds[1]);
+	// //printf("pipefd[0] = %d, pipefd[1] = %d\n", pipefds[0], pipefds[1]);
 	return (0);
 }
 
