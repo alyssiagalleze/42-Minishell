@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 14:31:53 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:48:47 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,71 +56,79 @@ pid_t	exec_assign_var(t_exec *exec_list, t_env **env, int	saved_stds[2])
 		node->is_exported = FALSE;
 		node->is_local = TRUE;
 	}
-	// if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
-	// 	return (perror("dup2 restore stdin"), 1);
-	// node = var_exists(env, )
 	(void)saved_stds;
 	return (0);
 }
 
-//TODO: si tu veux fais ca joli
-pid_t	exec_command(t_exec *exec_list, t_env **env, int *prev_fd, int saved_stds[2])
+int	is_var(t_exec *exec_list)
 {
-	pid_t pid;
-	
+	return (exec_list->command->is_var);
+}
+
+//TODO: si tu veux fais ca joli
+pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
+{
+	pid_t	pid;
+
 	if (!exec_list->next
 		&& (is_builtin(exec_list) || exec_list->command->is_var))
 	{
 		if (is_builtin(exec_list))
-			pid = exec_single_builtin(exec_list, env, saved_stds);
+		{
+			printf("-> exec single builtin\n");
+			pid = exec_single_builtin(exec_list, env, exec_data);
+		}
 		if (exec_list->command->is_var)
-			pid = exec_assign_var(exec_list, env, saved_stds);
+			pid = exec_assign_var(exec_list, env, exec_data->saved_stds);
 	}
 	else
-		pid = exec_pipeline(exec_list, env, prev_fd, saved_stds);
+		pid = exec_pipeline(exec_list, env, exec_data);
 	return (pid);
 }
 
-int execute_list(t_exec **exec_list, struct s_data *data)
+void	restore_std_fds(int saved_stds[2])
 {
-	pid_t 		last_pid;
-	int			exec_count;
-	static int 	saved_stds[2];
-	static int	prev_fd;
+	if (dup2(saved_stds[0], STDIN_FILENO) == -1)
+		perror("dup2 restore stdin");
+	if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
+		perror("dup2 restore stdout");
+	close(saved_stds[0]);
+	close(saved_stds[1]);
+}
 
-	prev_fd = -1;
-	exec_count = 0;
-	if (save_std_fds(&saved_stds[0], &saved_stds[1]) == -1)
+int	execute_list(t_exec **exec_list, struct s_data *data)
+{
+	struct s_exec_data	exec_data;
+
+	exec_data.prev_fd = -1;
+	exec_data.exec_count = 0;
+	if (save_std_fds(&exec_data.saved_stds[0], &exec_data.saved_stds[1]) == -1)
 		return (1);
 	while (*exec_list != NULL)
 	{
 		if ((*exec_list)->is_subshell)
-			last_pid = exec_subshell((*exec_list), data, &prev_fd, saved_stds);
+			exec_data.last_pid = exec_subshell((*exec_list), data, &exec_data);
 		else if ((*exec_list)->is_command)
-			last_pid = exec_command(*exec_list, &data->env, &prev_fd, saved_stds);
-		if (last_pid >= 0)
-			exec_count++;
+			exec_data.last_pid = exec_command(*exec_list, &data->env, &exec_data);
+		if (exec_data.last_pid >= 0)
+			exec_data.exec_count++;
 		clean_exec_node(exec_list);
 	}
-	if (dup2(saved_stds[0], STDIN_FILENO) == -1)
-		return (perror("dup2 restore stdin"), 1);
-	if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
-		return (perror("dup2 restore stdin"), 1);
-	close(saved_stds[0]);
-	close(saved_stds[1]);
-	if (prev_fd != -1)
-		close(prev_fd);
-	// close_fds(saved_stds);
-	return (pid_wait_all(exec_count, last_pid));
+	restore_std_fds(exec_data.saved_stds);
+	if (exec_data.prev_fd != -1)
+		close(exec_data.prev_fd);
+	if (exec_data.last_pid < 0)
+		return (1);
+	return (pid_wait_all(exec_data.exec_count, exec_data.last_pid));
 }
 
 int	pid_wait_all(int exec_count, pid_t last_pid)
 {
-	int 	status;
+	int		status;
 	int		exit_status;
-	int 	result;
+	int		result;
 	pid_t	pid;
-	
+
 	status = 0;
 	while (exec_count)
 	{

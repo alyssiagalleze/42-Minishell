@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:33:55 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 14:30:40 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:59:34 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,77 +14,83 @@
 
 void	close_fds(int pipefds[2], int saved_stds[2])
 {
-	if (saved_stds[0] != -1)
-		close(saved_stds[0]);
-	if (saved_stds[1] != -1)
-		close(saved_stds[1]);
-	if (pipefds[0] != -1)
-		close(pipefds[0]);
-	if (pipefds[1] != -1)
-		close(pipefds[1]);
+	if (pipefds)
+	{
+		if (pipefds[0] != -1)
+			close(pipefds[0]);
+		if (pipefds[1] != -1)
+			close(pipefds[1]);
+	}
+	if (saved_stds)
+	{
+		printf("-> in close fds\n");
+		if (saved_stds[0] != -1)
+			close(saved_stds[0]);
+		if (saved_stds[1] != -1)
+			close(saved_stds[1]);
+	}
 }
 
-int	open_fd_out(int i, t_exec *exec_list)
+int	handle_open_error(t_exec *exec_list, int fd, int is_single)
 {
-	int fd;
+	perror(exec_list->command->redir[0]);
+	close(fd);
+	if (is_single)
+		return (-1);
+	exit(1);
+	return (0);
+}
+
+int	open_fd_out(int i, t_exec *exec_list, int is_single)
+{
+	int	fd;
 
 	if (exec_list->command->redir_kind[i] == OUT_APP)
 	{
-		fd = open(exec_list->command->redir[i], O_RDWR | O_APPEND | O_CREAT, 0777);
+		fd = open(exec_list->command->redir[i], O_RDWR
+				| O_APPEND | O_CREAT, 0777);
 		if (fd == -1)
-		{
-			perror(exec_list->command->redir[i]);
-			exit(1);
-		}
-	}	
-	else 
+			return (handle_open_error(exec_list, fd, is_single));
+	}
+	else
 	{
-		fd = open(exec_list->command->redir[i], O_RDWR | O_TRUNC | O_CREAT, 0777);
-		printf("-> open fd out for file %s, got fd : %d\n", exec_list->command->redir[i], fd);
+		fd = open(exec_list->command->redir[i], O_RDWR
+				| O_TRUNC | O_CREAT, 0777);
 		if (fd == -1)
-		{
-			printf("je passe ici ? \n");
-			perror(exec_list->command->redir[i]);
-			exit(1);
-		}
+			return (handle_open_error(exec_list, fd, is_single));
 	}
 	return (fd);
 }
 
-int	open_fd_in(int i, t_exec *exec_list)
+int	open_fd_in(int i, t_exec *exec_list, int is_single)
 {
 	int	fd;
 
 	fd = open(exec_list->command->redir[i], O_RDONLY);
-	printf("-> open fd in for file %s, got fd : %d\n", exec_list->command->redir[i], fd);
-	if ( fd == -1)
-		return (perror(exec_list->command->redir[i]), -1);
+	if (fd == -1)
+		return (handle_open_error(exec_list, fd, is_single));
 	return (fd);
 }
 
 void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out)
 {
-	//printf("in open fds \n");
-	int i;
-	
+	int	i;
+
 	i = 0;
 	while (exec_list->command->redir[i])
 	{
-		printf("-> need to open fd for file %s, kind : %d\n", exec_list->command->redir[i], exec_list->command->redir_kind[i]);
 		if (exec_list->command->redir_kind[i] == IN)
 		{
-			printf("je viens la ? \n");
-			*fd_in = open_fd_in(i, exec_list);
+			*fd_in = open_fd_in(i, exec_list, 0);
 			if (*fd_in == -1)
-				exit(1);	
+				close_and_exit(*fd_in, *fd_out, NULL, 1);
 		}
 		if (exec_list->command->redir_kind[i] == OUT ||
 			exec_list->command->redir_kind[i] == OUT_APP)
 		{
-			printf("-> need to open fd out for file %s\n", exec_list->command->redir[i]);	
-			*fd_out = open_fd_out(i, exec_list);
+			*fd_out = open_fd_out(i, exec_list, 0);
 			if (*fd_out == -1)
-				exit(1);
+				close_and_exit(*fd_in, *fd_out, NULL, 1);
 		}
 			i++;
 	}

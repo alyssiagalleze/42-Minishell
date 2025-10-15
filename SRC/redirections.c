@@ -1,25 +1,26 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirections.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/09 15:12:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 14:27:01 by agalleze         ###   ########.fr       */
-/*                                                                            */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   redirections.c									 :+:	  :+:	:+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: agalleze <agalleze@student.42.fr>		  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2025/10/09 15:12:43 by agalleze		  #+#	#+#			 */
+/*   Updated: 2025/10/15 16:06:08 by agalleze		 ###   ########.fr	   */
+/*																			*/
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int in_redirections(t_exec *exec_list)
+int	in_redirections(t_exec *exec_list)
 {
 	int	i;
 
 	i = 0;
 	while (exec_list->command->redir[i])
 	{
-		if (exec_list->command->redir_kind[i] == IN || exec_list->command->redir_kind[i] == HDOC)
+		if (exec_list->command->redir_kind[i] == IN
+			|| exec_list->command->redir_kind[i] == HDOC)
 			return (1);
 		i++;
 	}
@@ -28,35 +29,33 @@ int in_redirections(t_exec *exec_list)
 
 int	out_redirections(t_exec *exec_list)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (exec_list->command->redir[i])
 	{
-		printf("-------------------redir : %s\n", exec_list->command->redir[i]);
-		if (exec_list->command->redir_kind[i] == OUT || exec_list->command->redir_kind[i] == OUT_APP)
+		if (exec_list->command->redir_kind[i] == OUT
+			|| exec_list->command->redir_kind[i] == OUT_APP)
 			return (1);
 		i++;
 	}
-	return (0);	
+	return (0);
 }
 
 int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd)
 {
-	// printf("in redirect in\n");
 	if (in_redirections(exec_list) == TRUE)
 	{
-		//printf("in redirect ?\n");
 		if (dup2(*fd_in, STDIN_FILENO) == -1)
 			return (perror("dup2 fd_in"), 1);
 		close(*fd_in);
 	}
 	else if (prev_fd != -1)
-    {
+	{
 		if (dup2(prev_fd, STDIN_FILENO) == -1)
 			return (perror("dup2 prev_fd"), 1);
 		close(prev_fd);
-    }
+	}
 	return (0);
 }
 
@@ -64,25 +63,23 @@ int	redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out)
 {
 	if (out_redirections(exec_list) == TRUE)
 	{
-		//printf("out redirect ?\n");
-		//printf("fd_out : %d\n", *fd_out);
 		if (dup2(*fd_out, STDOUT_FILENO) == -1)
 			return (perror("dup2 fd_out"), 1);
 		close(*fd_out);
 	}
-    else if (exec_list->next)
-    {
-        if (dup2(pipefd_out, STDOUT_FILENO) == -1)
-            return (perror("dup2 pipe write"), 1);
-        close(pipefd_out);
-    }
+	else if (exec_list->next)
+	{
+		if (dup2(pipefd_out, STDOUT_FILENO) == -1)
+			return (perror("dup2 pipe write"), 1);
+		close(pipefd_out);
+	}
 	return (0);
 }
 
 int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 {
-	static int fd_in = -1;
-	static int fd_out = -1;
+	static int	fd_in = -1;
+	static int	fd_out = -1;
 
 	if (exec_list->command->redir[0])
 		open_fds(exec_list, &fd_in, &fd_out);
@@ -94,7 +91,7 @@ int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 		close(pipefds[0]);
 	if (pipefds[1] != -1)
 		close(pipefds[1]);
-	return (0);	
+	return (0);
 }
 
 // int	here_doc_input(int i, t_exec *exec_list)

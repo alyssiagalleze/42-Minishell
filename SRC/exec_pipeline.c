@@ -6,15 +6,16 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 14:31:41 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/15 19:30:40 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2], int saved_stds[2])
+char	*get_path_for_command(t_exec *exec_list, char **my_env
+	, int pipefds[2], int saved_stds[2])
 {
-	char *path;
+	char	*path;
 
 	path = NULL;
 	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
@@ -22,51 +23,33 @@ char *get_path_for_command(t_exec *exec_list, char **my_env, int pipefds[2], int
 		path = set_command_path(exec_list, my_env);
 		if (!path)
 		{
-			print_err(exec_list->command->argv[0], ": command not found\n", NULL, NULL);
+			print_err(exec_list->command->argv[0]
+				, ": command not found\n", NULL, NULL);
 			close_fds(pipefds, saved_stds);
 		}
 	}
 	return (path);
 }
 
-void close_and_exit(int pipefds[2], char **my_env, int status)
-{
-	if (pipefds[0] != -1)
-		close(pipefds[0]);
-	if (pipefds[1] != -1)
-		close(pipefds[1]);
-	free_env_array(my_env);
-	exit(status);
-}
-// void close_fds()
-// {
-// 	int i = 3;
-// 	while (i < 1024)
-// 	{
-// 		close(i);
-// 		i++;
-// 	}
-// }
-void child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2], int prev_fd)
+void	child_exec(t_exec *exec_list, char *path, t_env **env
+	, int pipefds[2], struct s_exec_data *exec_data)
 {
 	int		status;
 	char	**my_env;
 
-	printf("pipefds[0] = %d, pipefds[1] = %d, prev_fd = %d\n", pipefds[0], pipefds[1], prev_fd);
-	if (redirect_fds(exec_list, pipefds, prev_fd))
-		close_and_exit(pipefds, NULL, 1);
+	if (redirect_fds(exec_list, pipefds, exec_data->prev_fd) != 0)
+		close_and_exit(pipefds[0], pipefds[1], NULL, 1);
 	if (pipefds[0] != -1)
 		close(pipefds[0]);
 	if (pipefds[1] != -1)
-		close(pipefds[1]);	
+		close(pipefds[1]);
 	if (is_builtin(exec_list))
 	{
 		status = built_in_exec(exec_list, env);
 		exit(status);
 	}
 	my_env = transfer_env(env);
-	// close_fds();
-
+	close_fds(pipefds, exec_data->saved_stds);
 	status = execve(path, exec_list->command->argv, my_env);
 	perror(exec_list->command->argv[0]);
 	free_env_array(my_env);
@@ -93,7 +76,8 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 	}
 }
 
-pid_t exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd, int saved_stds[2])
+pid_t	exec_pipeline(t_exec *exec_list, t_env **env
+	, struct s_exec_data *exec_data)
 {
 	int		pipefds[2];
 	pid_t	pid;
@@ -111,20 +95,16 @@ pid_t exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd, int saved_stds
 		return (handle_fork_error(pipefds, my_env));
 	if (pid == 0)
 	{
-		path = get_path_for_command(exec_list, my_env, pipefds, saved_stds);
+		path = get_path_for_command(exec_list, my_env, pipefds, exec_data->saved_stds);
 		if (!path && !is_builtin(exec_list))
 		{
-			if (pipefds[0] != -1)
-				close(pipefds[0]);
-			if (pipefds[1] != -1)
-				close(pipefds[1]);
+			close_fds(pipefds, exec_data->saved_stds);
 			free_env_array(my_env);
 			exit (127);
 		}
-		child_exec(exec_list, path, env, pipefds, *prev_fd);
+		child_exec(exec_list, path, env, pipefds, exec_data);
 	}
-	parent_after_fork(exec_list, prev_fd, pipefds);
-	// pid_add_back(pids, pid);
+	parent_after_fork(exec_list, &exec_data->prev_fd, pipefds);
 	free_env_array(my_env);
 	return (pid);
 }

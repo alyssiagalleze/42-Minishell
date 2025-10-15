@@ -23,6 +23,7 @@ SRC=	SRC/main.c \
 		SRC/expand_asterisk_bis.c \
 		SRC/expand_dollar.c \
 		SRC/expand_wordsplit.c \
+		SRC/fd_utils.c \
 		SRC/lexer.c \
 		SRC/lister.c \
 		SRC/parser.c \

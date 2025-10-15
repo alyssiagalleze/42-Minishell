@@ -6,20 +6,20 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 12:43:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 14:30:35 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/15 15:16:16 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 
-void	sub_pipe_redirect(t_exec *exec_list, int pipefds[2], int prev_fd, int saved_stds[2])
+void	sub_pipe_redirect(t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data)
 {
-	if (prev_fd != -1)
+	if (exec_data->prev_fd != -1)
 	{
-		if (dup2(prev_fd, STDIN_FILENO) == -1)
+		if (dup2(exec_data->prev_fd, STDIN_FILENO) == -1)
 			exit(1);
-		close(prev_fd);
+		close(exec_data->prev_fd);
 	}
 	if (pipefds[1] != -1)
 	{
@@ -29,12 +29,12 @@ void	sub_pipe_redirect(t_exec *exec_list, int pipefds[2], int prev_fd, int saved
 	}
 	if (!exec_list->next)
 	{
-		if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
+		if (dup2(exec_data->saved_stds[1], STDOUT_FILENO) == -1)
 			exit(1);
-		close(saved_stds[1]);
+		close(exec_data->saved_stds[1]);
 	}
 	// close(saved_stds[0]);
-	close_fds(pipefds, saved_stds);
+	close_fds(pipefds, exec_data->saved_stds);
 }
 
 void	launch_subshell(t_exec *exec_list, struct s_data *data)
@@ -69,7 +69,7 @@ void	save_prev_fd(t_exec *exec_list, int pipefds[2], int *prev_fd)
 	
 }
 
-pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int saved_stds[2])
+pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data)
 {
 	int pipefds[2];
 	int status;
@@ -85,9 +85,9 @@ pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int sa
 		return (handle_fork_error(pipefds, NULL));
 	if (pid == 0)
 	{
-		sub_pipe_redirect(exec_list, pipefds, *prev_fd, saved_stds);
+		sub_pipe_redirect(exec_list, pipefds, exec_data);
 		launch_subshell(exec_list, data);
 	}
-	save_prev_fd(exec_list, pipefds, prev_fd);
+	save_prev_fd(exec_list, pipefds, &exec_data->prev_fd);
 	return (status);
 }
