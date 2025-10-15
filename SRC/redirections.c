@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 15:12:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 17:32:42 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 14:27:01 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,17 +85,15 @@ int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 	static int fd_out = -1;
 
 	if (exec_list->command->redir[0])
-	{
 		open_fds(exec_list, &fd_in, &fd_out);
-		// if (fd_in == -1)
-		// 	return (1);
-		// if (fd_out == -1)
-		// 	return (1);
-	}
 	if (redirect_in(exec_list, &fd_in, prev_fd))
 		return (1);
 	if (redirect_out(exec_list, &fd_out, pipefds[1]))
 		return (1);
+	if (pipefds[0] != -1)
+		close(pipefds[0]);
+	if (pipefds[1] != -1)
+		close(pipefds[1]);
 	return (0);	
 }
 

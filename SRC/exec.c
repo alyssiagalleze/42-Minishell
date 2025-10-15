@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 11:48:33 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 14:31:53 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ pid_t	exec_command(t_exec *exec_list, t_env **env, int *prev_fd, int saved_stds[
 			pid = exec_assign_var(exec_list, env, saved_stds);
 	}
 	else
-		pid = exec_pipeline(exec_list, env, prev_fd);
+		pid = exec_pipeline(exec_list, env, prev_fd, saved_stds);
 	return (pid);
 }
 
@@ -104,8 +104,12 @@ int execute_list(t_exec **exec_list, struct s_data *data)
 	}
 	if (dup2(saved_stds[0], STDIN_FILENO) == -1)
 		return (perror("dup2 restore stdin"), 1);
-	// close(saved_stds[0]);
-	// close(saved_stds[1]);
+	if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
+		return (perror("dup2 restore stdin"), 1);
+	close(saved_stds[0]);
+	close(saved_stds[1]);
+	if (prev_fd != -1)
+		close(prev_fd);
 	// close_fds(saved_stds);
 	return (pid_wait_all(exec_count, last_pid));
 }

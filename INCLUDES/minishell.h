@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 11:43:31 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 14:32:20 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ int	built_in_exec(t_exec *exec_list, t_env **env);
 int exec_single_builtin(t_exec *exec_list, t_env **env, int saved_stds[2]);
 
 // exec_pipeline.c
-int		exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd);
+pid_t exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd, int saved_stds[2]);
 int		is_builtin(t_exec *exec_list);
 
 // exec_subshell.c
@@ -268,6 +268,7 @@ int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pip
 int	handle_fork_error(int pipefds[2], char **my_env);
 
 // redirection_utils.c
+void	close_fds(int pipefds[2], int saved_stds[2]);
 void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out);
 void	init_std_fds(struct s_data *subshell_data);
 

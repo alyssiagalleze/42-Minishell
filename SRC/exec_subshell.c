@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   exec_subshell.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 12:43:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 17:43:02 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 14:30:35 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
 
 void	sub_pipe_redirect(t_exec *exec_list, int pipefds[2], int prev_fd, int saved_stds[2])
 {
@@ -32,10 +33,8 @@ void	sub_pipe_redirect(t_exec *exec_list, int pipefds[2], int prev_fd, int saved
 			exit(1);
 		close(saved_stds[1]);
 	}
-	if (pipefds[0] != -1)
-		close(pipefds[0]);
-	if (pipefds[1] != -1)
-		close(pipefds[1]);
+	// close(saved_stds[0]);
+	close_fds(pipefds, saved_stds);
 }
 
 void	launch_subshell(t_exec *exec_list, struct s_data *data)
@@ -67,14 +66,18 @@ void	save_prev_fd(t_exec *exec_list, int pipefds[2], int *prev_fd)
 			close(pipefds[1]);
 		*prev_fd = -1;
 	}
+	
 }
 
 pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int saved_stds[2])
 {
-	int pipefds[2] = {-1, -1};
-	int status = 0;
+	int pipefds[2];
+	int status;
 	int pid;
 	
+	status = 0;
+	pipefds[0] = -1;
+	pipefds[1] = -1;
 	if (pipe(pipefds) == -1)
 		return (perror("pipe"), 1);
 	pid = fork();

@@ -3,14 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:33:55 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 15:14:26 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 14:30:40 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	close_fds(int pipefds[2], int saved_stds[2])
+{
+	if (saved_stds[0] != -1)
+		close(saved_stds[0]);
+	if (saved_stds[1] != -1)
+		close(saved_stds[1]);
+	if (pipefds[0] != -1)
+		close(pipefds[0]);
+	if (pipefds[1] != -1)
+		close(pipefds[1]);
+}
 
 int	open_fd_out(int i, t_exec *exec_list)
 {
