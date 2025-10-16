@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 14:32:22 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/16 14:35:17 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ int	main(int ac, char **av, char **env)
 	struct s_data	data;
 	int				status;
 
-	// loading();
+	loading();
 	init_readline_signals();
 	data.env = init_env_list(env);
 	if (!data.env)
