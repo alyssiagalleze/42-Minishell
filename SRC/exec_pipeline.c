@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/16 13:47:34 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/16 14:52:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ pid_t	exec_pipeline(t_exec *exec_list, t_env **env
 		return (handle_fork_error(pipefds, my_env));
 	if (pid == 0)
 	{
+		init_exec_child_signals();
 		path = get_path_for_command(exec_list, my_env, pipefds, exec_data->saved_stds);
 		if (!path && !is_builtin(exec_list))
 		{
