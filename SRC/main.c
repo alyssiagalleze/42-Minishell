@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 14:35:17 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/16 14:38:02 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,26 +107,22 @@ void	shell_loop(struct s_data *data, int *status)
 	}
 }
 
-void	loading()
-{
-	int	j;
-	int	k;
-	write(1, PROMPT, 46);
-	write(1, "loading... \n", 13);
-	j = 0;
-	while (j < 4)
-	{
-		k = -2000000000;
-		while (k <  2147483647)
-		{
-			k ++;
-		}
-		j ++;
-		if (j != 4)
-			write(1, "[]", 3);
-	}
-	write(1, "\n", 1);
-}
+// void	loading()
+// {
+// 	int	j;
+// 	int	k;
+// 	int bloc = '=';
+	
+// 	write(1, "\1\e[1;38;5;82m\2\1\e[0;38;5;82m\2", 30);
+// 	write(1, "==============================================================================\n", 80);
+// 	write(1, "                                 loading... \n", 46);
+// 	j = 0;
+// 	while (j < 80)
+// 	{
+		
+// 	}
+// 	write(1, "\n", 1);
+// }
 
 int g_signal = 0;
 
@@ -135,7 +131,7 @@ int	main(int ac, char **av, char **env)
 	struct s_data	data;
 	int				status;
 
-	loading();
+	// loading();
 	init_readline_signals();
 	data.env = init_env_list(env);
 	if (!data.env)
