@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 19:31:24 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 13:25:59 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,27 @@ void	shell_loop(struct s_data *data, int *status)
 	}
 }
 
+void	loading()
+{
+	int	j;
+	int	k;
+	write(1, PROMPT, 46);
+	write(1, "loading... \n", 13);
+	j = 0;
+	while (j < 4)
+	{
+		k = -2000000000;
+		while (k <  2147483647)
+		{
+			k ++;
+		}
+		j ++;
+		if (j != 4)
+			write(1, "[]", 3);
+	}
+	write(1, "\n", 1);
+}
+
 int g_signal = 0;
 
 int	main(int ac, char **av, char **env)
@@ -114,6 +135,7 @@ int	main(int ac, char **av, char **env)
 	struct s_data	data;
 	int				status;
 
+	loading();
 	init_readline_signals();
 	data.env = init_env_list(env);
 	status = 0;
@@ -125,9 +147,9 @@ int	main(int ac, char **av, char **env)
 }
 
 /*
-*	exit must be a built in
-*	copy env sans local
-*	signaux
-*	readme
-*	passe builtin
+*	heredoc (readline / fd / signals)
+*	
+*	exit as command (+ args ?)
+*	copy env sans local ?
+*	clean / valgrind / norminette
 */

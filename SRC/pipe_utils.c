@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:43:08 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 13:37:49 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 13:17:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pip
 
 int	handle_fork_error(int pipefds[2], char **my_env)
 {
-	if (pipefds[0] != -1)
+	// if (pipefds[0] != -1)
 		close(pipefds[0]);
-	if (pipefds[1] != -1)
+	// if (pipefds[1] != -1)
 		close(pipefds[1]);
 	if (my_env)
 		free_env_array(my_env);

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 17:01:32 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 19:42:55 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,15 @@ struct s_data
 	int		std_fds[2];
 };
 
+struct s_exec_data
+{
+	pid_t	last_pid;
+	int		exec_count;
+	int		saved_stds[2];
+	int		prev_fd;
+};
+
+
 // PROTOTYPES
 
 
@@ -223,16 +232,17 @@ int		ft_lstsize(t_env *lst);
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
 // exec_builtins.c
-int	is_builtin(t_exec *exec_list);
-int	built_in_exec(t_exec *exec_list, t_env **env);
-int exec_single_builtin(t_exec *exec_list, t_env **env, int saved_stds[2]);
+int		is_builtin(t_exec *exec_list);
+int		built_in_exec(t_exec *exec_list, t_env **env);
+int		exec_single_builtin(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
 
 // exec_pipeline.c
-int		exec_pipeline(t_exec *exec_list, t_env **env, int *prev_fd);
+pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
 int		is_builtin(t_exec *exec_list);
 
 // exec_subshell.c
-pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, int *prev_fd, int saved_stds[2]);
+pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data);
+
 // exec_utils.c
 char	*set_command_path(t_exec *exec_list, char **env);
 
@@ -247,6 +257,10 @@ t_exec	*exec_list_add_node(t_exec **exec_list_start);
 // expand.c
 int		expand_command(t_token *token_list, t_env **env);
 int		is_expandable_char(char c);
+
+// fd_utils.c
+void close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);
+int	close_no_exit(int pipefds_r, int pipefds_w, int status);
 
 // expand_asterisk.c + expand_aterisk_bis
 int		check_expand_asterisk(t_token *token_list);
@@ -278,8 +292,11 @@ int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pip
 int	handle_fork_error(int pipefds[2], char **my_env);
 
 // redirection_utils.c
+void	close_fds(int pipefds[2], int saved_stds[2]);
 void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out);
 void	init_std_fds(struct s_data *subshell_data);
+int		open_fd_out(int i, t_exec *exec_list, int is_single);
+int		open_fd_in(int i, t_exec *exec_list, int single);
 
 // redirections.c
 int in_redirections(t_exec *exec_list);

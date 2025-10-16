@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 15:16:07 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/15 19:00:24 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	move_folders(char *target, t_env **env)
 		return (perror("get working dir"), 1);
 	if (update_variable(env, "OLDPWD", working_dir) != 0)
 		return (free(working_dir), free(target), print_err(PROMPT,
-			": cd: could not update OLDPWD", NULL, NULL), 0);
+				": cd: could not update OLDPWD", NULL, NULL), 0);
 	if (chdir(target) == -1)
 		return (free(working_dir), print_err(PROMPT, ": cd: ",
 				NULL, NULL), perror(target), free(target), 0);
@@ -65,14 +65,16 @@ int	move_folders(char *target, t_env **env)
 	if (update_variable(env, "PWD", working_dir) != 0)
 		return (free(working_dir), free(target), print_err(PROMPT
 				, ": cd: could not update PWD", NULL, NULL), 0);
+	free(working_dir);
 	return (1);
 }
 
 int	cd(char **args, t_env **env)
 {
-	char	*target = NULL;
+	char	*target;
 	int		malloc_fail;
 
+	target = NULL;
 	malloc_fail = 0;
 	if (args[2] != NULL)
 	{
