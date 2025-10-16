@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 13:25:59 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 14:32:22 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,9 +135,11 @@ int	main(int ac, char **av, char **env)
 	struct s_data	data;
 	int				status;
 
-	loading();
+	// loading();
 	init_readline_signals();
 	data.env = init_env_list(env);
+	if (!data.env)
+		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), 1);
 	status = 0;
 	shell_loop(&data, &status);
 	exit_clean(&data);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 19:17:58 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 13:41:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,4 +230,20 @@ char	*str_append_sq(char *from, char *app)
 	new_str[i + j++] = '\0';
 	free(from);
 	return (new_str);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	unsigned char	k;
+
+	k = (unsigned char)c;
+	while (*s)
+	{
+		if (k == *s)
+			return ((char *)s);
+		s++;
+	}
+	if (k == 0)
+		return ((char *)s);
+	return (NULL);
 }

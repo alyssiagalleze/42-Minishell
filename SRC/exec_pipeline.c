@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:49:46 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 13:47:34 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ char	*get_path_for_command(t_exec *exec_list, char **my_env
 	char	*path;
 
 	path = NULL;
-	if (exec_list->is_subshell == FALSE
-		&& !is_builtin(exec_list) && !exec_list->command->is_var)
+	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
 	{
 		path = set_command_path(exec_list, my_env);
 		if (!path)
@@ -47,6 +46,7 @@ void	child_exec(t_exec *exec_list, char *path, t_env **env
 	if (is_builtin(exec_list))
 	{
 		status = built_in_exec(exec_list, env);
+		close_fds(pipefds, exec_data->saved_stds);
 		exit(status);
 	}
 	my_env = transfer_env(env);
@@ -77,8 +77,8 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 	}
 }
 
-pid_t	exec_pipeline(
-	t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
+pid_t	exec_pipeline(t_exec *exec_list, t_env **env
+	, struct s_exec_data *exec_data)
 {
 	int		pipefds[2];
 	pid_t	pid;
@@ -96,7 +96,6 @@ pid_t	exec_pipeline(
 		return (handle_fork_error(pipefds, my_env));
 	if (pid == 0)
 	{
-		init_exec_child_signals();
 		path = get_path_for_command(exec_list, my_env, pipefds, exec_data->saved_stds);
 		if (!path && !is_builtin(exec_list))
 		{
@@ -110,3 +109,4 @@ pid_t	exec_pipeline(
 	free_env_array(my_env);
 	return (pid);
 }
+

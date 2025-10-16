@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 19:42:55 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 13:41:59 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -316,6 +316,7 @@ char	*extract_string(const char *start, int len);
 char	*ft_strdup(const char *s);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*str_append_sq(char *from, char *app);
+char	*ft_strchr(const char *s, int c);
 
 // subshell_redirections.c
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd, int saved_stdout);
