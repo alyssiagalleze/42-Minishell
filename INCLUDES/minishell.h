@@ -6,25 +6,32 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 19:42:55 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 14:07:39 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+// # define __USE_POSIX
+// # define _POSIX_C_SOURCE 2
+
 # include <stdlib.h>
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <dirent.h>
-# include <signal.h>
+// # include <bits/sigaction.h>
 # include <sys/wait.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <unistd.h>
 # include <errno.h>
+# include <features.h>
+# include <signal.h>
+
+// #define _POSIX_C_SOURCE 199309L
 
 # define	MAX_ERROR_LEN	256
 # define	ERROR_TOO_LONG	"encountered an error too large to display\n"

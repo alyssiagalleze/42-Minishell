@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 18:53:14 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 14:16:15 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,16 @@ void	sa_readline_handler(int	sig)
 void	init_readline_signals(void)
 {
 	struct sigaction	sa;
-	
+	char				*sa_ptr;
+	unsigned long		i;
+
+	i = 0;
+	sa_ptr = (char *)&sa;
+	while (i < sizeof(sa))
+	{
+		*(sa_ptr + i) = 0;
+		i ++;
+	}
 	sa.sa_handler = sa_readline_handler;
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
@@ -49,6 +58,16 @@ void	sa_exec_child_handler(int	sig)
 void	init_exec_father_signals(void)
 {
 	struct sigaction	sa;
+	char				*sa_ptr;
+	unsigned long		i;
+
+	i = 0;
+	sa_ptr = (char *)&sa;
+	while (i < sizeof(sa))
+	{
+		*(sa_ptr + i) = 0;
+		i ++;
+	}
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
@@ -57,6 +76,16 @@ void	init_exec_father_signals(void)
 void	init_exec_child_signals()
 {
 	struct sigaction	sa;
+	char				*sa_ptr;
+	unsigned long		i;
+
+	i = 0;
+	sa_ptr = (char *)&sa;
+	while (i < sizeof(sa))
+	{
+		*(sa_ptr + i) = 0;
+		i ++;
+	}
 	sa.sa_handler = sa_exec_child_handler;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
