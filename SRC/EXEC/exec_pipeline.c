@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/16 14:52:45 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/16 16:47:36 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*get_path_for_command(t_exec *exec_list, char **my_env
-	, int pipefds[2], int saved_stds[2])
+char	*get_path_for_command(
+	t_exec *exec_list, char **my_env, int pipefds[2], int saved_stds[2])
 {
 	char	*path;
 
@@ -31,8 +31,8 @@ char	*get_path_for_command(t_exec *exec_list, char **my_env
 	return (path);
 }
 
-void	child_exec(t_exec *exec_list, char *path, t_env **env
-	, int pipefds[2], struct s_exec_data *exec_data)
+//TODO : 5 arguments
+void	child_exec(t_exec *exec_list, char *path, t_env **env, int pipefds[2], struct s_exec_data *exec_data)
 {
 	int		status;
 	char	**my_env;

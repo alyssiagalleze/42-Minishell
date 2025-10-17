@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 17:27:05 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 19:40:36 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 19:57:25 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,18 @@ int	should_expand_asterisk(t_token *token_list)
 		if (token_list->str[i] == '"')
 		{
 			i ++;
-			while (token_list->str[i] != '"')
+			while (token_list->str[i] && token_list->str[i] != '"')
 				i ++;
+			if (!token_list->str[i])
+				break ;
 		}
 		else if (token_list->str[i] == '\'')
 		{
 			i ++;
-			while (token_list->str[i] != '\'')
+			while (token_list->str[i] && token_list->str[i] != '\'')
 				i ++;
+			if (!token_list->str[i])
+				break ;
 		}
 		else if (token_list->str[i] == '*')
 			return (TRUE);

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:02:49 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 16:47:11 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 20:35:40 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,7 @@ void	lexer_create_token_from_input(
 		*input += len;
 }
 
+//TODO : lexer shouldn't clean input
 void	lexer(t_token **token_list, char *input, struct s_data *data)
 {
 	int		len;

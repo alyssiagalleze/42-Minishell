@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 13:37:49 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 13:17:33 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,11 @@ void	clean_token_list(t_token	**token_list)
 		{
 			free((*token_list)->str);
 			(*token_list)->str = NULL;
+		}
+		if ((*token_list)->hdoc_fd != -1)
+		{
+			close((*token_list)->hdoc_fd);
+			(*token_list)->hdoc_fd = -1;
 		}
 		free(*token_list);
 		*token_list = temp;

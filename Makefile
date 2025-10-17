@@ -10,25 +10,12 @@ SRC=	SRC/main.c \
 		SRC/clean_bis.c \
 		SRC/data.c \
 		SRC/debug.c \
-		SRC/env_list.c \
 		SRC/error.c	\
-		SRC/exec_list.c \
-		SRC/exec_builtins.c \
-		SRC/exec_pipeline.c \
-		SRC/exec_subshell.c \
-		SRC/exec_utils.c \
-		SRC/exec.c \
-		SRC/expand.c \
-		SRC/expand_asterisk.c \
-		SRC/expand_asterisk_bis.c \
-		SRC/expand_dollar.c \
-		SRC/expand_wordsplit.c \
 		SRC/fd_utils.c \
 		SRC/lexer.c \
 		SRC/lister.c \
 		SRC/parser.c \
 		SRC/parser_bis.c \
-		SRC/pid_list.c \
 		SRC/pipe_utils.c \
 		SRC/redirection_utils.c \
 		SRC/redirections.c \
@@ -36,17 +23,30 @@ SRC=	SRC/main.c \
 		SRC/split.c \
 		SRC/string_manip.c \
 		SRC/subshell_redirections.c \
-		SRC/token_list.c \
 		SRC/utils.c \
-		SRC/wordsplit_sort.c \
-		SRC/wordsplit_utils.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \
 		SRC/BUILTIN/pwd.c \
 		SRC/BUILTIN/unset.c \
 		SRC/BUILTIN/export.c \
-		SRC/BUILTIN/exit.c 
+		SRC/BUILTIN/exit.c \
+		SRC/EXEC/exec.c \
+		SRC/EXEC/exec_builtins.c \
+		SRC/EXEC/exec_pipeline.c \
+		SRC/EXEC/exec_subshell.c \
+		SRC/EXEC/exec_utils.c \
+		SRC/EXPAND/expand.c \
+		SRC/EXPAND/expand_asterisk.c \
+		SRC/EXPAND/expand_asterisk_bis.c \
+		SRC/EXPAND/expand_dollar.c \
+		SRC/EXPAND/expand_wordsplit.c \
+		SRC/EXPAND/wordsplit_sort.c \
+		SRC/EXPAND/wordsplit_utils.c \
+		SRC/LIST/env_list.c \
+		SRC/LIST/exec_list.c \
+		SRC/LIST/pid_list.c \
+		SRC/LIST/token_list.c
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 14:38:02 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 13:23:38 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	get_input(char **input, struct s_data *data, int status)
 	}
 }
 
-//TODO : move in correct spot
 void	save_last_status(int *status, t_env **env)
 {
 	t_env	*node;
@@ -64,10 +63,75 @@ void	save_last_status(int *status, t_env **env)
 	}
 }
 
+void	heredoc_input_to_pipe(char *delim, int	heredoc_in)
+{
+	// TODO : unquote delim etc
+	char	*input;
+
+	input = NULL;
+	while (1)
+	{
+		input = readline(HDOC_PROMPT);
+		if (input)
+		{
+			if (str_cmp(input, delim, FALSE))
+				break;
+			write(heredoc_in, input, ft_strlen(input));
+			free(input);
+		}
+	}
+	if (input)
+		free(input);
+}
+
+void	heredocs_display_header(char *delim)
+{
+	// TODO : unquote delim etc
+	write(1, HDOC_HEADER, 11);
+	write(1, delim, ft_strlen(delim));
+	write(1, "\n", 1);
+}
+
+int	heredocs(t_token *token_list)
+{
+	int		heredoc_pipe[2];
+	
+	init_heredoc_signals();
+	while (token_list)
+	{
+		heredoc_pipe[0] = -1;
+		heredoc_pipe[1] = -1;
+		while (token_list && token_list->kind != HDOC)
+			token_list = token_list->next;
+		if (token_list && token_list->kind == HDOC)
+		{
+			token_list = token_list->next;
+			if (!token_list)
+				break ;
+			heredocs_display_header(token_list->str);
+			if (pipe(heredoc_pipe)/* || dup2(heredoc_pipe[0], STDOUT_FILENO) == -1 */)
+			{
+				if (heredoc_pipe[0] != -1)
+					close(heredoc_pipe[0]);
+				if (heredoc_pipe[1] != -1)
+					close(heredoc_pipe[1]);
+				print_err(PROMPT, "heredoc pipe failed : ", token_list->str, NULL);
+				return (ERR_HDOC);
+			}
+			heredoc_input_to_pipe(token_list->str, heredoc_pipe[1]);
+			close(heredoc_pipe[1]);
+			token_list->hdoc_fd = heredoc_pipe[0];
+			token_list = token_list->next;
+		}
+	}
+	return (ERR_SUCCESS);
+}
+
 void	shell_loop(struct s_data *data, int *status)
 {
 	char *input;
 
+	*status = 0;
 	while (1)
 	{
 		if (g_signal == SIGINT || *status == SIGINT + 128)
@@ -94,13 +158,16 @@ void	shell_loop(struct s_data *data, int *status)
 			g_signal = 0;
 		}
 		lexer(&data->token_list, input, data);
+		input = NULL;
 		if (token_list_size(data->token_list) >= ARG_MAX)
 		{
 			print_err(PROMPT, PERR_ARG_MAX, NULL, NULL);
 			cleaner(NULL, NULL, &data->token_list_head);
 			*status = 2;
 		}
-		else if (parser(&data->token_list))
+		if (heredocs(data->token_list))
+			my_exit(2, &data->env, &input, &data->token_list_head);
+		if (parser(&data->token_list))
 			*status = token_list_to_exec(data);
 		else
 			cleaner(NULL, NULL, &data->token_list_head);
@@ -131,6 +198,7 @@ int	main(int ac, char **av, char **env)
 	struct s_data	data;
 	int				status;
 
+	g_signal = 0;
 	// loading();
 	init_readline_signals();
 	data.env = init_env_list(env);
@@ -144,10 +212,24 @@ int	main(int ac, char **av, char **env)
 	(void)av;
 }
 
+//heredoc :
+//prompt user <- quand ?
+//
+// ouvrir heredoc pipe -> transmettre fd a token_list x
+// token_list transmet fd a exec list ?
+// clean les fd soit dans token_list soit dans exec list
+// -> donc quand fd transmis, le passer a -1;
+// recuperer fd a l'exec
+
+
+// -> var1=theo var2=pierre && echo $var1 $var2
+
 /*
 *	heredoc (readline / fd / signals)
-*	
 *	exit as command (+ args ?)
 *	copy env sans local ?
 *	clean / valgrind / norminette
 */
+
+
+// 

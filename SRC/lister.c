@@ -145,12 +145,23 @@ int	build_exec_subshell_node(t_token **token_list, t_exec **exec_list)
 
 //TODOLONG
 void	scan_command_redirs(
-	t_token **token_list, t_command *command, int *redir_count)
+	t_token **token_list, t_command *command, int *redir_count, int	*hdoc_count)
 {
+	int	is_hdoc;
+
+	is_hdoc = FALSE;
 	command->redir_kind[*redir_count] = (*token_list)->kind;
+	if ((*token_list)->kind == HDOC)
+		is_hdoc = TRUE;
 	*token_list = (*token_list)->next;
 	command->redir[*redir_count] = (*token_list)->str;
 	*redir_count += 1;
+	if (is_hdoc)
+	{
+		command->hdoc_fd[*hdoc_count] = (*token_list)->hdoc_fd;
+		(*token_list)->hdoc_fd = -1;
+		*hdoc_count += 1;
+	}
 }
 
 int	scan_command_words(
@@ -183,21 +194,24 @@ int set_command_as_var_assign(char *var, t_command *command)
 	return (ERR_SUCCESS);
 }
 
+//TODO : 5 args
 int	scan_command_tokens(t_token **token_list, t_command *command)
 {
 	int			redir_count;
+	int			hdoc_count;
 	int			arg_count;
 	char		*var;
 	enum e_err	err; 
 
 	redir_count = 0;
+	hdoc_count = 0;
 	arg_count = 0;
 	var = NULL;
 	while (*token_list &&
 		((*token_list)->type == WORD || (*token_list)->type == REDIR_OPERATOR))
 	{
 		if ((*token_list)->type == REDIR_OPERATOR)
-			scan_command_redirs(token_list, command, &redir_count);
+			scan_command_redirs(token_list, command, &redir_count, &hdoc_count);
 		else if ((*token_list)->type == WORD)
 		{
 			err = scan_command_words(token_list, command, &arg_count, &var);
@@ -237,6 +251,7 @@ int	build_exec_command_node(t_token **token_list, t_exec **exec_list, t_env **en
 	return (err);
 }
 
+//TODO : clean fd dans pipeline skipped ???
 int	pipeline_to_exec(t_token **token_list, t_env **env, t_exec **exec_list, int lvalue)
 {
 	enum e_err	err;

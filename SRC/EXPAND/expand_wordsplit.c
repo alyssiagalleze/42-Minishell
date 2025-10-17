@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:25:58 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 12:07:07 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 19:59:12 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,14 +113,18 @@ int	should_expand_wordsplit(t_token *token_list)
 		if (token_list->str[i] == '"')
 		{
 			i++;
-			while (token_list->str[i] != '"')
+			while (token_list->str[i] && token_list->str[i] != '"')
 				i++;
+			if (!token_list->str[i])
+				break ;
 		}
 		else if (token_list->str[i] == '\'')
 		{
 			i++;
-			while (token_list->str[i] != '\'')
+			while (token_list->str[i] && token_list->str[i] != '\'')
 				i++;
+			if (!token_list->str[i])
+				break ;
 		}
 		if (is_white_space(token_list->str[i]))
 			return (TRUE);

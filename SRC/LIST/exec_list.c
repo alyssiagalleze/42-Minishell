@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:52:46 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/13 18:50:21 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 12:48:20 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	exec_list_init_command(t_command *command)
 		command->argv[i] = 0;
 		command->redir[i] = 0;
 		command->redir_kind[i] = 0;
+		command->hdoc_fd[i] = -1;
 		i ++;
 	}
 	command->is_var = FALSE;

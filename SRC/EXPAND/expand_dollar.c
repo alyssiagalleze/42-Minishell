@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 12:06:28 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 13:14:58 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 int	should_expand_dollar(t_token *token_list)
 {
 	int		i;
+	int		j;
 	char	*str;
 
 	i = 0;
@@ -26,8 +27,14 @@ int	should_expand_dollar(t_token *token_list)
 		if (str[i] == '\'')
 		{
 			i ++;
-			while (str[i] != '\'')
+			j = i;
+			while (str[i] && str[i] != '\'')
 				i ++;
+			if (!str[i])
+			{
+				i = j;
+				continue ;
+			}
 		}
 		else if (str_ncmp(str + i, "$?", 2, FALSE))
 			return (i);
@@ -98,6 +105,34 @@ int	expand_dollar_check_error(t_token *token_list, char *expanded)
 	return (ERR_SUCCESS);
 }
 
+void	dollar_expand_unquote(char *str)
+{
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if (str[i] == '"')
+		{
+			if (str[i] == '"')
+			{
+				i ++;
+				continue;
+			}
+		}
+		if (str[j] != str[i])
+			str[j] = str[i];
+		i ++;
+		j ++;
+	}
+	while (j < i)
+		str[j++] = '\0';
+}
+
+//TODO : echo "$var'"$var'$var'
+//TODO : reprendre expand depuis le caractere apres
 int	expand_dollar(t_token *token_list, t_env *env, int index)
 {
 	int		len;
@@ -107,6 +142,7 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 
 	len = 1;
 	var_name = NULL;
+	// printf("EXP : %s\n", token_list->str);
 	if (str_ncmp(token_list->str + index, "$?", 2, FALSE))
 		len = 2;
 	else
@@ -121,6 +157,8 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 	var_value = get_expand_dollar_value(var_name, env);
 	new_str = expand_dollar_restring(token_list->str, index, len, var_value);
 	free(var_name);
+	// printf("ENDEXP : %s\n", token_list->str);
+	// printf("newstr : %s\n", new_str);
 	return (expand_dollar_check_error(token_list, new_str));
 }
 
@@ -136,6 +174,12 @@ int	check_expand_dollar(t_token *token_list, t_env *env)
 			token_list = token_list->next;
 		else
 		{
+			if (!token_list->dollar_expanded)
+			{
+				dollar_expand_unquote(token_list->str);
+				token_list->dollar_expanded = TRUE;
+				continue ;
+			}
 			err = expand_dollar(token_list, env, index);
 			if (err)
 				return (err);

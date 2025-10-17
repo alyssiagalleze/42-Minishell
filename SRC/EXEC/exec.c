@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/16 14:55:21 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/16 19:45:28 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,9 +138,10 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 	pid_t	pid;
 
 	status = 0;
+	result = 0;
 	while (exec_count)
 	{
-		printf("waiting for a process !\n");
+		// printf("waiting for a process !\n");
 		// signal(SIGINT, SIG_DFL);
 		pid = wait(&status);
 		if ((WIFSIGNALED(status)))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 14:38:10 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 12:47:10 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,20 @@
 
 // #define _POSIX_C_SOURCE 199309L
 
+
+# define	TRUE	1
+# define	FALSE	0
+# define	PROMPT	"\1\e[1;38;5;82m\2XxxM3g4sh311xxX:\1\e[0;38;5;82m\2 "
+# define	RESET_FONT	"\1\e[0m\2"
+# define	HDOC_HEADER	"heredoc << "
+# define	HDOC_PROMPT	"> "
+
 # define	MAX_ERROR_LEN	256
 # define	ERROR_TOO_LONG	"encountered an error too large to display\n"
 
 // # define	ARG_MAX	2097152 //actually more complicated, 18char per command and take in account PATH
 # define	ARG_MAX			4096 //minimum POSIX arg_max
 // maybe env max ?
-
-# define	TRUE	1
-# define	FALSE	0
-# define	PROMPT	"\1\e[1;38;5;82m\2XxxM3g4sh311xxX:\1\e[0;38;5;82m\2 "
-# define	RESET_FONT	"\1\e[0m\2"
-
 # define	PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
 # define	PERR_AMBIG		"ambiguous redirect\n"
 # define	PERR_MALLOC		"Internal malloc failure. Abort.\n"
@@ -114,7 +116,8 @@ enum	e_err
 {
 	ERR_SUCCESS,
 	ERR_MALLOC,
-	ERR_AMBIG
+	ERR_AMBIG,
+	ERR_HDOC
 };
 
 //STRUCTS
@@ -125,7 +128,9 @@ typedef struct s_token
 	enum e_type			type;
 	enum e_kind			kind;
 	struct s_token		*next;
+	int					hdoc_fd;
 	int					wild_expanded;
+	int					dollar_expanded;
 }	t_token;
 
 //TODO : replace assigned by local
@@ -144,6 +149,7 @@ typedef struct s_command
 	char				*redir[ARG_MAX];
 	int					prev_fd;
 	enum e_kind			redir_kind[ARG_MAX];
+	int					hdoc_fd[ARG_MAX];
 	int					is_var;
 } t_command;
 
@@ -264,6 +270,7 @@ t_exec	*exec_list_add_node(t_exec **exec_list_start);
 // expand.c
 int		expand_command(t_token *token_list, t_env **env);
 int		is_expandable_char(char c);
+void	expand_unquote(char *str);
 
 // fd_utils.c
 void close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);

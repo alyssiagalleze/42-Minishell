@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:54:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/11 18:00:56 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 12:28:15 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,9 @@ void	token_list_empty_node(t_token *token)
 	token->type = NONE;
 	token->kind = UNKNOWN;
 	token->next = NULL;
+	token->hdoc_fd = -1;
 	token->wild_expanded = FALSE;
+	token->dollar_expanded = FALSE;
 }
 
 t_token	*token_list_add_node(t_token **token_list_start)
@@ -39,13 +41,12 @@ t_token	*token_list_add_node(t_token **token_list_start)
 		curr_node->next = new_node;
 	}
 	else
-	{
 		*token_list_start = new_node;
-	}
 	token_list_empty_node(new_node);
 	return (new_node);
 }
 
+//TODO : token_list_copy_node pour subshell
 void	token_list_fill_node(
 	t_token *token, char *str, enum e_type type, enum e_kind kind)
 {	

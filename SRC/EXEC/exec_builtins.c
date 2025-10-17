@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:51:30 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 16:40:02 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,14 @@ int	open_fds_s_builtin(t_exec *exec_list, int *fd_in, int *fd_out)
 			if (*fd_in == -1)
 				return (close_no_exit(*fd_in, *fd_out, 1));
 		}
+		if (exec_list->command->redir_kind[i] == HDOC)
+		{
+			printf("heredoc with %s\n", exec_list->command->redir[i]);
+		}
 		if (exec_list->command->redir_kind[i] == OUT ||
 			exec_list->command->redir_kind[i] == OUT_APP)
 		{
 			*fd_out = open_fd_out(i, exec_list, TRUE);
-			printf("salut moi ici ???\n");
 			if (*fd_out == -1)
 				return (close_no_exit(*fd_in, *fd_out, 1));
 		}

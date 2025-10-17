@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/14 11:29:40 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 17:20:05 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,11 @@ int	parser(t_token **token_list)
 			return (FALSE);
 		prev_token = token;
 		token = token->next;
+	}
+	if (prev_token->type == REDIR_OPERATOR)
+	{
+		print_err(PROMPT, PERR_STX_NL, NULL, NULL);
+		return (FALSE);
 	}
 	if (brackets)
 	{

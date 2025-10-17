@@ -6,12 +6,13 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 12:52:26 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 12:06:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/16 19:52:53 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+//TODO : not just this
 int	is_expandable_char(char c)
 {
 	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
@@ -54,9 +55,11 @@ void	expand_unquote(char *str)
 
 void	check_expand_unquote(t_token *token_list)
 {
-	while (token_list)
+	while (token_list
+		&& token_list->type != CONTR_OPERATOR && token_list->type != BRACKET)
 	{
-		expand_unquote(token_list->str);
+		if (!token_list->dollar_expanded)
+			expand_unquote(token_list->str);
 		token_list = token_list->next;
 	}
 }
