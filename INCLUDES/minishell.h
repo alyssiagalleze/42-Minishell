@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 12:47:10 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 16:22:21 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,7 @@ struct s_exec_data
 	int		exec_count;
 	int		saved_stds[2];
 	int		prev_fd;
+	int		is_pipe;
 };
 
 
@@ -257,7 +258,7 @@ int		is_builtin(t_exec *exec_list);
 pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data);
 
 // exec_utils.c
-char	*set_command_path(t_exec *exec_list, char **env);
+char	*set_command_path(t_exec *exec_list, t_env **env);
 
 // exec.c
 int 	execute_list(t_exec **exec_list, struct s_data *data);
@@ -302,12 +303,12 @@ int		token_list_to_exec(struct s_data *data);
 
 // pipe_utils.c
 void free_env_array(char **envp);
-int prepare_env_and_pipe(t_exec *exec_list, t_env **env, char ***my_env, int pipefds[2]);
-int	handle_fork_error(int pipefds[2], char **my_env);
+int prepare_pipe(t_exec *exec_list, int pipefds[2]);
+int	handle_fork_error(int pipefds[2]);
 
 // redirection_utils.c
 void	close_fds(int pipefds[2], int saved_stds[2]);
-void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out);
+void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int is_pipe);
 void	init_std_fds(struct s_data *subshell_data);
 int		open_fd_out(int i, t_exec *exec_list, int is_single);
 int		open_fd_in(int i, t_exec *exec_list, int single);
@@ -345,7 +346,7 @@ void 	clean_pid(t_pid_list **list);
 void	pid_add_back(t_pid_list **list, pid_t pid);
 
 // redirections.c
-int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
+int	redirect_fds(t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data);
 
 // // signals.c
 // void sigint_handler(int sig, siginfo_t *info, void *context);
@@ -353,6 +354,7 @@ int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
 void	init_readline_signals(void);
 void	init_exec_father_signals(void);
 void	init_exec_child_signals(void);
+void	init_heredoc_signals(void);
 
 // token_list.c
 void	token_list_empty_node(t_token *token);

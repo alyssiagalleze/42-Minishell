@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_subshell.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 12:43:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:45:41 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 15:59:33 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *
 		return (perror("pipe"), 1);
 	pid = fork();
 	if (pid == -1)
-		return (handle_fork_error(pipefds, NULL));
+		return (handle_fork_error(pipefds));
 	if (pid == 0)
 	{
 		sub_pipe_redirect(exec_list, pipefds, exec_data);

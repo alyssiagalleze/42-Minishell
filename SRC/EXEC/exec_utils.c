@@ -6,29 +6,42 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:10:35 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 16:04:43 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**get_paths(char **env_tab)
+char	**get_paths(t_env **env)
 {
 	char	**path_tab;
-	int		i;
+	// int		i;
+	t_env	*current;
 
-	i = 0;
+	// i = 0;
+	current = *env;
 	path_tab = NULL;
-	while (env_tab[i])
+	while (current)
 	{
-		if (str_ncmp(env_tab[i], "PATH=", 3, FALSE))
+		if (str_ncmp(current->var_name, "PATH=", 3, FALSE))
 		{
-			path_tab = ft_split(env_tab[i], ':');
+			printf("path var : %s\n", current->var_value);
+			path_tab = ft_split(current->var_value, ':');
 			if (!path_tab)
 				return (NULL);
 		}
-		i++;
+		current = current->next;
 	}
+	// while (env_tab[i])
+	// {
+	// 	if (str_ncmp(env_tab[i], "PATH=", 3, FALSE))
+	// 	{
+	// 		path_tab = ft_split(env_tab[i], ':');
+	// 		if (!path_tab)
+	// 			return (NULL);
+	// 	}
+	// 	i++;
+	// }
 	return (path_tab);
 }
 
@@ -51,7 +64,7 @@ char	*append_exec_file(char *cmd_name, char *path)
 	return (cmd_path);
 }
 
-char	*set_command_path(t_exec *exec_list, char **env)
+char	*set_command_path(t_exec *exec_list, t_env **env)
 {
 	int		i;
 	char	**path_tab;
@@ -74,6 +87,7 @@ char	*set_command_path(t_exec *exec_list, char **env)
 	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
 	if (!access(cmd_path, F_OK | X_OK))
 		return (cmd_path);
+	perror(exec_list->command->argv[0]);
 	free(cmd_path);
 	return (NULL);
 }

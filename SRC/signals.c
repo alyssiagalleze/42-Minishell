@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 13:26:32 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 16:22:31 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	init_heredoc_signals(void)
 		i ++;
 	}
 	sa.sa_handler = sa_heredoc_handler;
-	sigaction(SIGINT, &sa, NULL)
+	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
 }

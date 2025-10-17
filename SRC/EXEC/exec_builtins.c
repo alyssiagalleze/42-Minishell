@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/16 16:40:02 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 16:20:16 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,14 @@ int	open_fds_s_builtin(t_exec *exec_list, int *fd_in, int *fd_out)
 		{
 			*fd_out = open_fd_out(i, exec_list, TRUE);
 			if (*fd_out == -1)
-				return (close_no_exit(*fd_in, *fd_out, 1));
+				return (close_no_exit(*fd_in, -1, 1));
 		}
 			i++;
 	}
 	return (0);
 }
 
-int	built_in_redirections( t_exec *exec_list)
+int	built_in_redirections(t_exec *exec_list)
 {
 	int	fd_in;
 	int	fd_out;
@@ -50,7 +50,8 @@ int	built_in_redirections( t_exec *exec_list)
 	fd_out = -1;
 	if (exec_list->command->redir[0])
 	{
-		if (open_fds_s_builtin(exec_list, &fd_in, &fd_out) != 0)
+		open_fds(exec_list, &fd_in, &fd_out, 0);
+		if (fd_in == -1 || fd_out == -1)
 			return (1);
 	}
 	if (in_redirections(exec_list))
@@ -71,19 +72,19 @@ int	built_in_redirections( t_exec *exec_list)
 
 int	is_builtin(t_exec *exec_list)
 {
-	if (str_cmp(exec_list->command->argv[0], "echo", FALSE))
+	if (str_cmp(exec_list->command->argv[0], "echo", TRUE))
 		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "cd", FALSE))
+	else if (str_cmp(exec_list->command->argv[0], "cd", TRUE))
 		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "pwd", FALSE))
+	else if (str_cmp(exec_list->command->argv[0], "pwd", TRUE))
 		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "export", FALSE))
+	else if (str_cmp(exec_list->command->argv[0], "export", TRUE))
 		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "unset", FALSE))
+	else if (str_cmp(exec_list->command->argv[0], "unset", TRUE))
 		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
+	else if (str_cmp(exec_list->command->argv[0], "env", TRUE))
 		return (TRUE);
-	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
+	else if (str_cmp(exec_list->command->argv[0], "exit", TRUE))
 		return (TRUE);
 	else
 		return (FALSE);
