@@ -6,40 +6,11 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:20:16 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 17:19:39 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	open_fds_s_builtin(t_exec *exec_list, int *fd_in, int *fd_out)
-{
-	int	i;
-
-	i = 0;
-	while (exec_list->command->redir[i])
-	{
-		if (exec_list->command->redir_kind[i] == IN)
-		{
-			*fd_in = open_fd_in(i, exec_list, TRUE);
-			if (*fd_in == -1)
-				return (close_no_exit(*fd_in, *fd_out, 1));
-		}
-		if (exec_list->command->redir_kind[i] == HDOC)
-		{
-			printf("heredoc with %s\n", exec_list->command->redir[i]);
-		}
-		if (exec_list->command->redir_kind[i] == OUT ||
-			exec_list->command->redir_kind[i] == OUT_APP)
-		{
-			*fd_out = open_fd_out(i, exec_list, TRUE);
-			if (*fd_out == -1)
-				return (close_no_exit(*fd_in, -1, 1));
-		}
-			i++;
-	}
-	return (0);
-}
 
 int	built_in_redirections(t_exec *exec_list)
 {

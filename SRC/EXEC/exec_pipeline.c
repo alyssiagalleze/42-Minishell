@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:21:23 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 17:21:40 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,11 @@ char	*get_path_for_command(t_exec *exec_list, t_env **my_env
 		path = set_command_path(exec_list, my_env);
 		if (!path)
 		{
-			print_err(exec_list->command->argv[0]
-				, ": command not found\n", NULL, NULL);
+			perror(exec_list->command->argv[0]);
+			// print_err(exec_list->command->argv[0]
+			// 	, ": command not found\n", NULL, NULL);
 			close_fds(pipefds, saved_stds);
+			exit(errno);
 		}
 	}
 	return (path);

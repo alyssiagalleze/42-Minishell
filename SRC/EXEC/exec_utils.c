@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:04:43 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 17:20:05 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ char	*set_command_path(t_exec *exec_list, t_env **env)
 	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
 	if (!access(cmd_path, F_OK | X_OK))
 		return (cmd_path);
-	perror(exec_list->command->argv[0]);
+	// perror(exec_list->command->argv[0]);
 	free(cmd_path);
 	return (NULL);
 }

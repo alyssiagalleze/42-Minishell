@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 13:23:38 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 17:02:11 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ void	heredoc_input_to_pipe(char *delim, int	heredoc_in)
 			if (str_cmp(input, delim, FALSE))
 				break;
 			write(heredoc_in, input, ft_strlen(input));
+			write(heredoc_in, "\n", 1);
 			free(input);
 		}
 	}
