@@ -76,14 +76,14 @@ int	redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out)
 	return (0);
 }
 
-int	redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
+int	redirect_fds(t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data)
 {
 	static int	fd_in = -1;
 	static int	fd_out = -1;
 
 	if (exec_list->command->redir[0])
-		open_fds(exec_list, &fd_in, &fd_out);
-	if (redirect_in(exec_list, &fd_in, prev_fd))
+		open_fds(exec_list, &fd_in, &fd_out, exec_data->is_pipe);
+	if (redirect_in(exec_list, &fd_in, exec_data->prev_fd))
 		return (1);
 	if (redirect_out(exec_list, &fd_out, pipefds[1]))
 		return (1);

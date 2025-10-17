@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 12:54:15 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:28:25 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,34 +62,25 @@ int	is_var(t_exec *exec_list)
 {
 	return (exec_list->command->is_var);
 }
-int	need_pipe(t_exec *exec_list)
-{
-	return (exec_list->next != NULL);
-}
 //TODO: si tu veux fais ca joli
 pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {
-	printf("-> in exec_command for %s\n", exec_list->command->argv[0]);
 	pid_t		pid;
-	static int	need_pipe = 0;
 
-	if (need_pipe == 0)
-		need_pipe = exec_list->next && exec_list->next->is_command;
-	if (!need_pipe
+	if (exec_data->is_pipe == 0)
+		exec_data->is_pipe = exec_list->next && exec_list->next->is_command;
+	if (!exec_data->is_pipe
 		&& (is_builtin(exec_list) || exec_list->command->is_var))
 	{
 		if (is_builtin(exec_list))
-		{
-			printf("-> exec single builtin\n");
-			pid = exec_single_builtin(exec_list, env, exec_data);
-		}
+			pid = exec_single_builtin(exec_list, env, exec_data), printf("----> builtin pid : %d\n", pid);
 		if (exec_list->command->is_var)
 			pid = exec_assign_var(exec_list, env);
 	}
 	else
 		pid = exec_pipeline(exec_list, env, exec_data);
 	if (!exec_list->next)
-		need_pipe = 0;
+		exec_data->is_pipe = 0;
 	return (pid);
 }
 
@@ -110,6 +101,7 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 	init_exec_father_signals();
 	exec_data.prev_fd = -1;
 	exec_data.exec_count = 0;
+	exec_data.is_pipe = 0;
 	if (save_std_fds(&exec_data.saved_stds[0], &exec_data.saved_stds[1]) == -1)
 		return (1);
 	while (*exec_list != NULL)
@@ -152,6 +144,8 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 			result = status;
 		exec_count--;
 	}
+	printf("-------> last pid : %d\n", last_pid);
+
 	if (WIFEXITED(result))
 		exit_status = WEXITSTATUS(result);
 	else if (WIFSIGNALED(result))
@@ -159,5 +153,7 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 	else
 		exit_status = result;
 	init_readline_signals();
+	if (last_pid < 0)
+		exit_status = -last_pid;
 	return (exit_status);
 }

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:33:55 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 11:23:01 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:42:29 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,13 @@ void	close_fds(int pipefds[2], int saved_stds[2])
 	}
 }
 
-int	handle_open_error(t_exec *exec_list, int is_single)
+int	handle_open_error(t_exec *exec_list, int need_pipe)
 {
 	perror(exec_list->command->redir[0]);
-	if (is_single)
-		return (-1);
+	if (!need_pipe && is_builtin(exec_list))
+		return (1);
+	if (need_pipe)
+		exit(0);
 	exit(1);
 	return (0);
 }
@@ -49,47 +51,57 @@ int	open_fd_out(int i, t_exec *exec_list, int is_single)
 		fd = open(exec_list->command->redir[i], O_RDWR
 				| O_APPEND | O_CREAT, 0777);
 		if (fd == -1)
-			return (handle_open_error(exec_list, is_single));
+			return (handle_open_error(exec_list, is_single), -1);
 	}
 	else
 	{
 		fd = open(exec_list->command->redir[i], O_RDWR
 				| O_TRUNC | O_CREAT, 0777);
 		if (fd == -1)
-			return (handle_open_error(exec_list, is_single));
+			return (handle_open_error(exec_list, is_single), -1);
 	}
 	return (fd);
 }
 
-int	open_fd_in(int i, t_exec *exec_list, int is_single)
+int	open_fd_in(int i, t_exec *exec_list, int need_pipe)
 {
 	int	fd;
 
 	fd = open(exec_list->command->redir[i], O_RDONLY);
 	if (fd == -1)
-		return (handle_open_error(exec_list, is_single));
+		return (handle_open_error(exec_list, need_pipe), -1);
 	return (fd);
 }
 
-void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out)
+void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int need_pipe)
 {
 	int	i;
+	int builtin;
 
 	i = 0;
+	builtin = is_builtin(exec_list);
 	while (exec_list->command->redir[i])
 	{
 		if (exec_list->command->redir_kind[i] == IN)
 		{
-			*fd_in = open_fd_in(i, exec_list, 0);
+			*fd_in = open_fd_in(i, exec_list, need_pipe);
 			if (*fd_in == -1)
-				close_and_exit(*fd_in, *fd_out, NULL, 1);
+			{
+				if (*fd_out != -1)
+					close(*fd_out);
+				return ;
+			}
 		}
 		if (exec_list->command->redir_kind[i] == OUT ||
 			exec_list->command->redir_kind[i] == OUT_APP)
 		{
 			*fd_out = open_fd_out(i, exec_list, 0);
 			if (*fd_out == -1)
-				close_and_exit(*fd_in, *fd_out, NULL, 1);
+			{
+				if (*fd_in != -1)
+					close(*fd_in);
+				return ;
+			}
 		}
 			i++;
 	}
