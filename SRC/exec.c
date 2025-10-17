@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/16 14:55:21 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 12:54:15 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	need_pipe(t_exec *exec_list)
 //TODO: si tu veux fais ca joli
 pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {
+	printf("-> in exec_command for %s\n", exec_list->command->argv[0]);
 	pid_t		pid;
 	static int	need_pipe = 0;
 

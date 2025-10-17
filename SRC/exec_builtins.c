@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:51:30 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 11:18:35 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	open_fds_s_builtin(t_exec *exec_list, int *fd_in, int *fd_out)
 			*fd_out = open_fd_out(i, exec_list, TRUE);
 			printf("salut moi ici ???\n");
 			if (*fd_out == -1)
-				return (close_no_exit(*fd_in, *fd_out, 1));
+				return (close_no_exit(*fd_in, -1, 1));
 		}
 			i++;
 	}

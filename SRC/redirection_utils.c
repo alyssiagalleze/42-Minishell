@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:33:55 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 18:59:34 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 11:23:01 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,9 @@ void	close_fds(int pipefds[2], int saved_stds[2])
 	}
 }
 
-int	handle_open_error(t_exec *exec_list, int fd, int is_single)
+int	handle_open_error(t_exec *exec_list, int is_single)
 {
 	perror(exec_list->command->redir[0]);
-	close(fd);
 	if (is_single)
 		return (-1);
 	exit(1);
@@ -50,14 +49,14 @@ int	open_fd_out(int i, t_exec *exec_list, int is_single)
 		fd = open(exec_list->command->redir[i], O_RDWR
 				| O_APPEND | O_CREAT, 0777);
 		if (fd == -1)
-			return (handle_open_error(exec_list, fd, is_single));
+			return (handle_open_error(exec_list, is_single));
 	}
 	else
 	{
 		fd = open(exec_list->command->redir[i], O_RDWR
 				| O_TRUNC | O_CREAT, 0777);
 		if (fd == -1)
-			return (handle_open_error(exec_list, fd, is_single));
+			return (handle_open_error(exec_list, is_single));
 	}
 	return (fd);
 }
@@ -68,7 +67,7 @@ int	open_fd_in(int i, t_exec *exec_list, int is_single)
 
 	fd = open(exec_list->command->redir[i], O_RDONLY);
 	if (fd == -1)
-		return (handle_open_error(exec_list, fd, is_single));
+		return (handle_open_error(exec_list, is_single));
 	return (fd);
 }
 

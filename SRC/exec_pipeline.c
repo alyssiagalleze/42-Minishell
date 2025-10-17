@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/16 14:52:45 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 13:00:59 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,9 @@ void	child_exec(t_exec *exec_list, char *path, t_env **env
 	int		status;
 	char	**my_env;
 
-	if (redirect_fds(exec_list, pipefds, exec_data->prev_fd) != 0)
-		close_and_exit(pipefds[0], pipefds[1], NULL, 1);
+	if (redirect_fds(exec_list, pipefds, exec_data->prev_fd) != 0
+		|| exec_list->command->argv[0] == NULL)
+		printf("is null command ?\n"), close_and_exit(pipefds[0], pipefds[1], NULL, 1);
 	if (pipefds[0] != -1)
 		close(pipefds[0]);
 	if (pipefds[1] != -1)
@@ -80,6 +81,7 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 pid_t	exec_pipeline(t_exec *exec_list, t_env **env
 	, struct s_exec_data *exec_data)
 {
+	printf("-> in exec_pipeline\n");
 	int		pipefds[2];
 	pid_t	pid;
 	char	*path;
