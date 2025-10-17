@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 17:20:05 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 18:18:37 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,33 +15,20 @@
 char	**get_paths(t_env **env)
 {
 	char	**path_tab;
-	// int		i;
 	t_env	*current;
 
-	// i = 0;
 	current = *env;
 	path_tab = NULL;
 	while (current)
 	{
 		if (str_ncmp(current->var_name, "PATH=", 3, FALSE))
 		{
-			printf("path var : %s\n", current->var_value);
 			path_tab = ft_split(current->var_value, ':');
 			if (!path_tab)
 				return (NULL);
 		}
 		current = current->next;
 	}
-	// while (env_tab[i])
-	// {
-	// 	if (str_ncmp(env_tab[i], "PATH=", 3, FALSE))
-	// 	{
-	// 		path_tab = ft_split(env_tab[i], ':');
-	// 		if (!path_tab)
-	// 			return (NULL);
-	// 	}
-	// 	i++;
-	// }
 	return (path_tab);
 }
 
@@ -64,6 +51,16 @@ char	*append_exec_file(char *cmd_name, char *path)
 	return (cmd_path);
 }
 
+void	is_executable(char *cmd_path)
+{
+	if (access(cmd_path, X_OK) == -1)
+	{
+		perror(cmd_path);
+		free(cmd_path);
+		exit(126);
+	}
+}
+
 char	*set_command_path(t_exec *exec_list, t_env **env)
 {
 	int		i;
@@ -78,16 +75,20 @@ char	*set_command_path(t_exec *exec_list, t_env **env)
 	while (path_tab[i])
 	{
 		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
-		if (!access(cmd_path, F_OK | X_OK))
-			return (exec_cleaner(path_tab, NULL), cmd_path);
+		if (!cmd_path)
+		{
+			exec_cleaner(path_tab, NULL); // erreur malloc
+			return (NULL);
+		}
+		if (!access(cmd_path, F_OK))
+			return (is_executable(cmd_path), exec_cleaner(path_tab, NULL), cmd_path);
 		free(cmd_path);
 		i++;
 	}
 	exec_cleaner(path_tab, NULL);
 	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
-	if (!access(cmd_path, F_OK | X_OK))
-		return (cmd_path);
-	// perror(exec_list->command->argv[0]);
+	if (!access(cmd_path, F_OK))
+		return (is_executable(cmd_path), cmd_path);
 	free(cmd_path);
 	return (NULL);
 }

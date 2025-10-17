@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:26:05 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 18:25:39 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,8 @@ pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data
 		&& (is_builtin(exec_list) || exec_list->command->is_var))
 	{
 		if (is_builtin(exec_list))
-			pid = exec_single_builtin(exec_list, env, exec_data), printf("----> builtin pid : %d\n", pid);
-		if (exec_list->command->is_var)
+			pid = exec_single_builtin(exec_list, env, exec_data);
+		if (is_var(exec_list))
 			pid = exec_assign_var(exec_list, env);
 	}
 	else
@@ -145,7 +145,6 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 			result = status;
 		exec_count--;
 	}
-	printf("-------> last pid : %d\n", last_pid);
 
 	if (WIFEXITED(result))
 		exit_status = WEXITSTATUS(result);
