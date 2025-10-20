@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:22:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 17:57:43 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,7 @@ void	sa_heredoc_handler(int sig)
 	if (sig == SIGINT)
 	{
 		write(STDOUT_FILENO, "\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
+		close(STDIN_FILENO);
 		g_signal = SIGINT;
 	}
 }
@@ -78,11 +76,11 @@ void	sa_exec_child_handler(int	sig)
 {
 	if (sig == SIGINT)
 	{
-		exit(sig + 228);
+		exit(sig + 128);
 	}
 	if (sig == SIGQUIT)
 	{
-		exit(sig + 228);
+		exit(sig + 128);
 	}
 }
 

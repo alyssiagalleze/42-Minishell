@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:33:55 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:56:13 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 19:36:01 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	close_fds(int pipefds[2], int saved_stds[2])
 	}
 	if (saved_stds)
 	{
-		printf("-> in close fds\n");
+		// printf("-> in close fds\n");
 		if (saved_stds[0] != -1)
 			close(saved_stds[0]);
 		if (saved_stds[1] != -1)
@@ -96,7 +96,7 @@ void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int need_pipe)
 		}
 		if (exec_list->command->redir_kind[i] == HDOC)
 		{
-			printf("hdoc fd[%d] = %d\n", h, exec_list->command->hdoc_fd[h]);
+			// printf("hdoc fd[%d] = %d\n", h, exec_list->command->hdoc_fd[h]);
 			*fd_in = exec_list->command->hdoc_fd[h];
 			h++;
 			if (h > 0)
@@ -115,7 +115,7 @@ void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int need_pipe)
 		}
 			i++;
 	}
-	printf("final fd_in : %d\n", *fd_in);
+	// printf("final fd_in : %d\n", *fd_in);
 }
 
 //  il faut ouvrir les fds dans l ordre mais il 
@@ -124,7 +124,7 @@ void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int need_pipe)
 
 void	init_std_fds(struct s_data *subshell_data)
 {
-	printf("-> in init std fds\n");
+	// printf("-> in init std fds\n");
 	subshell_data->std_fds[0] = dup(STDIN_FILENO);
 	if (subshell_data->std_fds[0] == -1)
 		return (perror("dup"));

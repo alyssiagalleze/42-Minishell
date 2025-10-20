@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 16:53:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/18 14:43:53 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@
 # define	PERR_STX_NL		"syntax error near unexpected token `newline'\n"
 # define	PERR_STX_BRA	"syntax error near unexpected token `('\n"
 # define	PERR_STX_OPE	"syntax error : invalid operator "
+# define	PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
 # define	PERR_ASSIGN		"malloc error, failed assignement of "
 
 //treat all metacharacters or only the one in subject ??
@@ -209,6 +210,8 @@ int		echo(char **args);
 int		export(char **args, t_env **env);
 void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head);
 
+int	is_string_valid_var(char *str);
+
 //	clean.c  + clean_bis.c
 void	clean_input(char **input);
 void	clean_env(t_env **env);
@@ -330,6 +333,7 @@ int		str_ncmp(char *str1, char *str2, int n, int accept_null);
 char	*extract_string(const char *start, int len);
 char	*ft_strdup(const char *s);
 char	*ft_strjoin(char const *s1, char const *s2);
+char	*str_append(char *from, char *app);
 char	*str_append_sq(char *from, char *app);
 char	*ft_strchr(const char *s, int c);
 

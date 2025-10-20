@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 16:26:05 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 19:37:06 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,10 @@ pid_t	exec_assign_var(t_exec *exec_list, t_env **env)
 	var_name = exec_list->command->argv[0];
 	i = is_char_in_string('=', var_name, FALSE, TRUE);
 	var_name[i] = '\0';
+	if (!is_string_valid_var(var_name))
+	{
+		return (-1);
+	}
 	var_value = ft_strdup(var_name + i + 1);
 	if (!var_value)
 		return (print_err(PROMPT, PERR_ASSIGN, var_name, NULL), -2);
@@ -73,7 +77,7 @@ pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data
 		&& (is_builtin(exec_list) || exec_list->command->is_var))
 	{
 		if (is_builtin(exec_list))
-			pid = exec_single_builtin(exec_list, env, exec_data), printf("----> builtin pid : %d\n", pid);
+			pid = exec_single_builtin(exec_list, env, exec_data)/*, printf("----> builtin pid : %d\n", pid)*/;
 		if (exec_list->command->is_var)
 			pid = exec_assign_var(exec_list, env);
 	}
@@ -145,7 +149,7 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 			result = status;
 		exec_count--;
 	}
-	printf("-------> last pid : %d\n", last_pid);
+	// printf("-------> last pid : %d\n", last_pid);
 
 	if (WIFEXITED(result))
 		exit_status = WEXITSTATUS(result);

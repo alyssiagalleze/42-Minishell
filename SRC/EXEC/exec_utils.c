@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 17:20:05 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 16:27:08 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ char	**get_paths(t_env **env)
 	{
 		if (str_ncmp(current->var_name, "PATH=", 3, FALSE))
 		{
-			printf("path var : %s\n", current->var_value);
+			// printf("path var : %s\n", current->var_value);
 			path_tab = ft_split(current->var_value, ':');
 			if (!path_tab)
 				return (NULL);

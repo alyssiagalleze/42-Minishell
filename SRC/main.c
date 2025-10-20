@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 17:02:11 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:37:33 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,13 @@ void	check_exit(char **input, struct s_data *data, int status)
 		my_exit(status, &data->env, input, NULL);
 }
 
-//TODO : check quel std
-void	get_input(char **input, struct s_data *data, int status)
+void	get_input(char **input, struct s_data *data, int status, int *cmd_count)
 {
 	while (!*input)
 	{
 		*input = readline(PROMPT);
 		check_exit(input, data, status);
+		*cmd_count += 1;
 		if (is_str_empty_or_null(*input))
 			clean_input(input);
 		else
@@ -63,26 +63,146 @@ void	save_last_status(int *status, t_env **env)
 	}
 }
 
-void	heredoc_input_to_pipe(char *delim, int	heredoc_in)
+// -> str_append qui rajoute une chaine de caractere a une autre (doit etre malloc)
+
+// -> avance dans input
+// -> recupere la len de soit 	1) une chaine sans expand
+//									-> recupere copie de chaine
+// 								2) une chaine a expand
+//									-> recupere copie de var equivalente
+//	append la copie a new_string
+
+//TODO : 5 args
+int	heredoc_expand_input(char **input, t_env *env)
 {
-	// TODO : unquote delim etc
+	char	*input_save;
+	char	*new_input;
+	char	*substr;
+	t_env	*var;
+	int		len;
+
+	input_save = *input;
+	new_input = NULL;
+	while (**input)
+	{
+		len = 0;
+		if (**input != '$')
+		{
+			while ((*input)[len] && (*input)[len] != '$')
+				len++;
+			// printf("str len = %d\n", len);
+			substr = extract_string(*input, len);
+			if (substr == NULL)
+			{
+				// TODO : malloc error
+			}
+			new_input = str_append(new_input, substr);
+			if (new_input == NULL)
+			{
+				// TODO : malloc error
+			}
+			*input += len;
+		}
+		len = 0;
+		if (**input == '$')
+		{
+			len++;
+			if (!is_char_in_string((*input)[len], "0123456789", FALSE, FALSE))
+			{
+				while (is_expandable_char((*input)[len]))
+				{
+					// printf("char is expendable %c\n", (*input)[len]);
+					len++;
+				}
+				// printf("char is NOT expendable %c\n", (*input)[len]);
+			}
+			// printf("var len = %d\n", len);
+			if (len == 1)
+				substr = ft_strdup("$");
+			else
+			{
+				substr = extract_string(*input + 1, len - 1);
+				// printf("looking for substr from string %s\n", *input);
+				if (substr == NULL)
+				{
+					// TODO : malloc error
+				}
+				var = var_exists(&env, substr);
+				free(substr);
+				if (var == NULL)
+				{
+					substr = NULL;
+					*input += len;
+					continue ;
+				}
+				substr = ft_strdup(var->var_value);
+			}	
+			if (substr == NULL)
+			{
+				// TODO : malloc error
+			}
+			new_input = str_append(new_input, substr);
+			if (new_input == NULL)
+			{
+				// TODO : malloc error
+			}
+			*input += len;
+		}
+	}
+	(void)env;
+	free(input_save);
+	*input = new_input;
+	// printf("Expanded %s <-\n", new_input);
+	return (ERR_SUCCESS);
+}
+
+int	heredoc_input_to_pipe(char *delim, int	heredoc_in, int *cmd_count, int no_expand, t_env *env)
+{
 	char	*input;
+	int		hdoc_len;
+	char	*line_count_str;
+	int		err;
 
 	input = NULL;
+	hdoc_len = 0;
 	while (1)
 	{
 		input = readline(HDOC_PROMPT);
+		if (g_signal == SIGINT)
+			return (ERR_SUCCESS);
+		if (input && str_cmp(input, delim, FALSE))
+			break ;
 		if (input)
 		{
-			if (str_cmp(input, delim, FALSE))
-				break;
+			if (!is_str_empty_or_null(input) && !no_expand)
+			{
+				err = heredoc_expand_input(&input, env);
+				if (err)
+					return (err);
+			}
+			hdoc_len ++;
 			write(heredoc_in, input, ft_strlen(input));
 			write(heredoc_in, "\n", 1);
 			free(input);
+			*cmd_count += 1;
+		}
+		else if (!input)
+		{
+			*cmd_count += 1;
+			line_count_str = ft_itoa(*cmd_count);
+			if (line_count_str)
+			{
+				print_err("XxxM3g4sh311xxX: warning: here-document at line ", line_count_str, " delimited by end-of-file\n", NULL);
+				free(line_count_str);
+			}			
+			else
+				print_err("XxxM3g4sh311xxX: warning: here-document delimited by end-of-file (wanted `", delim, "/')\n", NULL);
+			break ;
 		}
 	}
 	if (input)
 		free(input);
+	return (ERR_SUCCESS);
 }
 
 void	heredocs_display_header(char *delim)
@@ -93,35 +213,100 @@ void	heredocs_display_header(char *delim)
 	write(1, "\n", 1);
 }
 
-int	heredocs(t_token *token_list)
+int	heredoc_expand_delim(char *delim, char **new_delim, int *is_quoted)
+{
+	int	len;
+	int	i;
+	int	j;
+	char	c;
+
+	i = 0;
+	j = 0;
+	len = ft_strlen(delim);
+	*new_delim = malloc(sizeof(*delim) * (len + 1));
+	if (!*new_delim)
+	{
+		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		return (ERR_MALLOC);
+	}
+	*is_quoted = FALSE;
+	while (i < len)
+	{
+		if (delim[i] == '\'' || delim[i] == '"')
+		{
+			c = delim[i];
+			*is_quoted = TRUE;
+			i++;
+			while (i < len && delim[i] != c)
+			{
+				(*new_delim)[j] = delim[i];
+				j++;
+				i++;
+			}
+			if (i >= len)
+			{
+				print_err(PROMPT, PERR_STX_HDOC, NULL, NULL);
+				free(*new_delim);
+				return (ERR_AMBIG);
+			}
+			i++;
+			c = '\0';
+		}
+		while (i < len && delim[i] != '\'' && delim[i] != '"')
+		{
+			(*new_delim)[j] = delim[i];
+			j++;
+			i++;
+		}
+	}
+	(*new_delim)[j] = '\0';
+	return (ERR_SUCCESS);
+}
+
+int	heredocs(t_token *token_list, int cmd_count, t_env *env)
 {
 	int		heredoc_pipe[2];
+	char	*exp_delim;
+	int		is_quoted;
+	int		err;
 	
-	init_heredoc_signals();
+	exp_delim = NULL;
 	while (token_list)
 	{
 		heredoc_pipe[0] = -1;
 		heredoc_pipe[1] = -1;
+		init_heredoc_signals();
 		while (token_list && token_list->kind != HDOC)
 			token_list = token_list->next;
 		if (token_list && token_list->kind == HDOC)
 		{
 			token_list = token_list->next;
 			if (!token_list)
-				break ;
-			heredocs_display_header(token_list->str);
-			if (pipe(heredoc_pipe)/* || dup2(heredoc_pipe[0], STDOUT_FILENO) == -1 */)
+			break ;
+			err = heredoc_expand_delim(token_list->str, &exp_delim, &is_quoted);
+			if (err)
+			return (err);
+			heredocs_display_header(exp_delim);
+			if (pipe(heredoc_pipe))
 			{
 				if (heredoc_pipe[0] != -1)
 					close(heredoc_pipe[0]);
 				if (heredoc_pipe[1] != -1)
 					close(heredoc_pipe[1]);
-				print_err(PROMPT, "heredoc pipe failed : ", token_list->str, NULL);
+				if (exp_delim)
+					free(exp_delim);
+				print_err(PROMPT, "heredoc pipe failed : ", exp_delim, NULL);
 				return (ERR_HDOC);
 			}
-			heredoc_input_to_pipe(token_list->str, heredoc_pipe[1]);
+			err = heredoc_input_to_pipe(exp_delim, heredoc_pipe[1], &cmd_count, is_quoted, env);
+			free(exp_delim);
+			exp_delim = NULL;
 			close(heredoc_pipe[1]);
 			token_list->hdoc_fd = heredoc_pipe[0];
+			if (err)
+				return (err);
+			if (g_signal == SIGINT)
+				return (ERR_SUCCESS);
 			token_list = token_list->next;
 		}
 	}
@@ -130,9 +315,11 @@ int	heredocs(t_token *token_list)
 
 void	shell_loop(struct s_data *data, int *status)
 {
-	char *input;
+	char 	*input;
+	int		cmd_count;
 
 	*status = 0;
+	cmd_count = 0;
 	while (1)
 	{
 		if (g_signal == SIGINT || *status == SIGINT + 128)
@@ -151,7 +338,7 @@ void	shell_loop(struct s_data *data, int *status)
 		save_last_status(status, &data->env);
 		input = NULL;
 		data_reset_pointers(data);
-		get_input(&input, data, *status);
+		get_input(&input, data, *status, &cmd_count);
 		if (g_signal)
 		{
 			*status = g_signal + 128;
@@ -166,8 +353,10 @@ void	shell_loop(struct s_data *data, int *status)
 			cleaner(NULL, NULL, &data->token_list_head);
 			*status = 2;
 		}
-		if (heredocs(data->token_list))
-			my_exit(2, &data->env, &input, &data->token_list_head);
+		if (heredocs(data->token_list, cmd_count, data->env))
+			my_exit(2, &data->env, &input, &data->token_list_head); //TODO : le retour se fait dans fonction heredoc ?
+		else if (g_signal == SIGINT)
+			my_exit(SIGINT + 128,  &data->env, &input, &data->token_list_head);
 		if (parser(&data->token_list))
 			*status = token_list_to_exec(data);
 		else
@@ -213,24 +402,33 @@ int	main(int ac, char **av, char **env)
 	(void)av;
 }
 
-//heredoc :
-//prompt user <- quand ?
-//
-// ouvrir heredoc pipe -> transmettre fd a token_list x
-// token_list transmet fd a exec list ?
-// clean les fd soit dans token_list soit dans exec list
-// -> donc quand fd transmis, le passer a -1;
-// recuperer fd a l'exec
 
 
-// -> var1=theo var2=pierre && echo $var1 $var2
+
 
 /*
-*	heredoc (readline / fd / signals)
+*	heredoc
+*	-> expansion dans heredoc
+*	->
 *	exit as command (+ args ?)
-*	copy env sans local ?
-*	clean / valgrind / norminette
+*	clean / valgrind / fds / norminette
 */
 
+// TO FIX !!
+
+// unset PATH
+// -> ls 
+
+// echo -n -nnnnnn -na -n
+
+// echo test > out
+
+// env should not print locale var
+
+// unset first env
+
+// ./minishell | ./minishell
+
+// mkdir -> rm ../. -> pwd ou cd ..
 
 // 

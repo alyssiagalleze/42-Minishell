@@ -48,7 +48,7 @@ int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd)
 	{
 		if (dup2(*fd_in, STDIN_FILENO) == -1)
 			return (perror("dup2 fd_in"), 1);
-		printf("redirections sur hdoc ? fd : %d\n", *fd_in);
+		// printf("redirections sur hdoc ? fd : %d\n", *fd_in);
 		close(*fd_in);
 	}
 	else if (prev_fd != -1)

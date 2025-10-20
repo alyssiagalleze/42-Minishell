@@ -24,7 +24,7 @@ int print_env(t_env **env)
 			ft_putstr_fd(current->var_name, 1);
 			write(1, "=", 1);
 			ft_putstr_fd(current->var_value, 1);
-			write(1, "\n", 1);			
+			write(1, "\n", 1);
 			current = current->next;
 		}
 		else

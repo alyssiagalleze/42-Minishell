@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 17:19:39 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 16:27:04 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	built_in_redirections(t_exec *exec_list)
 		close(fd_in);
 	if (out_redirections(exec_list))
 	{
-		printf("moi ici ????\n");
+		// printf("moi ici ????\n");
 		if (dup2(fd_out, STDOUT_FILENO) == -1)
 			return (perror("dup2 fd_out"), 1);		
 	}

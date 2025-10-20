@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   subshell_redirections.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 18:59:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 10:55:24 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 19:36:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ int	sub_redirect_out(t_exec *exec_list, int pipefds[2], int *fd_out, int saved_s
 	printf("--> pipefds in : %d, out : %d\n", pipefds[0], pipefds[1]);
 	if (out_redirections(exec_list) == TRUE)
 	{
-		printf("out redirect ?\n");
-		printf("fd_out : %d\n", *fd_out);
+		// printf("out redirect ?\n");
+		// printf("fd_out : %d\n", *fd_out);
 		if (dup2(*fd_out, STDOUT_FILENO) == -1)
 			return (perror("dup2 fd_out"), 1);
 		close(*fd_out);
@@ -41,7 +41,7 @@ int	sub_redirect_out(t_exec *exec_list, int pipefds[2], int *fd_out, int saved_s
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd, int saved_stdout)
 {
 	// printf("in redirect fds for redir : %s\n", exec_list->command->redir[0]);
-	printf("--> pipefds in : %d, out : %d\n", pipefds[0], pipefds[1]);
+	// printf("--> pipefds in : %d, out : %d\n", pipefds[0], pipefds[1]);
 	
 	int fd_in;
 	int fd_out;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 17:21:40 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/17 19:36:41 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	child_exec(
 	}
 	if (redirect_fds(exec_list, pipefds, exec_data) || !exec_list->command->argv[0])
 	{
-		printf("is null command ?\n");
+		// printf("is null command ?\n");
 		close_and_exit(pipefds[0], pipefds[1], NULL, 0);
 	}
 	if (pipefds[0] != -1)
@@ -74,7 +74,7 @@ void	child_exec(
 
 void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 {
-	printf("parent after fork\n");
+	// printf("parent after fork\n");
 	if (*prev_fd != -1)
 		close(*prev_fd);
 	if (exec_list->next)
@@ -95,7 +95,7 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 
 pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {
-	printf("-> in exec_pipeline\n");
+	// printf("-> in exec_pipeline\n");
 	int		pipefds[2];
 	pid_t	pid;
 
@@ -105,7 +105,7 @@ pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_dat
 		return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
 	if (prepare_pipe(exec_list, pipefds) != 0)
 		return (1);
-	printf("pipe in : %d, pipe out : %d\n", pipefds[0], pipefds[1]);
+	// printf("pipe in : %d, pipe out : %d\n", pipefds[0], pipefds[1]);
 	pid = fork();
 	if (pid == -1)
 		return (handle_fork_error(pipefds));

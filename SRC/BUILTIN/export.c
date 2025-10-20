@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/14 16:52:33 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/17 18:11:27 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,19 +26,29 @@ t_env	*var_exists(t_env **env, char *name)
 	return (current);
 }
 
-int	is_string_valid(char *str)
+int	is_string_valid_var(char *str)
 {
-	while (str && *str)
+	int	is_valid;
+
+	is_valid = TRUE;
+	if (!str || (!(*str >= 'a' && *str <= 'z') && !(*str >= 'A' && *str < 'Z') && *str != '_'))
+		is_valid = FALSE;
+	while (is_valid && str && *str)
 	{
 		if (!(*str >= 'a' && *str <= 'z') && !(*str >= 'A' && *str < 'Z') && *str != '_')
 		{
-			str++ ;
-			*str = '\0';
-			str--;
-			ft_putstr_fd(str, 2);
-			return (ft_putstr_fd(": not a valid identifier\n", 2), FALSE);
+			is_valid = FALSE;
+			break ;
 		}	
 		str++;
+	}
+	if (!is_valid)
+	{
+		str++ ;
+		*str = '\0';
+		str--;
+		print_err(PROMPT, str, ": not a valid identifier\n", NULL);
+		return (FALSE);
 	}
 	return (TRUE);
 }
@@ -88,7 +98,7 @@ int	export(char **args, t_env **env)
 		sep = strchr(args[i], '='); //ILLEGAL
 		if (!sep)
 		{
-			if (!is_string_valid(args[i]))
+			if (!is_string_valid_var(args[i]))
 				return (1);
 			// look for variable in env, if not present add it with export toggle on and value null
 			if (var_exists(env, args[i]))
@@ -98,7 +108,7 @@ int	export(char **args, t_env **env)
 		else
 		{
 			*sep = '\0';
-			if (!is_string_valid(args[i]))
+			if (!is_string_valid_var(args[i]))
 			{
 				errno = 1;
 				return (1);
