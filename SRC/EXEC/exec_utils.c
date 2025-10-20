@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 18:18:37 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:37:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,19 +124,21 @@ char	**transfer_env(t_env **env)
 	int		lst_len;
 	int		i;
 
-	lst_len = ft_lstsize(*env);
+	lst_len = env_size(*env);
 	i = 0;
-	my_env = malloc((lst_len + 1)* (sizeof(char *)));
+	my_env = malloc((lst_len + 1) * (sizeof(char *)));
 	if (!my_env)
 		return (NULL);
 	current = *env;
-	while (current && i < lst_len)
+	while (current)
 	{
-		my_env[i] = build_env_variable(current);
-		if (!my_env[i])
-			return (NULL);
+		if (!current->is_local)
+		{
+			my_env[i] = build_env_variable(current);
+			if (!my_env[i])
+				return (NULL);
+		}	
 		current = current->next;
-		i++;
 	}
 	my_env[i] = NULL;
 	return (my_env);

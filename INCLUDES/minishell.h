@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/20 17:50:03 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:38:12 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,7 @@ t_env   *env_new_node(const char *var_name, const char *var_value, int is_export
 t_env	*var_exists(t_env **env, char *name);
 int		unset_single(char *arg, t_env **env);
 char	**transfer_env(t_env **env);
-int		ft_lstsize(t_env *lst);
+int		env_size(t_env *lst);
 
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);

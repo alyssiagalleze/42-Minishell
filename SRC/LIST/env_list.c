@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 16:18:02 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 13:43:14 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:36:52 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ char	*get_var_value(t_env **env, char *var_name)
 	return (NULL);
 }
 
-int	ft_lstsize(t_env *lst)
+int	env_size(t_env *lst)
 {
 	int	i;
 
@@ -146,7 +146,10 @@ int	ft_lstsize(t_env *lst)
 	while (lst)
 	{
 		lst = lst -> next;
-		i++;
+		if (lst->is_local)
+			lst = lst->next;
+		else
+			i++;
 	}
 	return (i);
 }

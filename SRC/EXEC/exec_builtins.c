@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 12:47:28 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:39:15 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	built_in_redirections(t_exec *exec_list)
 {
-	printf("built_in_redirections\n");
 	int	fd_in;
 	int	fd_out;
 
@@ -26,7 +25,6 @@ int	built_in_redirections(t_exec *exec_list)
 		if (fd_in == -1 && fd_out == -1)
 			return (1);
 	}
-	printf("redirecting fds : in=%d out=%d\n", fd_in, fd_out);
 	if (in_redirections(exec_list))
 		if (dup2(fd_in, STDIN_FILENO) == -1)
 			return (perror("dup2 fd_in"), 1);

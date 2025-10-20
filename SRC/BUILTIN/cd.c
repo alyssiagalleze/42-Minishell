@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:24:16 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:31:44 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ int	move_folders(char *target, t_env **env)
 	{
 		if (errno == ENOENT)
 			ft_putstr_fd("cd: error retrieving current directory:"
-				"getcwd: cannot access parent directories:", 2);
-		else 
+				"getcwd: cannot access parent directories\n", 2);
+		else
 			perror("getcwd");
 		return (1);
 	}
