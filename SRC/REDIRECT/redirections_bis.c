@@ -1,33 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fd_utils.c                                         :+:      :+:    :+:   */
+/*   redirections_bis.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 16:51:35 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 11:23:11 by agalleze         ###   ########.fr       */
+/*   Created: 2025/10/20 15:17:34 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/20 15:28:04 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status)
+int	is_out_redirection(t_exec *exec_list, int i)
 {
-	if (pipefds_r != -1)
-		close(pipefds_r);
-	if (pipefds_w != -1)
-		close(pipefds_w);
-	if (my_env)
-		free_env_array(my_env);
-	exit(status);
+	if (exec_list->command->redir_kind[i] == OUT
+		|| exec_list->command->redir_kind[i] == OUT_APP)
+		return (TRUE);
+	else
+		return (FALSE);
 }
 
-int	close_no_exit(int pipefds_r, int pipefds_w, int status)
+int	is_in_redirection(t_exec *exec_list, int i)
 {
-	if (pipefds_r != -1)
-		close(pipefds_r);
-	if (pipefds_w != -1)
-		close(pipefds_w);
-	return (status);
+	if (exec_list->command->redir_kind[i] == IN
+		|| exec_list->command->redir_kind[i] == HDOC)
+		return (TRUE);
+	else
+		return (FALSE);
 }

@@ -11,18 +11,13 @@ SRC=	SRC/main.c \
 		SRC/data.c \
 		SRC/debug.c \
 		SRC/error.c	\
-		SRC/fd_utils.c \
 		SRC/lexer.c \
 		SRC/lister.c \
 		SRC/parser.c \
 		SRC/parser_bis.c \
-		SRC/pipe_utils.c \
-		SRC/redirection_utils.c \
-		SRC/redirections.c \
 		SRC/signals.c \
 		SRC/split.c \
 		SRC/string_manip.c \
-		SRC/subshell_redirections.c \
 		SRC/utils.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
@@ -46,7 +41,13 @@ SRC=	SRC/main.c \
 		SRC/LIST/env_list.c \
 		SRC/LIST/exec_list.c \
 		SRC/LIST/pid_list.c \
-		SRC/LIST/token_list.c
+		SRC/LIST/token_list.c \
+		SRC/REDIRECT/close_fds.c \
+		SRC/REDIRECT/open_fds.c \
+		SRC/REDIRECT/prepare_pipe.c \
+		SRC/REDIRECT/redirections_bis.c \
+		SRC/REDIRECT/redirections.c \
+		SRC/REDIRECT/subshell_redirections.c 
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 

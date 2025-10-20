@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 17:02:11 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 17:51:39 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	get_input(char **input, struct s_data *data, int status)
 void	save_last_status(int *status, t_env **env)
 {
 	t_env	*node;
-	
+
 	node = var_exists(env, "?");
 	if (!node)
 	{
@@ -63,7 +63,7 @@ void	save_last_status(int *status, t_env **env)
 	}
 }
 
-void	heredoc_input_to_pipe(char *delim, int	heredoc_in)
+void	heredoc_input_to_pipe(char *delim, int heredoc_in)
 {
 	// TODO : unquote delim etc
 	char	*input;
@@ -171,7 +171,7 @@ void	shell_loop(struct s_data *data, int *status)
 		if (parser(&data->token_list))
 			*status = token_list_to_exec(data);
 		else
-			cleaner(NULL, NULL, &data->token_list_head);
+			cleaner(&data->env, NULL, &data->token_list_head);
 	}
 }
 
@@ -208,7 +208,7 @@ int	main(int ac, char **av, char **env)
 	status = 0;
 	shell_loop(&data, &status);
 	exit_clean(&data);
-	return(status);
+	return (status);
 	(void)ac;
 	(void)av;
 }

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:43:08 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 15:59:47 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 12:37:57 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,14 @@ void free_env_array(char **envp)
 	while (envp[i])
 		free(envp[i++]);
 	free(envp);
+}
+
+void	init_std_fds(struct s_data *subshell_data)
+{
+	subshell_data->std_fds[0] = dup(STDIN_FILENO);
+	if (subshell_data->std_fds[0] == -1)
+		return (perror("dup"));
+	subshell_data->std_fds[1] = dup(STDOUT_FILENO);
+	if (subshell_data->std_fds[1] == -1)
+		return (perror("dup"));
 }

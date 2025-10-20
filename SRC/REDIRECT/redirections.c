@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*																			*/
-/*														:::	  ::::::::   */
-/*   redirections.c									 :+:	  :+:	:+:   */
-/*													+:+ +:+		 +:+	 */
-/*   By: agalleze <agalleze@student.42.fr>		  +#+  +:+	   +#+		*/
-/*												+#+#+#+#+#+   +#+		   */
-/*   Created: 2025/10/09 15:12:43 by agalleze		  #+#	#+#			 */
-/*   Updated: 2025/10/15 16:06:08 by agalleze		 ###   ########.fr	   */
-/*																			*/
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirections.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/20 11:55:02 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/20 15:29:53 by agalleze         ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
@@ -76,7 +76,8 @@ int	redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out)
 	return (0);
 }
 
-int	redirect_fds(t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data)
+int	redirect_fds(t_exec *exec_list,
+	int pipefds[2], struct s_exec_data *exec_data)
 {
 	static int	fd_in = -1;
 	static int	fd_out = -1;

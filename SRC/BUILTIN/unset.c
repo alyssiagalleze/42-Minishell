@@ -3,14 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:25:01 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:18:30 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/20 18:07:34 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "minishell.h"
 
 #include "minishell.h"
 
@@ -18,7 +16,7 @@ int	unset_single(char *arg, t_env **env)
 {
 	t_env	*prev;
 	t_env	*current;
-	
+
 	prev = NULL;
 	current = *env;
 	while (current)
@@ -45,8 +43,8 @@ int	unset(char **args, t_env **env)
 	t_env	*prev;
 	t_env	*current;
 	int		i;
-	
-	i = 0;
+
+	i = 1;
 	prev = NULL;
 	current = *env;
 	while (args[i])
@@ -63,13 +61,12 @@ int	unset(char **args, t_env **env)
 				free(current->var_name);
 				free(current->var_value);
 				free(current);
-				break;
+				break ;
 			}
 			prev = current;
 			current = current->next;
 		}
 		i++;
-		
 	}
 	return (0);
 }

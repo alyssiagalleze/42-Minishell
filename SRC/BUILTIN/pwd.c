@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:16:31 by agalleze          #+#    #+#             */
-/*   Updated: 2025/09/16 18:12:11 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 15:30:39 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	ft_putstr_fd(const char *s, int fd)
 		write(fd, &s[i++], 1);
 }
 
-int pwd(void)
+int	pwd(void)
 {
 	char	*pwd;
 

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/15 19:00:24 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:24:16 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	move_folders(char *target, t_env **env)
 
 	working_dir = getcwd(NULL, 0);
 	if (!working_dir)
-		return (perror("get working dir"), 1);
+		perror("getcwd");
 	if (update_variable(env, "OLDPWD", working_dir) != 0)
 		return (free(working_dir), free(target), print_err(PROMPT,
 				": cd: could not update OLDPWD", NULL, NULL), 0);
@@ -61,7 +61,14 @@ int	move_folders(char *target, t_env **env)
 	free(target);
 	working_dir = getcwd(NULL, 0);
 	if (!working_dir)
-		return (perror("get working dir"), 1);
+	{
+		if (errno == ENOENT)
+			ft_putstr_fd("cd: error retrieving current directory:"
+				"getcwd: cannot access parent directories:", 2);
+		else 
+			perror("getcwd");
+		return (1);
+	}
 	if (update_variable(env, "PWD", working_dir) != 0)
 		return (free(working_dir), free(target), print_err(PROMPT
 				, ": cd: could not update PWD", NULL, NULL), 0);

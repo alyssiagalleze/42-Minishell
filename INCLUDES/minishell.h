@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 16:53:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 17:50:03 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,12 +306,14 @@ void free_env_array(char **envp);
 int prepare_pipe(t_exec *exec_list, int pipefds[2]);
 int	handle_fork_error(int pipefds[2]);
 
-// redirection_utils.c
+// redirections_bis.c
+int	is_out_redirection(t_exec *exec_list, int i);
+int	is_in_redirection(t_exec *exec_list, int i);
 void	close_fds(int pipefds[2], int saved_stds[2]);
 void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int is_pipe);
 void	init_std_fds(struct s_data *subshell_data);
 int		open_fd_out(int i, t_exec *exec_list, int is_single);
-int		open_fd_in(int i, t_exec *exec_list, int single);
+int		open_fd_in(int i, int *h, t_exec *exec_list, int single);
 
 // redirections.c
 int in_redirections(t_exec *exec_list);
@@ -334,7 +336,7 @@ char	*str_append_sq(char *from, char *app);
 char	*ft_strchr(const char *s, int c);
 
 // subshell_redirections.c
-int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd, int saved_stdout);
+int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
 
 // parser.c
 int		parser(t_token **lexer);
@@ -365,6 +367,7 @@ void	token_list_insert_list(t_token *token_from, t_token *new_list);
 
 // utils.c
 char	*ft_itoa(int n);
+int		ft_atoi(const char *nptr);
 
 //	wordsplit_sort.c
 void	sort_tab(char **tab, int word_count);

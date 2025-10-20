@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:29:30 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/13 13:17:25 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/20 18:06:17 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int is_n_enabled(char *arg)
+int	is_n_enabled(char *arg)
 {
 	if (!arg)
 		return (FALSE);
 	if (*arg == '-')
-	{ 
+	{
 		arg++;
 		while (*arg)
 		{
@@ -31,9 +31,9 @@ int is_n_enabled(char *arg)
 		return (FALSE);
 }
 
-int  echo(char **args)
+int	echo(char **args)
 {
-	int i;
+	int	i;
 	int	count;
 	int	newline;
 
@@ -42,7 +42,7 @@ int  echo(char **args)
 		count++;
 	i = 1;
 	newline = TRUE;
-	if (is_n_enabled(args[i]))
+	while (is_n_enabled(args[i]))
 	{
 		i++;
 		newline = FALSE;
@@ -51,7 +51,7 @@ int  echo(char **args)
 	{
 		ft_putstr_fd(args[i++], 1);
 		if (i != count)
-			write(STDOUT_FILENO, " ", 1);			
+			write(STDOUT_FILENO, " ", 1);
 	}
 	if (newline)
 		write(STDOUT_FILENO, "\n", 1);

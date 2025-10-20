@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 18:24:11 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 14:35:41 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	child_exec(
 		exit (127);
 	}
 	if (redirect_fds(exec_list, pipefds, exec_data) || !exec_list->command->argv[0])
-		close_and_exit(pipefds[0], pipefds[1], NULL, 0);
+		(close_fds(pipefds, exec_data->saved_stds), exit(0));
 	if (pipefds[0] != -1)
 		close(pipefds[0]);
 	if (pipefds[1] != -1)
