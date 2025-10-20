@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*																			*/
-/*														:::	  ::::::::   */
-/*   export.c										   :+:	  :+:	:+:   */
-/*													+:+ +:+		 +:+	 */
-/*   By: agalleze <agalleze@student.42.fr>		  +#+  +:+	   +#+		*/
-/*												+#+#+#+#+#+   +#+		   */
-/*   Created: 2025/09/16 18:30:56 by agalleze		  #+#	#+#			 */
-/*   Updated: 2025/10/20 16:37:26 by agalleze		 ###   ########.fr	   */
-/*																			*/
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/20 18:53:54 by tfiette          ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
@@ -26,20 +26,29 @@ t_env	*var_exists(t_env **env, char *name)
 	return (current);
 }
 
-int	is_string_valid(char *str)
+int	is_string_valid_var(char *str)
 {
-	while (str && *str)
+	int	is_valid;
+
+	is_valid = TRUE;
+	if (!str || (!(*str >= 'a' && *str <= 'z') && !(*str >= 'A' && *str < 'Z') && *str != '_'))
+		is_valid = FALSE;
+	while (is_valid && str && *str)
 	{
-		if (!(*str >= 'a' && *str <= 'z')
-			&& !(*str >= 'A' && *str < 'Z') && *str != '_')
+		if (!(*str >= 'a' && *str <= 'z') && !(*str >= 'A' && *str < 'Z') && *str != '_')
 		{
-			str++ ;
-			*str = '\0';
-			str--;
-			ft_putstr_fd(str, 2);
-			return (ft_putstr_fd(": not a valid identifier\n", 2), FALSE);
+			is_valid = FALSE;
+			break ;
 		}	
 		str++;
+	}
+	if (!is_valid)
+	{
+		str++ ;
+		*str = '\0';
+		str--;
+		print_err(PROMPT, str, ": not a valid identifier\n", NULL);
+		return (FALSE);
 	}
 	return (TRUE);
 }
@@ -78,7 +87,7 @@ t_env	*create_exported_var(char *argument, t_env **env, int *malloc_fail)
 	sep = ft_strchr(argument, '=');
 	if (!sep)
 	{
-		if (!is_string_valid(argument) || var_exists(env, argument))
+		if (!is_string_valid_var(argument) || var_exists(env, argument))
 			return (NULL);
 		new = env_new_node(argument, NULL, TRUE, FALSE);
 		if (!new)
@@ -87,7 +96,7 @@ t_env	*create_exported_var(char *argument, t_env **env, int *malloc_fail)
 	else
 	{
 		*sep = '\0';
-		if (!is_string_valid(argument))
+		if (!is_string_valid_var(argument))
 			return (NULL);
 		if (var_exists(env, argument))
 			unset_single(argument, env);

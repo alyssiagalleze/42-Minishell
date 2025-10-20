@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 13:41:45 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/18 16:29:02 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ char	*extract_string(const char *start, int len)
 		new_str[i] = start[i];
 		i ++;
 	}
-	new_str[i] = 0;
+	new_str[i] = '\0';
 	return (new_str);
 }
 
@@ -184,7 +184,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (!s1) //TODO : FALSE, and malloc can break
 		s1 = ft_strdup("");
 	if (!s2)
-		return (ft_strdup(s1));
+		return (ft_strdup(s1)); //TODO : no free of S1 si strdup juste en haut
 	len = ft_strlen(s1) + ft_strlen(s2);
 	str = malloc((len + 1) * sizeof(char));
 	if (!str)
@@ -201,6 +201,36 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	str[i + j] = '\0';
 	return (str);
+}
+
+char	*str_append(char *from, char *app)
+{
+	char	*new_str;
+	int		i;
+	int		j;
+
+	if (app == NULL)
+		return (from);
+	new_str = malloc(sizeof(*new_str) * (ft_strlen(from) + ft_strlen(app) + 1));
+	if (new_str == NULL)
+		return (free(from), free(app), NULL);
+	i = 0;
+	while (from && from[i])
+	{
+		new_str[i] = from[i];
+		i ++;
+	}
+	j = 0;
+	while (app[j])
+	{
+		new_str[i + j] = app[j];
+		j++;
+	}
+	new_str[i + j] = '\0';
+	if (from)
+		free(from);
+	free(app);
+	return (new_str);
 }
 
 char	*str_append_sq(char *from, char *app)
@@ -247,3 +277,4 @@ char	*ft_strchr(const char *s, int c)
 		return ((char *)s);
 	return (NULL);
 }
+

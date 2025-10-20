@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   subshell_redirections.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 18:59:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 14:19:52 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:53:35 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ int	sub_redirect_out(t_exec *exec_list, int pipefds[2], int *fd_out)
 
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 {
-	printf("--> pipefds in : %d, out : %d\n", pipefds[0], pipefds[1]);
 	int fd_in;
 	int fd_out;
 

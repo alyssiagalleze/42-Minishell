@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/17 18:25:39 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:53:04 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,10 @@ pid_t	exec_assign_var(t_exec *exec_list, t_env **env)
 	var_name = exec_list->command->argv[0];
 	i = is_char_in_string('=', var_name, FALSE, TRUE);
 	var_name[i] = '\0';
+	if (!is_string_valid_var(var_name))
+	{
+		return (-1);
+	}
 	var_value = ft_strdup(var_name + i + 1);
 	if (!var_value)
 		return (print_err(PROMPT, PERR_ASSIGN, var_name, NULL), -2);
