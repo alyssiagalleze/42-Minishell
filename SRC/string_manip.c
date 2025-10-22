@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/18 16:29:02 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/21 19:30:02 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,9 +227,8 @@ char	*str_append(char *from, char *app)
 		j++;
 	}
 	new_str[i + j] = '\0';
-	if (from)
-		free(from);
-	free(app);
+	from = ft_free(from);
+	app = ft_free(app);
 	return (new_str);
 }
 

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:52:20 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 14:27:35 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,7 @@ void	child_exec(
 		close_fds(pipefds, exec_data->saved_stds);
 		exit(status);
 	}
-	my_env = transfer_env(env);
-	if (!my_env)
+	if (transfer_env(env, &my_env))
 		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), exit(2));
 	close_fds(pipefds, exec_data->saved_stds);
 	status = execve(path, exec_list->command->argv, my_env);

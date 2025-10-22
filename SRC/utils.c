@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 17:32:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/20 17:41:18 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/21 19:28:15 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,18 @@ int	ft_atoi(const char *nptr)
 	while (nptr[i] >= '0' && nptr[i] <= '9')
 		res = res * 10 + nptr[i++] - '0';
 	return (sign * res);
+}
+
+void	*ft_free(void *ptr)
+{
+	if (ptr)
+		free(ptr);
+	return (NULL);
+}
+
+void	ft_close(int *fd)
+{
+	if (*fd != -1)
+		close(*fd);
+	*fd = -1;
 }

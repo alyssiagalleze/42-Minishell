@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_list.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 16:18:02 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/20 18:36:52 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/22 14:02:06 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ t_env *create_env_node(char *env_variable)
 
 //TODO : est ce qu'il y a du malloc qlq part, si oui err_malloc
 //TODO : 5 variables
-t_env	*init_env_list(char **env)
+int	init_env_list(char **env, t_env **env_list)
 {
 	t_env	*top;
 	t_env	*new_node;
@@ -101,12 +101,14 @@ t_env	*init_env_list(char **env)
 		if (!new_node)
 		{
 			clean_env(&top);
-			return (print_err("malloc", ": init ", "env list", "."), NULL);
+			*env_list = NULL;
+			return (print_err("malloc", ": init ", "env list", "."), ERR_MALLOC);
 		}
 		env_add_node(&top, new_node);
 		i++;
 	}
-	return (top);
+	*env_list = top;
+	return (ERR_SUCCESS);
 }
 
 //TODO : ne retourne que 0 ?? Pourquoi retourner un int alors ?

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/20 18:46:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 14:30:49 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,10 @@
 # define	PERR_STX_OPE	"syntax error : invalid operator "
 # define	PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
 # define	PERR_ASSIGN		"malloc error, failed assignement of "
+# define	PERR_HDOC		"XxxM3g4sh311xxX: warning: here-document at line "
+# define	PERR_EOF		" delimited by end-of-file\n"
+# define	PERR_HDOC_EOF	"XxxM3g4sh311xxX: warning: here-document delimited by end-of-file (wanted `"
+# define	PERR_HDOC_FDS	"heredoc fds management failed : "
 
 //treat all metacharacters or only the one in subject ??
 //could also say input invalid if metacharacters we don't use ??
@@ -175,6 +179,12 @@ typedef struct s_exec
 	struct s_exec		*next;
 } t_exec;
 
+struct	s_heredoc
+{
+	int		heredoc_fds[3];
+	char	*exp_delim;
+	int		is_quoted;
+};
 
 struct s_data
 {
@@ -232,17 +242,18 @@ void	debug_lexer_print_kind(t_token *lexer_node);
 void	debug_lexer_print_line(t_token *lexer_node);
 // void	debug_lexer_print_subline(t_token *lexer_node);
 void	debug_print_env(t_env *env);
+void	debug_print_env_tab(char **env);
 void	debug_print_wordsplit(char **tab);
 
 // env_list.c
-t_env   *init_env_list(char **env);
+int		init_env_list(char **env, t_env **env_list);
 int		update_variable(t_env **env, char *var, char *value);
 char	*get_var_value(t_env **env, char *var_name);
 void	env_add_node(t_env **top, t_env *node);
 t_env   *env_new_node(const char *var_name, const char *var_value, int is_exported, int is_local);
 t_env	*var_exists(t_env **env, char *name);
 int		unset_single(char *arg, t_env **env);
-char	**transfer_env(t_env **env);
+int		transfer_env(t_env **env, char ***new_env);
 int		env_size(t_env *lst);
 
 //	error.c
@@ -276,9 +287,6 @@ int		expand_command(t_token *token_list, t_env **env);
 int		is_expandable_char(char c);
 void	expand_unquote(char *str);
 
-// fd_utils.c
-void close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);
-int	close_no_exit(int pipefds_r, int pipefds_w, int status);
 
 // expand_asterisk.c + expand_aterisk_bis
 int		check_expand_asterisk(t_token *token_list);
@@ -288,12 +296,19 @@ int		is_dir_only(char **pattern);
 int		is_dir(struct dirent *file_info);
 int		should_expand_file(
 char	*file_name, char *pattern, int dir_only, struct dirent	*file);
-
+	
 // expand_dollar.c
 int		check_expand_dollar(t_token *token_list, t_env *env);
-
+	
 //expand_wordsplit.c
 int		check_expand_wordsplit(t_token *token_list);
+	
+// fd_utils.c
+void close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);
+int	close_no_exit(int pipefds_r, int pipefds_w, int status);
+
+// heredoc.c
+int	heredocs(t_token *token_list, int cmd_count, t_env *env);
 
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
@@ -372,6 +387,8 @@ void	token_list_insert_list(t_token *token_from, t_token *new_list);
 // utils.c
 char	*ft_itoa(int n);
 int		ft_atoi(const char *nptr);
+void	*ft_free(void *ptr);
+void	ft_close(int *fd);
 
 //	wordsplit_sort.c
 void	sort_tab(char **tab, int word_count);

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:29:04 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/14 17:45:02 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 14:13:14 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,16 @@ void	debug_lexer_print_line(t_token *lexer_node)
 			printf(" ");
 	}
 	printf("\n");
+}
+
+void	debug_print_env_tab(char **env)
+{
+	printf("debug_print_env_tab\n");
+	while (*env)
+	{
+		printf("%s\n", *env);
+		*env += 1;
+	}
 }
 
 // // void	debug_lexer_print_subline(t_token *lexer_node)

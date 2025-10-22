@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 19:22:12 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/21 13:37:08 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,7 @@ void	sa_heredoc_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
-		write(STDOUT_FILENO, "\n", 1);
-		// close(STDIN_FILENO);
-		// TODO : Si je close je peux plus read input next prompt
+		close(STDIN_FILENO);
 		g_signal = SIGINT;
 	}
 }

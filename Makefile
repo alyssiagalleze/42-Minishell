@@ -11,6 +11,7 @@ SRC=	SRC/main.c \
 		SRC/data.c \
 		SRC/debug.c \
 		SRC/error.c	\
+		SRC/heredoc.c \
 		SRC/lexer.c \
 		SRC/lister.c \
 		SRC/parser.c \
