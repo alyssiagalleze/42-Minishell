@@ -3,95 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:52:31 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/21 15:29:01 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-char	**get_paths(t_env **env)
-{
-	char	**path_tab;
-	t_env	*current;
-
-	current = *env;
-	path_tab = NULL;
-	while (current)
-	{
-		if (str_ncmp(current->var_name, "PATH=", 3, FALSE))
-		{
-			path_tab = ft_split(current->var_value, ':');
-			if (!path_tab)
-				return (NULL);
-		}
-		current = current->next;
-	}
-	return (path_tab);
-}
-
-char	*append_exec_file(char *cmd_name, char *path)
-{
-	char	*tmp;
-	char	*cmd_path;
-
-	tmp = NULL;
-	tmp = ft_strjoin(path, "/");
-	if (!tmp)
-		return (NULL);
-	cmd_path = ft_strjoin(tmp, cmd_name);
-	if (!cmd_path)
-	{
-		free(tmp);
-		return (NULL);
-	}
-	free(tmp);
-	return (cmd_path);
-}
-
-void	is_executable(char *cmd_path)
-{
-	if (access(cmd_path, X_OK) == -1)
-	{
-		perror(cmd_path);
-		free(cmd_path);
-		exit(126);
-	}
-}
-
-char	*set_command_path(t_exec *exec_list, t_env **env)
-{
-	int		i;
-	char	**path_tab;
-	char	*cmd_path;
-
-	path_tab = get_paths(env);
-	if (!path_tab)
-		return (NULL);
-	cmd_path = NULL;
-	i = 0;
-	while (path_tab[i])
-	{
-		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
-		if (!cmd_path)
-		{
-			exec_cleaner(path_tab, NULL); // erreur malloc
-			return (NULL);
-		}
-		if (!access(cmd_path, F_OK))
-			return (is_executable(cmd_path), exec_cleaner(path_tab, NULL), cmd_path);
-		free(cmd_path);
-		i++;
-	}
-	exec_cleaner(path_tab, NULL);
-	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
-	if (!access(cmd_path, F_OK))
-		return (is_executable(cmd_path), cmd_path);
-	free(cmd_path);
-	return (NULL);
-}
 
 char	*build_env_variable(t_env *node)
 {
@@ -137,6 +56,7 @@ char	**transfer_env(t_env **env)
 			my_env[i] = build_env_variable(current);
 			if (!my_env[i])
 				return (NULL);
+			i++;
 		}	
 		current = current->next;
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/20 18:46:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/21 17:50:25 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,9 +208,42 @@ int		print_env(t_env **env);
 int 	pwd(void);
 int		echo(char **args);
 int		export(char **args, t_env **env);
+char	**split_into_words(char *input);
 void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head);
+void	my_exit_builtin(char **args, t_env **env, char **input, t_token **token_list_head);
+int		is_string_valid_var(char *str);
 
-int	is_string_valid_var(char *str);
+// EXEC
+// exec_builtins.c
+int			is_builtin(t_exec *exec_list);
+pid_t		built_in_exec(t_exec *exec_list, t_env **env);
+pid_t		exec_single_builtin(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
+
+// exec_pipeline.c
+pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
+int		is_builtin(t_exec *exec_list);
+
+// exec_subshell.c
+pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data);
+
+// exec_utils.c
+char	*set_command_path(t_exec *exec_list, t_env **env, int pipefds[2], int saved_fds[2]);
+
+// exec.c
+int 	execute_list(t_exec **exec_list, struct s_data *data);
+
+// find_command_path.c
+char	*set_command_path(t_exec *exec_list, t_env **env, int pipefds[2], int saved_stds[2]);
+char	*get_path_for_command(t_exec *exec_list, t_env **my_env, int pipefds[2], int saved_stds[2]);
+char	*dup_cmd_arg(t_exec *exec_list, t_env **env, int pipefds[2], int saved_stds[2]);
+char	**get_paths(t_env **env);
+char	*append_exec_file(char *cmd_name, char *path);
+
+// find_command_path_bis.c
+void	is_executable(char *cmd_path, t_env **env, int pipefds[2], int saved_stds[2]);
+void	path_variable_missing(char *cmd_name);
+void	file_exists(char *cmd_path, t_env **env, int pipefds[2], int saved_stds[2]);
+int	has_slash(char *cmd_name);
 
 //	clean.c  + clean_bis.c
 void	clean_input(char **input);
@@ -248,24 +281,6 @@ int		env_size(t_env *lst);
 //	error.c
 void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
 
-// exec_builtins.c
-int		is_builtin(t_exec *exec_list);
-int		built_in_exec(t_exec *exec_list, t_env **env);
-int		exec_single_builtin(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
-
-// exec_pipeline.c
-pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
-int		is_builtin(t_exec *exec_list);
-
-// exec_subshell.c
-pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data);
-
-// exec_utils.c
-char	*set_command_path(t_exec *exec_list, t_env **env);
-
-// exec.c
-int 	execute_list(t_exec **exec_list, struct s_data *data);
-
 // exec_list.c
 void	exec_list_init_command(t_command *command);
 void	exec_list_init_node(t_exec *exec);
@@ -295,6 +310,8 @@ int		check_expand_dollar(t_token *token_list, t_env *env);
 //expand_wordsplit.c
 int		check_expand_wordsplit(t_token *token_list);
 
+// find_command_path
+char	*get_path_for_command(t_exec *exec_list, t_env **my_env, int pipefds[2], int saved_stds[2]);
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
 void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind kind);
@@ -308,15 +325,32 @@ int		token_list_to_exec(struct s_data *data);
 void free_env_array(char **envp);
 int prepare_pipe(t_exec *exec_list, int pipefds[2]);
 int	handle_fork_error(int pipefds[2]);
+int	save_std_fds(int *std_in, int *std_out);
 
-// redirections_bis.c
-int	is_out_redirection(t_exec *exec_list, int i);
-int	is_in_redirection(t_exec *exec_list, int i);
+// REDIRECT
+// close_fds.c
+void	close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);
+int		close_no_exit(int pipefds_r, int pipefds_w, int status);
 void	close_fds(int pipefds[2], int saved_stds[2]);
-void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int is_pipe);
-void	init_std_fds(struct s_data *subshell_data);
+
+// open_fds.c
 int		open_fd_out(int i, t_exec *exec_list, int is_single);
 int		open_fd_in(int i, int *h, t_exec *exec_list, int single);
+void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int need_pipe);
+
+// prepare_pipe.c
+int 	prepare_pipe(t_exec *exec_list, int pipefds[2]);
+int		handle_fork_error(int pipefds[2]);
+void 	free_env_array(char **envp);
+void	init_std_fds(struct s_data *subshell_data);
+int		save_std_fds(int *std_in, int *std_out);
+
+// redirections_bis.c
+int		is_out_redirection(t_exec *exec_list, int i);
+int		is_in_redirection(t_exec *exec_list, int i);
+void	close_fds(int pipefds[2], int saved_stds[2]);
+void	init_std_fds(struct s_data *subshell_data);
+void	restore_std_fds(int saved_stds[2]);
 
 // redirections.c
 int in_redirections(t_exec *exec_list);
@@ -338,6 +372,7 @@ char	*ft_strjoin(char const *s1, char const *s2);
 char	*str_append(char *from, char *app);
 char	*str_append_sq(char *from, char *app);
 char	*ft_strchr(const char *s, int c);
+int is_only_digit(char *arg);
 
 // subshell_redirections.c
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);

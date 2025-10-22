@@ -21,10 +21,18 @@ int	print_env(t_env **env)
 	{
 		if (!current->is_exported && !current->is_local)
 		{
-			ft_putstr_fd(current->var_name, 1);
-			write(1, "=", 1);
-			ft_putstr_fd(current->var_value, 1);
-			write(1, "\n", 1);
+			if (current->var_value)
+			{
+				ft_putstr_fd(current->var_name, 1);
+				write(1, "=", 1);
+			}
+			if (!current->var_value)
+				write(1, "\n", 1);
+			if (current->var_value)
+			{
+				ft_putstr_fd(current->var_value, 1);
+				write(1, "\n", 1);
+			}
 			current = current->next;
 		}
 		else

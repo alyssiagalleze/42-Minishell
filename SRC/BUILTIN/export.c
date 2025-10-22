@@ -3,55 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:53:54 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/21 17:20:24 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-t_env	*var_exists(t_env **env, char *name)
-{
-	t_env	*current;
-
-	current = *env;
-	while (current)
-	{
-		if (str_cmp(current->var_name, name, FALSE))
-			break ;
-		current = current->next;
-	}
-	return (current);
-}
-
-int	is_string_valid_var(char *str)
-{
-	int	is_valid;
-
-	is_valid = TRUE;
-	if (!str || (!(*str >= 'a' && *str <= 'z') && !(*str >= 'A' && *str < 'Z') && *str != '_'))
-		is_valid = FALSE;
-	while (is_valid && str && *str)
-	{
-		if (!(*str >= 'a' && *str <= 'z') && !(*str >= 'A' && *str < 'Z') && *str != '_')
-		{
-			is_valid = FALSE;
-			break ;
-		}	
-		str++;
-	}
-	if (!is_valid)
-	{
-		str++ ;
-		*str = '\0';
-		str--;
-		print_err(PROMPT, str, ": not a valid identifier\n", NULL);
-		return (FALSE);
-	}
-	return (TRUE);
-}
 
 int	print_exported(t_env **env)
 {
@@ -69,8 +28,9 @@ int	print_exported(t_env **env)
 		ft_putstr_fd(current->var_name, 1);
 		if (!current->is_exported)
 		{
-			write(1, "=", 1);
+			write(1, "=\"", 2);
 			ft_putstr_fd(current->var_value, 1);
+			write(1, "\"", 1);
 		}
 		write(1, "\n", 1);
 		current = current->next;
@@ -134,10 +94,17 @@ int	export(char **args, t_env **env)
 		return (print_exported(env), 0);
 	while (args[i])
 	{
-		new_node = create_exported_var(args[i], env, &malloc_fail);
-		if (!new_node)
-			return (node_create_fail(env, new_node, args[i], malloc_fail));
-		env_add_node(env, new_node);
+		if (args[i][0] != '\0')
+		{
+			new_node = create_exported_var(args[i], env, &malloc_fail);
+			if (!new_node)
+				return (node_create_fail(env, new_node, args[i], malloc_fail));
+			env_add_node(env, new_node);
+		}
+		else
+			print_err(PROMPT, ": export:", "\'\'", ": not a valid identifier\n");
+		if (args[i][0] == '\0' && args[i + 1] == NULL)
+			return (1);
 		i++;
 	}
 	return (0);

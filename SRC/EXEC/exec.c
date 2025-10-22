@@ -3,25 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:53:04 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/21 17:27:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	save_std_fds(int *std_in, int *std_out)
-{
-	*std_in = dup(STDIN_FILENO);
-	if (*std_in == -1)
-		return (perror("dup"), 1);
-	*std_out = dup(STDOUT_FILENO);
-	if (*std_out == -1)
-		return (perror("dup"), 1);
-	return (0);
-}
 
 //TODO: clean malloc
 //TODO: exit close etc
@@ -66,9 +55,10 @@ int	is_var(t_exec *exec_list)
 {
 	return (exec_list->command->is_var);
 }
+
 //TODO: si tu veux fais ca joli
 pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
-{
+{	
 	pid_t		pid;
 
 	if (exec_data->is_pipe == 0)
@@ -86,16 +76,6 @@ pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data
 	if (!exec_list->next)
 		exec_data->is_pipe = 0;
 	return (pid);
-}
-
-void	restore_std_fds(int saved_stds[2])
-{
-	if (dup2(saved_stds[0], STDIN_FILENO) == -1)
-		perror("dup2 restore stdin");
-	if (dup2(saved_stds[1], STDOUT_FILENO) == -1)
-		perror("dup2 restore stdout");
-	close(saved_stds[0]);
-	close(saved_stds[1]);
 }
 
 int	execute_list(t_exec **exec_list, struct s_data *data)
@@ -122,8 +102,8 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 	restore_std_fds(exec_data.saved_stds);
 	if (exec_data.prev_fd != -1)
 		close(exec_data.prev_fd);
-	// if (exec_data.last_pid < 0)
-	// 	return (1);
+	if (exec_data.last_pid == -7)
+		return (-7);
 	return (pid_wait_all(exec_data.exec_count, exec_data.last_pid));
 }
 
