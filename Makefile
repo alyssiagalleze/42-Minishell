@@ -26,12 +26,15 @@ SRC=	SRC/main.c \
 		SRC/BUILTIN/pwd.c \
 		SRC/BUILTIN/unset.c \
 		SRC/BUILTIN/export.c \
+		SRC/BUILTIN/export_bis.c \
 		SRC/BUILTIN/exit.c \
 		SRC/EXEC/exec.c \
 		SRC/EXEC/exec_builtins.c \
 		SRC/EXEC/exec_pipeline.c \
 		SRC/EXEC/exec_subshell.c \
 		SRC/EXEC/exec_utils.c \
+		SRC/EXEC/find_command_path.c \
+		SRC/EXEC/find_command_path_bis.c \
 		SRC/EXPAND/expand.c \
 		SRC/EXPAND/expand_asterisk.c \
 		SRC/EXPAND/expand_asterisk_bis.c \

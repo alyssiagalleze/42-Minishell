@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipe_utils.c                                       :+:      :+:    :+:   */
+/*   prepare_pipe.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:43:08 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 12:37:57 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/21 15:23:03 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,15 @@ void	init_std_fds(struct s_data *subshell_data)
 	subshell_data->std_fds[1] = dup(STDOUT_FILENO);
 	if (subshell_data->std_fds[1] == -1)
 		return (perror("dup"));
+}
+
+int	save_std_fds(int *std_in, int *std_out)
+{
+	*std_in = dup(STDIN_FILENO);
+	if (*std_in == -1)
+		return (perror("dup"), 1);
+	*std_out = dup(STDOUT_FILENO);
+	if (*std_out == -1)
+		return (perror("dup"), 1);
+	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:51:47 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 15:50:16 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,29 @@ int	is_builtin(t_exec *exec_list)
 		return (FALSE);
 }
 
-//TODO pid ???
-int	exec_single_builtin(
+int	parse_exit(char **args)
+{
+	int	status;
+
+	status = 0;
+	if (is_only_digit(args[1]))
+	{
+		print_err(PROMPT, ": exit: ", args[1], ": numeric argument required");
+		exit(2);
+	}
+	if (args[2] != NULL)
+	{
+		print_err(PROMPT, ": exit: too many arguments", NULL, NULL);
+		exit(2);
+	}
+	status = ft_atoi(args[1]);
+	return (status);
+}
+
+pid_t	exec_single_builtin(
 	t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {
-	int	exit_status;
+	pid_t	exit_status;
 
 	exit_status = 0;
 	if (built_in_redirections(exec_list) != 0)
@@ -75,9 +93,9 @@ int	exec_single_builtin(
 	return (-exit_status);
 }
 
-int	built_in_exec(t_exec *exec_list, t_env **env)
+pid_t	built_in_exec(t_exec *exec_list, t_env **env)
 {
-	int	exit_status;
+	pid_t	exit_status;
 
 	exit_status = 0;
 	if (str_cmp(exec_list->command->argv[0], "echo", FALSE) == TRUE)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/21 19:30:02 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 15:33:41 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	// printf("+++++++++++++s1 : %s, s2 : %s\n", s1, s2);
 	if (!s1) //TODO : FALSE, and malloc can break
 		s1 = ft_strdup("");
 	if (!s2)
@@ -277,3 +276,16 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
+int is_only_digit(char *arg)
+{
+	int	i;
+
+	i = 0;
+	while (arg[i])
+	{
+		if (!(arg[i] >= '0' && arg[i] <= '9'))
+			return (0);
+		i++;
+	}
+	return (1);
+}

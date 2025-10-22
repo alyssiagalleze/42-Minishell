@@ -3,55 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/22 14:27:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 15:34:07 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*get_path_for_command(t_exec *exec_list, t_env **my_env
-	, int pipefds[2], int saved_stds[2])
-{
-	char	*path;
-
-	path = NULL;
-	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
-	{
-		path = set_command_path(exec_list, my_env);
-		if (!path)
-		{
-			print_err(exec_list->command->argv[0]
-				, ": command not found\n", NULL, NULL);
-			close_fds(pipefds, saved_stds);
-			exit(127);
-		}
-	}
-	return (path);
-}
-
 void	child_exec(
 	t_exec *exec_list, t_env **env, int pipefds[2], struct s_exec_data *exec_data)
 {
 	int		status;
-	char 	*path;
+	char	*path;
 	char	**my_env;
-	
+
 	my_env = NULL;
+	if (redirect_fds(exec_list, pipefds, exec_data) || !exec_list->command->argv[0])
+		(close_fds(pipefds, exec_data->saved_stds), clean_env(env), exit(0));
+	if (pipefds[0] != -1)
+		close(pipefds[0]);
+	if (pipefds[1] != -1)
+		close(pipefds[1]);
 	path = get_path_for_command(exec_list, env, pipefds, exec_data->saved_stds);
 	if (!path && !is_builtin(exec_list))
 	{
 		close_fds(pipefds, exec_data->saved_stds);
 		exit (127);
 	}
-	if (redirect_fds(exec_list, pipefds, exec_data) || !exec_list->command->argv[0])
-		(close_fds(pipefds, exec_data->saved_stds), exit(0));
-	if (pipefds[0] != -1)
-		close(pipefds[0]);
-	if (pipefds[1] != -1)
-		close(pipefds[1]);
 	if (is_builtin(exec_list))
 	{
 		status = built_in_exec(exec_list, env);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_list.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 16:18:02 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/22 14:02:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/22 15:32:40 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,8 +114,15 @@ int	init_env_list(char **env, t_env **env_list)
 //TODO : ne retourne que 0 ?? Pourquoi retourner un int alors ?
 int	update_variable(t_env **env, char *var, char *value)
 {
-	unset_single(var, env);
-	env_add_node(env, env_new_node(var, value, FALSE, FALSE));
+	t_env	*node;
+
+	node = NULL;
+	if (unset_single(var, env))
+		return (1);
+	node = env_new_node(var, value, FALSE, FALSE);
+	if (!node)
+		return (print_err("malloc", ": update ", var, " variable."), 2);	
+	env_add_node(env, node);
 	return (0);
 }
 
@@ -147,11 +154,13 @@ int	env_size(t_env *lst)
 	i = 0;
 	while (lst)
 	{
-		lst = lst -> next;
 		if (lst->is_local)
 			lst = lst->next;
 		else
+		{
+			lst = lst -> next;
 			i++;
+		}
 	}
 	return (i);
 }
