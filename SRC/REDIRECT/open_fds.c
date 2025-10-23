@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:56:24 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 18:04:36 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:47:11 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ int	handle_open_error(t_exec *exec_list, struct s_exec_data *exec_data, int i)
 {
 	print_err(PROMPT, NULL, NULL, NULL);
 	perror(exec_list->command->redir[i]);
-	clean_data_close_fds(exec_data, NULL, 1);
+	clean_data_close_fds(exec_data, NULL, exec_data->is_pipe);
 	if (!exec_data->is_pipe && is_builtin(exec_list))
-		return (1);
+		return (-1);
 	if (exec_data->is_pipe && !exec_list->command->argv[0])
 	{
 		clean_exec_list(&exec_list);
@@ -68,18 +68,18 @@ int	open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data)
 	{
 		fd = open(exec_list->command->redir[i], O_RDONLY);
 		if (fd == -1)
-			return (handle_open_error(exec_list, exec_data, i), -1);
+			return (handle_open_error(exec_list, exec_data, i));
 	}
 	else if (exec_list->command->redir_kind[i] == HDOC)
 	{
 		fd = open_hdoc_fds(exec_list, h);
 		if (fd == -1)
-			return (handle_open_error(exec_list, exec_data, i), -1);
+			return (handle_open_error(exec_list, exec_data, i));
 	}
 	return (fd);
 }
 
-void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data)
+int	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data)
 {
 	int	i;
 	int	h;
@@ -88,32 +88,33 @@ void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *ex
 
 	i = 0;
 	h = 0;
-	prev_in = 0;
-	prev_out = 0;
+	prev_in = -1;
+	prev_out = -1;
 	while (exec_list->command->redir[i])
 	{
 		if (is_in_redirection(exec_list, i))
 		{
-			if (prev_in)		//LEAK FD
+			if (prev_in != -1)		//LEAK FD
 				close(prev_in);
 			else if (exec_data->prev_fd != -1)
 				ft_close(&exec_data->prev_fd);
 			*fd_in = open_fd_in(i, &h, exec_list, exec_data);
-			if (*fd_in == -1 && *fd_out != -1)
-				close(*fd_out);
+			if (*fd_in == -1)
+				return (ft_close(fd_out), -1);
 			prev_in = *fd_in;
 		}
 		if (h > 0)
 			exec_list->command->hdoc_fd[h - 1] = -1;
 		if (is_out_redirection(exec_list, i))
 		{
-			if (prev_out)		// LEAK FD
+			if (prev_out != -1)		// LEAK FD
 				close(prev_out);
 			*fd_out = open_fd_out(i, exec_list, exec_data);
-			if (*fd_out == -1 && *fd_in != -1)
-				close(*fd_in);
+			if (*fd_out == -1)
+				return (ft_close(fd_in), -1);
 			prev_out = *fd_out;
 		}
 			i++;
 	}
+	return (0);
 }

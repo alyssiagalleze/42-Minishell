@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 18:04:19 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:46:58 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ int	built_in_redirections(t_exec *exec_list, struct s_exec_data *exec_data)
 	fd_out = -1;
 	if (exec_list->command->redir[0])
 	{
-		open_fds(exec_list, &fd_in, &fd_out, exec_data);
+		if (open_fds(exec_list, &fd_in, &fd_out, exec_data) == -1)
+			return (1);
 		if (fd_in == -1 && fd_out == -1)
 			return (1);
 	}

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 17:09:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:15:39 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,7 +356,7 @@ void	close_fds(int pipefds[2], int saved_stds[2]);
 // open_fds.c
 int     open_fd_out(int i, t_exec *exec_list, struct s_exec_data *exec_data);
 int     open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data);
-void    open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data);
+int    open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data);
 
 // prepare_pipe.c
 int 	prepare_pipe(t_exec *exec_list, int pipefds[2]);

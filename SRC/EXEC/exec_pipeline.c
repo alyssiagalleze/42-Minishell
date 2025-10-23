@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 17:11:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:30:48 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ void	child_exec(
 	close_fds(pipefds, exec_data->saved_stds);
 	status = execve(path, exec_list->command->argv, my_env);
 	perror(exec_list->command->argv[0]);
+	clean_data_close_fds(exec_data, exec_list, 1);
+	free(path);
 	free_env_array(my_env);
 	exit(status);
 }
