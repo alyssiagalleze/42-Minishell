@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/21 15:42:59 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 17:58:09 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char	*find_target(char *path, t_env **env, int *malloc_fail)
 	{
 		target = get_var_value(env, "OLDPWD");
 		if (target == NULL)
-			return (print_err(PROMPT, ": cd: ", "OLDPWD not set\n", NULL), 
+			return (print_err(PROMPT, ": cd: ", "OLDPWD not set\n", NULL),
 				NULL);
 		else
 			return (target);
@@ -72,8 +72,6 @@ int	move_folders(char *target, t_env **env)
 				, ": cd: could not update PWD", NULL, NULL), 0);
 	return (free(working_dir), 1);
 }
-
-
 
 int	cd(char **args, t_env **env)
 {

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 14:54:12 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:01:47 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data
 		exec_data->is_pipe = 0;
 	return (pid);
 }
+
 void	init_exec_data(struct s_exec_data *exec_data, struct s_data *data)
 {
 	exec_data->prev_fd = -1;
@@ -89,7 +90,6 @@ void	init_exec_data(struct s_exec_data *exec_data, struct s_data *data)
 	exec_data->env = data->env;
 	exec_data->token_list = data->token_list_head;
 }
-
 
 int	execute_list(t_exec **exec_list, struct s_data *data)
 {
@@ -104,7 +104,8 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 		if ((*exec_list)->is_subshell)
 			exec_data.last_pid = exec_subshell((*exec_list), data, &exec_data);
 		else if ((*exec_list)->is_command)
-			exec_data.last_pid = exec_command(*exec_list, &data->env, &exec_data);
+			exec_data.last_pid = exec_command(
+					*exec_list, &data->env, &exec_data);
 		if (exec_data.last_pid >= 0)
 			exec_data.exec_count++;
 		clean_exec_node(exec_list);
@@ -139,7 +140,6 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 			result = status;
 		exec_count--;
 	}
-
 	if (WIFEXITED(result))
 		exit_status = WEXITSTATUS(result);
 	else if (WIFSIGNALED(result))

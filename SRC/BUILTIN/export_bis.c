@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 17:19:46 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/21 17:20:17 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 17:58:37 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,6 @@ int	is_string_valid_var(char *str)
 	}
 	if (!is_valid)
 	{
-		// str++ ;
-		// *str = '\0';
-		// str--;
 		print_err(PROMPT, ": export: \'", str, "\' : not a valid identifier\n");
 		return (FALSE);
 	}

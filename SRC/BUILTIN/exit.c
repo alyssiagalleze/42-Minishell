@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 14:53:12 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 15:08:57 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 17:34:18 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void	my_exit_builtin(
 
 	status = 0;
 	i = 0;
-	printf("args[0] = %s\n", exec_list->command->argv[0]);
 	if (exec_list->command->argv[1] && !only_digit(exec_list->command->argv[1]))
 	{
 		print_err(PROMPT, ": exit: ",
@@ -44,6 +43,6 @@ void	my_exit_builtin(
 		printf("%s", RESET_FONT);
 	if (input && !exec_data->is_pipe)
 		clean_input(input);
-	clean_data_close_fds(exec_data, exec_list);
+	clean_data_close_fds(exec_data, exec_list, 1);
 	exit(status);
 }

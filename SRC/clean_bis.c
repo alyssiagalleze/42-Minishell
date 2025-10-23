@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   clean_bis.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 19:01:11 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 19:14:23 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 17:33:56 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	exec_cleaner(char **path_tab, char *path)
+char	*exec_cleaner(char **path_tab, char *path, char *cmd_path)
 {
 	int	i;
 
@@ -24,7 +24,10 @@ void	exec_cleaner(char **path_tab, char *path)
 		free(path_tab);
 	}
 	if (path)
+	{
 		free(path);
+	}
+	return (cmd_path);
 }
 
 void	clean_exec_command_node(t_exec *exec_list)
@@ -39,6 +42,7 @@ void	clean_exec_command_node(t_exec *exec_list)
 		i ++;
 	}
 	free(exec_list->command);
+	exec_list->command = NULL;
 }
 
 void	clean_exec_subshell_node(t_exec *exec_list)

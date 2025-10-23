@@ -6,13 +6,14 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 12:43:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/21 15:38:18 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:00:03 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sub_pipe_redirect(t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data)
+void	sub_pipe_redirect(
+	t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data)
 {
 	if (exec_data->prev_fd != -1)
 	{
@@ -70,7 +71,8 @@ void	save_prev_fd(t_exec *exec_list, int pipefds[2], int *prev_fd)
 	}
 }
 
-pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data)
+pid_t	exec_subshell(
+	t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data)
 {
 	int	pipefds[2];
 	int	pid;

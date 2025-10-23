@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 16:15:18 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 18:04:19 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ int	is_builtin(t_exec *exec_list)
 pid_t	exec_single_builtin(
 	t_exec *exec_list, struct s_exec_data *exec_data)
 {
-	printf("Executing single built-in: %s\n", exec_list->command->argv[0]);
 	pid_t	exit_status;
 
 	exit_status = 0;
@@ -90,13 +89,7 @@ pid_t	built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data)
 		exit_status = unset(exec_list->command->argv, &exec_data->env);
 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
 		exit_status = print_env(&exec_data->env);
-	else if (exec_data->is_pipe && str_cmp(exec_list->command->argv[0], "exit", FALSE))  //TODO ???? 
-	{
+	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
 		my_exit_builtin(exec_list, exec_data, NULL);
-	}
-	else if (!exec_data->is_pipe && str_cmp(exec_list->command->argv[0], "exit", FALSE))
-	{
-		my_exit_builtin(exec_list, exec_data, NULL);
-	}
 	return (exit_status);
 }

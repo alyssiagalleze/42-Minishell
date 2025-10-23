@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 15:12:45 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 17:09:31 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,23 +251,24 @@ char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
 char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data);
 char	**get_paths(t_env **env);
 char	*append_exec_file(char *cmd_name, char *path);
+char	*exec_cleaner(char **path_tab, char *path, char *cmd_path);
 
 // find_command_path_bis.c
 void	is_executable(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);
-void	path_variable_missing(char *cmd_name);
+void	path_variable_missing(struct s_exec_data *exec_data, t_exec *exec_list);
 void	file_exists(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);
 int	has_slash(char *cmd_name);
+void	malloc_exit(t_exec *exec_list, struct s_exec_data *exec_data);
 
 //	clean.c  + clean_bis.c
 void	clean_input(char **input);
 void	clean_env(t_env **env);
 void	clean_token_list(t_token	**lexer);
-void	exec_cleaner(char **path_tab, char *path);
 void	clean_exec_list(t_exec **exec_list);
 void	clean_exec_node(t_exec **exec_list);
 void	exit_clean(struct s_data *data);
 void	cleaner(t_env **my_env, char **input, t_token **token_list);
-void	clean_data_close_fds(struct s_exec_data *exec_data, t_exec *exec_list);
+void	clean_data_close_fds(struct s_exec_data *exec_data, t_exec *exec_list, int is_in_child);
 
 //	data.c
 void	data_reset_pointers(struct s_data *data);

@@ -6,13 +6,13 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:43:08 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/21 15:23:03 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:59:13 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int prepare_pipe(t_exec *exec_list, int pipefds[2])
+int	prepare_pipe(t_exec *exec_list, int pipefds[2])
 {
 	pipefds[0] = -1;
 	pipefds[1] = -1;
@@ -34,9 +34,9 @@ int	handle_fork_error(int pipefds[2])
 	return (1);
 }
 
-void free_env_array(char **envp)
+void	free_env_array(char **envp)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!envp)
