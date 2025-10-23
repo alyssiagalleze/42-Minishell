@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/22 15:51:21 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/22 17:36:35 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,6 +201,7 @@ struct s_exec_data
 	int		saved_stds[2];
 	int		prev_fd;
 	int		is_pipe;
+	int		pipefds[2];
 };
 
 
@@ -220,13 +221,14 @@ int		echo(char **args);
 int		export(char **args, t_env **env);
 char	**split_into_words(char *input);
 void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head);
-void	my_exit_builtin(char **args, t_env **env, char **input, t_token **token_list_head);
+void	my_exit_builtin(char **args, struct s_exec_data *exec_data, char **input, t_token **token_list_head);
 int		is_string_valid_var(char *str);
 
 // EXEC
 // exec_builtins.c
 int			is_builtin(t_exec *exec_list);
-pid_t		built_in_exec(t_exec *exec_list, t_env **env);
+// pid_t		built_in_exec(t_exec *exec_list, t_env **env);
+pid_t  		 built_in_exec(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
 pid_t		exec_single_builtin(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
 
 // exec_pipeline.c
@@ -349,9 +351,9 @@ int		close_no_exit(int pipefds_r, int pipefds_w, int status);
 void	close_fds(int pipefds[2], int saved_stds[2]);
 
 // open_fds.c
-int		open_fd_out(int i, t_exec *exec_list, int is_single);
-int		open_fd_in(int i, int *h, t_exec *exec_list, int single);
-void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, int need_pipe);
+int     open_fd_out(int i, t_exec *exec_list, struct s_exec_data *exec_data);
+int     open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data);
+void    open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data);
 
 // prepare_pipe.c
 int 	prepare_pipe(t_exec *exec_list, int pipefds[2]);

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:55:02 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/22 15:51:16 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:10:11 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int	redirect_fds(t_exec *exec_list,
 	static int	fd_out = -1;
 
 	if (exec_list->command->redir[0])
-		open_fds(exec_list, &fd_in, &fd_out, exec_data->is_pipe);
+		open_fds(exec_list, &fd_in, &fd_out, exec_data);
 	if (redirect_in(exec_list, &fd_in, exec_data->prev_fd))
 		return (1);
 	if (redirect_out(exec_list, &fd_out, pipefds[1]))
