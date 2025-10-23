@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/21 17:27:45 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 13:17:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,7 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 		if ((*exec_list)->is_subshell)
 			exec_data.last_pid = exec_subshell((*exec_list), data, &exec_data);
 		else if ((*exec_list)->is_command)
-			exec_data.last_pid = exec_command
-				(*exec_list, &data->env, &exec_data);
+			exec_data.last_pid = exec_command(*exec_list, &data->env, &exec_data);
 		if (exec_data.last_pid >= 0)
 			exec_data.exec_count++;
 		clean_exec_node(exec_list);

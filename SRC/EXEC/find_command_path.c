@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   find_command_path.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:26:37 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/22 15:37:30 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 13:08:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ char	*get_path_for_command(t_exec *exec_list, t_env **my_env, int pipefds[2], in
 			print_err(exec_list->command->argv[0],
 				": command not found\n", NULL, NULL);
 			close_fds(pipefds, saved_stds);
-			clean_env(my_env);
+			clean_exec_list(&exec_list); // LEAK
+			clean_env(my_env); // LEAK
 			exit(127);
 		}
 	}

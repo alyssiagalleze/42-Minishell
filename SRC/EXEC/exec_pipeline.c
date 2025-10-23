@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/22 15:34:07 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 13:07:24 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,16 @@ void	child_exec(
 	if (!path && !is_builtin(exec_list))
 	{
 		close_fds(pipefds, exec_data->saved_stds);
+		clean_exec_list(&exec_list); // LEAK
+		clean_env(env); // LEAK
 		exit (127);
 	}
 	if (is_builtin(exec_list))
 	{
 		status = built_in_exec(exec_list, env);
 		close_fds(pipefds, exec_data->saved_stds);
+		clean_exec_list(&exec_list); // LEAK
+		clean_env(env); // LEAK
 		exit(status);
 	}
 	if (transfer_env(env, &my_env))

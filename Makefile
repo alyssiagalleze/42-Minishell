@@ -9,7 +9,6 @@ SRC=	SRC/main.c \
 		SRC/clean.c \
 		SRC/clean_bis.c \
 		SRC/data.c \
-		SRC/debug.c \
 		SRC/error.c	\
 		SRC/heredoc.c \
 		SRC/lexer.c \
@@ -42,6 +41,8 @@ SRC=	SRC/main.c \
 		SRC/EXPAND/expand_wordsplit.c \
 		SRC/EXPAND/wordsplit_sort.c \
 		SRC/EXPAND/wordsplit_utils.c \
+		SRC/GNL/get_next_line.c \
+		SRC/GNL/get_next_line_utils.c \
 		SRC/LIST/env_list.c \
 		SRC/LIST/exec_list.c \
 		SRC/LIST/pid_list.c \
@@ -51,7 +52,8 @@ SRC=	SRC/main.c \
 		SRC/REDIRECT/prepare_pipe.c \
 		SRC/REDIRECT/redirections_bis.c \
 		SRC/REDIRECT/redirections.c \
-		SRC/REDIRECT/subshell_redirections.c 
+		SRC/REDIRECT/subshell_redirections.c
+		
 
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 

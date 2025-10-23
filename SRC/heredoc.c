@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 14:02:50 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/22 13:30:08 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 12:17:39 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	heredoc_copy_until_dollar(char **input, char **new_input)
 int	heredoc_get_var_name_length(const char *input)
 {
 	int	len;
-	
+
 	len = 1;
 	if (!is_char_in_string(input[len], "0123456789", FALSE, FALSE))
 		while (is_expandable_char(input[len]))
@@ -51,7 +51,7 @@ int	heredoc_expand_get_var_value(
 	char **input, int len, t_env *env, char **substr)
 {
 	t_env	*var;
-	
+
 	if (len == 1)
 	{
 		*substr = ft_strdup("$");
@@ -78,7 +78,7 @@ int	heredoc_expand_input_var(char **input, char **new_input, t_env *env)
 {
 	int		len;
 	char	*substr;
-	
+
 	len = heredoc_get_var_name_length(*input);
 	if (heredoc_expand_get_var_value(input, len, env, &substr))
 	{
@@ -147,13 +147,28 @@ int	heredoc_expand_write_input(
 	{
 		err = heredoc_expand_input(&input, env);
 		if (err)
+		{
+			input = ft_free(input);
 			return (err);
+		}
 	}
 	write(hdoc_data->heredoc_fds[1], input, ft_strlen(input));
 	write(hdoc_data->heredoc_fds[1], "\n", 1);
 	input = ft_free(input);
 	*cmd_count += 1;
 	return (ERR_SUCCESS);
+}
+
+void	heredoc_remove_newline(char *input)
+{
+	int	i;
+
+	i = 0;
+	while (input[i])
+		i++;
+	i--;
+	if (input[i] == '\n')
+		input[i] = '\0';
 }
 
 int	heredoc_input_to_pipe(
@@ -164,16 +179,21 @@ int	heredoc_input_to_pipe(
 	input = NULL;
 	while (1)
 	{
-		input = readline(HDOC_PROMPT);
+		write(1, HDOC_PROMPT, 2);
+		input = get_next_line(STDIN_FILENO);
 		if (g_signal == SIGINT)
+		{
+			*err = ERR_SUCCESS;
 			return (ERR_SUCCESS);
-		if (input && str_cmp(input, hdoc_data->exp_delim, FALSE))
-			break ;
+		}
 		if (!input)
 		{
 			heredoc_inform_eof(cmd_count, hdoc_data->exp_delim);
 			break ;
 		}
+		heredoc_remove_newline(input);
+		if (str_cmp(input, hdoc_data->exp_delim, FALSE))
+			break ;
 		*err = heredoc_expand_write_input(input, hdoc_data, env, cmd_count);
 		if (*err)
 			return (*err);
@@ -295,7 +315,8 @@ void	init_hdoc_data(struct s_heredoc *hdoc_data)
 
 int	heredoc_anticipated_stop(struct s_heredoc *hdoc_data, int err)
 {
-	if (dup2(hdoc_data->heredoc_fds[2], STDIN_FILENO) == -1)
+	if (g_signal == SIGINT
+		&& dup2(hdoc_data->heredoc_fds[2], STDIN_FILENO) == -1)
 	{
 		print_err(PROMPT, PERR_HDOC_FDS, hdoc_data->exp_delim, NULL);
 		err = ERR_HDOC;

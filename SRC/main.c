@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/22 15:20:17 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 11:59:04 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,13 +90,13 @@ void	shell_loop(struct s_data *data, int *status)
 		init_readline_signals();
 		if (g_signal == SIGINT || *status == SIGINT + 128)
 		{
-			write(STDIN_FILENO, "\n", 1);
+			write(STDOUT_FILENO, "\n", 1);
 			rl_on_new_line();
 			rl_replace_line("", 0);
 		}
 		if (g_signal == SIGQUIT || *status == SIGQUIT + 128)
 		{
-			write(STDIN_FILENO, "Quit (core dumped)\n", 20);
+			write(STDERR_FILENO, "Quit (core dumped)\n", 20);
 			rl_on_new_line();
 			rl_replace_line("", 0);
 		}
@@ -149,7 +149,7 @@ int	main(int ac, char **av, char **env)
 	}
 	if (!isatty(STDOUT_FILENO))
 	{
-		print_err(PROMPT, "Incident with the STDOUT\n", "You might have redirected it which is not supported.\n", NULL);
+		print_err(PROMPT, "Incident with the STDOUT\n", "You might have redirected it, which is not supported.\n", NULL);
 		exit (2);
 	}
 	g_signal = 0;
@@ -161,36 +161,7 @@ int	main(int ac, char **av, char **env)
 	return (status);
 }
 
-
-
-
-
-/*
-*	heredoc
-*	-> expansion dans heredoc
-*	->
-*	exit as command (+ args ?)
-*	clean / valgrind / fds / norminette
-*/
-
 // TO FIX !!
-
-// unset PATH
-// -> ls 
-
-// echo -n -nnnnnn -na -n
-
-// echo test > out
-
-// env should not print locale var
-
-// unset first env
-
-// ./minishell | ./minishell
 
 // mkdir -> rm ../. -> pwd ou cd ..
 
-// ^C in heredoc : rtlance input
-
-
-// ^C in heredoc puis ^C in readline
