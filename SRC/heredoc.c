@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 14:02:50 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 16:48:37 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 18:58:37 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,8 @@ void	heredoc_remove_newline(char *input)
 	int	i;
 
 	i = 0;
+	if (!input)
+		return ;
 	while (input[i])
 		i++;
 	i--;
@@ -182,12 +184,10 @@ int	heredoc_input_to_pipe(
 		write(1, HDOC_PROMPT, 2);
 		input = get_next_line(STDIN_FILENO);
 		if (g_signal == SIGINT)
-		{
-			*err = ERR_SUCCESS;
-			return (ERR_SUCCESS);
-		}
+			break ;
 		if (!input)
 		{
+			write(1, "\n", 1);
 			heredoc_inform_eof(cmd_count, hdoc_data->exp_delim);
 			break ;
 		}

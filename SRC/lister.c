@@ -159,7 +159,6 @@ void	scan_command_redirs(
 	if (is_hdoc)
 	{
 		command->hdoc_fd[*hdoc_count] = (*token_list)->hdoc_fd;
-		(*token_list)->hdoc_fd = -1;
 		*hdoc_count += 1;
 	}
 }

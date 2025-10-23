@@ -8,7 +8,7 @@ D_BUILD=.build/
 SRC=	SRC/main.c \
 		SRC/clean.c \
 		SRC/clean_bis.c \
-		SRC/clean_bis_bis.c \
+		SRC/clean_ter.c \
 		SRC/data.c \
 		SRC/error.c	\
 		SRC/heredoc.c \

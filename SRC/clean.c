@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 18:04:27 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 19:22:16 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	clean_input(char **input)
 	}
 }
 
-void	clean_token_list(t_token	**token_list)
+void	clean_token_list(t_token **token_list)
 {
 	t_token	*temp;
 
@@ -34,9 +34,7 @@ void	clean_token_list(t_token	**token_list)
 			(*token_list)->str = NULL;
 		}
 		if ((*token_list)->hdoc_fd != -1)
-		{
 			ft_close(&(*token_list)->hdoc_fd);
-		}
 		free(*token_list);
 		*token_list = temp;
 	}
