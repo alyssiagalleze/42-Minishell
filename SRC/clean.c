@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 19:01:06 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 12:57:51 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 13:34:47 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	clean_token_list(t_token	**token_list)
 
 void	clean_env(t_env **env)
 {
+	printf("Cleaning env\n");
 	t_env	*tmp;
 
 	while (*env)
@@ -58,7 +59,7 @@ void	clean_env(t_env **env)
 		free(*env);
 		*env = tmp;
 	}
-	env = NULL;
+	*env = NULL;
 }
 
 void	exit_clean(struct s_data *data)

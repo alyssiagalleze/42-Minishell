@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 13:07:24 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 13:35:04 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	child_exec(
 	}
 	if (is_builtin(exec_list))
 	{
-		status = built_in_exec(exec_list, env);
+		status = built_in_exec(exec_list, env, exec_data);
 		close_fds(pipefds, exec_data->saved_stds);
 		clean_exec_list(&exec_list); // LEAK
 		clean_env(env); // LEAK
@@ -73,24 +73,24 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 
 pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {
-	int		pipefds[2];
+	// int		pipefds[2];
 	pid_t	pid;
 
-	pipefds[0] = -1;
-	pipefds[1] = -1;
+	// pipefds[0] = -1;
+	// pipefds[1] = -1;
 	if (!exec_list || exec_list->is_subshell || !exec_list->is_command || !exec_list->command)
 		return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
-	if (prepare_pipe(exec_list, pipefds) != 0)
+	if (prepare_pipe(exec_list, exec_data->pipefds) != 0)
 		return (1);
 	pid = fork();
 	if (pid == -1)
-		return (handle_fork_error(pipefds));
+		return (handle_fork_error(exec_data->pipefds));
 	if (pid == 0)
 	{
 		init_exec_child_signals();
-		child_exec(exec_list, env, pipefds, exec_data);
+		child_exec(exec_list, env, exec_data->pipefds, exec_data);
 	}
-	parent_after_fork(exec_list, &exec_data->prev_fd, pipefds);
+	parent_after_fork(exec_list, &exec_data->prev_fd, exec_data->pipefds);
 	return (pid);
 }
 
