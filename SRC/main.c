@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 13:34:58 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:50:09 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void	shell_loop(struct s_data *data, int *status)
 		}
 		else if (heredocs(data->token_list, cmd_count, data->env))
 			my_exit(2, &data->env, &input, &data->token_list_head); //TODO : le retour se fait dans fonction heredoc ?
-		if (g_signal == SIGINT) //gerer ca directement dans heredoc ?
+		if (g_signal == SIGINT)
 		{
 			cleaner(NULL, NULL, &data->token_list_head);
 			*status = SIGINT + 128;
@@ -165,3 +165,6 @@ int	main(int ac, char **av, char **env)
 
 // mkdir -> rm ../. -> pwd ou cd ..
 
+//FDS
+
+// ^C heredoc : clean fds !!!

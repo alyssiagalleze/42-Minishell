@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 14:52:48 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:15:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,8 @@ int	built_in_redirections(t_exec *exec_list, struct s_exec_data *exec_data)
 	if (fd_in != -1)
 		close(fd_in);
 	if (out_redirections(exec_list))
-	{
 		if (dup2(fd_out, STDOUT_FILENO) == -1)
 			return (perror("dup2 fd_out"), 1);		
-	}
 	if (fd_out != -1)
 		close(fd_out);
 	return (0);
@@ -92,7 +90,7 @@ pid_t	built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data)
 		exit_status = unset(exec_list->command->argv, &exec_data->env);
 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
 		exit_status = print_env(&exec_data->env);
-	else if (exec_data->is_pipe && str_cmp(exec_list->command->argv[0], "exit", FALSE))
+	else if (exec_data->is_pipe && str_cmp(exec_list->command->argv[0], "exit", FALSE))  //TODO ???? 
 	{
 		my_exit_builtin(exec_list, exec_data, NULL);
 	}

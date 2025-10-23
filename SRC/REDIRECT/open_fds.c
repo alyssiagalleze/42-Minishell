@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   open_fds.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:56:24 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 15:13:01 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:29:36 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,24 +83,36 @@ void	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *ex
 {
 	int	i;
 	int	h;
+	int prev_in;
+	int prev_out;
 
 	i = 0;
 	h = 0;
+	prev_in = 0;
+	prev_out = 0;
 	while (exec_list->command->redir[i])
 	{
 		if (is_in_redirection(exec_list, i))
 		{
+			if (prev_in)		//LEAK FD
+				close(prev_in);
+			else if (exec_data->prev_fd != -1)
+				ft_close(&exec_data->prev_fd);
 			*fd_in = open_fd_in(i, &h, exec_list, exec_data);
 			if (*fd_in == -1 && *fd_out != -1)
 				close(*fd_out);
+			prev_in = *fd_in;
 		}
 		if (h > 0)
 			exec_list->command->hdoc_fd[h - 1] = -1;
 		if (is_out_redirection(exec_list, i))
 		{
+			if (prev_out)		// LEAK FD
+				close(prev_out);
 			*fd_out = open_fd_out(i, exec_list, exec_data);
 			if (*fd_out == -1 && *fd_in != -1)
 				close(*fd_in);
+			prev_out = *fd_out;
 		}
 			i++;
 	}
