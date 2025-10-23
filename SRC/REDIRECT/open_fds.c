@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:56:24 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/22 16:21:15 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:13:01 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,15 @@ int	handle_open_error(t_exec *exec_list, struct s_exec_data *exec_data)
 {
 	print_err(PROMPT, NULL, NULL, NULL);
 	perror(exec_list->command->redir[0]);
+	clean_data_close_fds(exec_data, exec_list);
 	if (!exec_data->is_pipe && is_builtin(exec_list))
 		return (1);
-	close_fds(exec_data->pipefds, exec_data->saved_stds);
 	if (exec_data->is_pipe && !exec_list->command->argv[0])
+	{
+		clean_exec_list(&exec_list);
 		exit(0);
+	}
+	clean_exec_list(&exec_list);
 	exit(1);
 	return (0);
 }

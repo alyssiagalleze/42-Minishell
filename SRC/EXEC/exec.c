@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 13:35:13 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 14:54:12 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,17 +67,17 @@ pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data
 		&& (is_builtin(exec_list) || exec_list->command->is_var))
 	{
 		if (is_builtin(exec_list))
-			pid = exec_single_builtin(exec_list, env, exec_data);
+			pid = exec_single_builtin(exec_list, exec_data);
 		if (is_var(exec_list))
 			pid = exec_assign_var(exec_list, env);
 	}
 	else
-		pid = exec_pipeline(exec_list, env, exec_data);
+		pid = exec_pipeline(exec_list, exec_data);
 	if (!exec_list->next)
 		exec_data->is_pipe = 0;
 	return (pid);
 }
-void	init_exec_data(struct s_exec_data *exec_data)
+void	init_exec_data(struct s_exec_data *exec_data, struct s_data *data)
 {
 	exec_data->prev_fd = -1;
 	exec_data->exec_count = 0;
@@ -86,6 +86,8 @@ void	init_exec_data(struct s_exec_data *exec_data)
 	exec_data->is_pipe = 0;
 	exec_data->pipefds[0] = -1;
 	exec_data->pipefds[1] = -1;
+	exec_data->env = data->env;
+	exec_data->token_list = data->token_list_head;
 }
 
 
@@ -94,13 +96,11 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 	struct s_exec_data	exec_data;
 
 	init_exec_father_signals();
-	init_exec_data(&exec_data);
-
+	init_exec_data(&exec_data, data);
 	if (save_std_fds(&exec_data.saved_stds[0], &exec_data.saved_stds[1]) == -1)
 		return (1);
 	while (*exec_list != NULL)
 	{
-		// printf("Executing new node, cmd : %s, arg : %s\n", (*exec_list)->command->argv[0], (*exec_list)->command->argv[1]);
 		if ((*exec_list)->is_subshell)
 			exec_data.last_pid = exec_subshell((*exec_list), data, &exec_data);
 		else if ((*exec_list)->is_command)

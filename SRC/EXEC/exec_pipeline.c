@@ -6,14 +6,14 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 13:35:04 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 14:59:38 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void	child_exec(
-	t_exec *exec_list, t_env **env, int pipefds[2], struct s_exec_data *exec_data)
+	t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data)
 {
 	int		status;
 	char	*path;
@@ -21,28 +21,28 @@ void	child_exec(
 
 	my_env = NULL;
 	if (redirect_fds(exec_list, pipefds, exec_data) || !exec_list->command->argv[0])
-		(close_fds(pipefds, exec_data->saved_stds), clean_env(env), exit(0));
+		(close_fds(pipefds, exec_data->saved_stds), clean_env(&exec_data->env), exit(0));
 	if (pipefds[0] != -1)
 		close(pipefds[0]);
 	if (pipefds[1] != -1)
 		close(pipefds[1]);
-	path = get_path_for_command(exec_list, env, pipefds, exec_data->saved_stds);
+	path = get_path_for_command(exec_list, exec_data);
 	if (!path && !is_builtin(exec_list))
 	{
 		close_fds(pipefds, exec_data->saved_stds);
 		clean_exec_list(&exec_list); // LEAK
-		clean_env(env); // LEAK
+		clean_env(&exec_data->env); // LEAK
 		exit (127);
 	}
 	if (is_builtin(exec_list))
 	{
-		status = built_in_exec(exec_list, env, exec_data);
+		status = built_in_exec(exec_list, exec_data);
 		close_fds(pipefds, exec_data->saved_stds);
 		clean_exec_list(&exec_list); // LEAK
-		clean_env(env); // LEAK
+		clean_env(&exec_data->env); // LEAK
 		exit(status);
 	}
-	if (transfer_env(env, &my_env))
+	if (transfer_env(&exec_data->env, &my_env))
 		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), exit(2));
 	close_fds(pipefds, exec_data->saved_stds);
 	status = execve(path, exec_list->command->argv, my_env);
@@ -71,7 +71,7 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 	}
 }
 
-pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
+pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data)
 {
 	// int		pipefds[2];
 	pid_t	pid;
@@ -88,7 +88,7 @@ pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_dat
 	if (pid == 0)
 	{
 		init_exec_child_signals();
-		child_exec(exec_list, env, exec_data->pipefds, exec_data);
+		child_exec(exec_list, exec_data->pipefds, exec_data);
 	}
 	parent_after_fork(exec_list, &exec_data->prev_fd, exec_data->pipefds);
 	return (pid);

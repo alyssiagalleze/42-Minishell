@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 19:41:32 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/22 17:25:19 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 14:38:07 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-int is_only_digit(char *arg)
+int only_digit(char *arg)
 {
 	int	i;
 

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 13:34:25 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:12:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,56 +35,55 @@
 
 // #define _POSIX_C_SOURCE 199309L
 
-
-# define	TRUE	1
-# define	FALSE	0
-# define	PROMPT	"\1\e[1;38;5;82m\2XxxM3g4sh311xxX:\1\e[0;38;5;82m\2 "
-# define	RESET_FONT	"\1\e[0m\2"
-# define	HDOC_HEADER	"heredoc << "
-# define	HDOC_PROMPT	"> "
+# define TRUE			1
+# define FALSE			0
+# define PROMPT			"\1\e[1;38;5;82m\2XxxM3g4sh311xxX:\1\e[0;38;5;82m\2 "
+# define RESET_FONT		"\1\e[0m\2"
+# define HDOC_HEADER	"heredoc << "
+# define HDOC_PROMPT	"> "
 
 # define	MAX_ERROR_LEN	256
 # define	ERROR_TOO_LONG	"encountered an error too large to display\n"
 
 // # define	ARG_MAX	2097152 //actually more complicated, 18char per command and take in account PATH
-# define	ARG_MAX			4096 //minimum POSIX arg_max
+# define ARG_MAX			4096 //minimum POSIX arg_max
 // maybe env max ?
-# define	PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
-# define	PERR_AMBIG		"ambiguous redirect\n"
-# define	PERR_MALLOC		"Internal malloc failure. Abort.\n"
-# define	PERR_QUOTE		"unexpected EOF while looking for matching `\'\'\n"
-# define	PERR_QUOTES		"unexpected EOF while looking for matching `\"'\n"
-# define	PERR_BRA		"unexpected EOF while looking for matching `(\'\n"
-# define	PERR_STX_EOF	"syntax error: unexpected end of file\n"
-# define	PERR_STX_Q		"syntax error near unexpected token `"
-# define	PERR_STX_NL		"syntax error near unexpected token `newline'\n"
-# define	PERR_STX_BRA	"syntax error near unexpected token `('\n"
-# define	PERR_STX_OPE	"syntax error : invalid operator "
-# define	PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
-# define	PERR_ASSIGN		"malloc error, failed assignement of "
-# define	PERR_HDOC		"XxxM3g4sh311xxX: warning: here-document at line "
-# define	PERR_EOF		" delimited by end-of-file\n"
-# define	PERR_HDOC_EOF	"XxxM3g4sh311xxX: warning: here-document delimited by end-of-file (wanted `"
-# define	PERR_HDOC_FDS	"heredoc fds management failed : "
+# define PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
+# define PERR_AMBIG		"ambiguous redirect\n"
+# define PERR_MALLOC		"Internal malloc failure. Abort.\n"
+# define PERR_QUOTE		"unexpected EOF while looking for matching `\'\'\n"
+# define PERR_QUOTES		"unexpected EOF while looking for matching `\"'\n"
+# define PERR_BRA		"unexpected EOF while looking for matching `(\'\n"
+# define PERR_STX_EOF	"syntax error: unexpected end of file\n"
+# define PERR_STX_Q		"syntax error near unexpected token `"
+# define PERR_STX_NL		"syntax error near unexpected token `newline'\n"
+# define PERR_STX_BRA	"syntax error near unexpected token `('\n"
+# define PERR_STX_OPE	"syntax error : invalid operator "
+# define PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
+# define PERR_ASSIGN		"malloc error, failed assignement of "
+# define PERR_HDOC		"XxxM3g4sh311xxX: warning: here-document at line "
+# define PERR_EOF		" delimited by end-of-file\n"
+# define PERR_HDOC_EOF	"XxxM3g4sh311xxX: warning: here-document delimited by end-of-file (wanted `"
+# define PERR_HDOC_FDS	"heredoc fds management failed : "
 
 //treat all metacharacters or only the one in subject ??
 //could also say input invalid if metacharacters we don't use ??
-# define	METACHARACTERS	"|&;()<>"
-# define	METASEPARATORS	"\t \n"
+# define METACHARACTERS	"|&;()<>"
+# define METASEPARATORS	"\t \n"
 
-# define	SINGLE_QUOTE	'\''
-# define	DOUBLE_QUOTE	'\"'
+# define SINGLE_QUOTE	'\''
+# define DOUBLE_QUOTE	'\"'
 
-# define	OPERATOR_NBR	9
-# define	_OR			"||"
-# define	_AND		"&&"
-# define	_PIPE		"|"
-# define	_OUT		">"
-# define	_IN			"<"
-# define	_HDOC		"<<"
-# define	_OUT_APP	">>"
-# define	_BRACKET_O	"("
-# define	_BRACKET_C	")"
+# define OPERATOR_NBR	9
+# define _OR			"||"
+# define _AND			"&&"
+# define _PIPE			"|"
+# define _OUT			">"
+# define _IN			"<"
+# define _HDOC			"<<"
+# define _OUT_APP		">>"
+# define _BRACKET_O		"("
+# define _BRACKET_C		")"
 
 //	GLOBAL
 
@@ -152,24 +151,24 @@ typedef struct s_env_list
 
 typedef struct s_command
 {
-	char 				*argv[ARG_MAX];
+	char				*argv[ARG_MAX];
 	char				*redir[ARG_MAX];
 	int					prev_fd;
 	enum e_kind			redir_kind[ARG_MAX];
 	int					hdoc_fd[ARG_MAX];
 	int					is_var;
-} t_command;
+}	t_command;
 
 typedef struct s_subshell
 {
 	t_token		*token_sublist;
-} t_subshell;
+}	t_subshell;
 
 typedef struct s_pid_list
 {
-	pid_t pid;
-	struct s_pid_list *next;
-}   t_pid_list;
+	pid_t				pid;
+	struct s_pid_list	*next;
+}	t_pid_list;
 
 typedef struct s_exec
 {
@@ -179,7 +178,7 @@ typedef struct s_exec
 	t_command			*command;
 	t_subshell			*subshell;
 	struct s_exec		*next;
-} t_exec;
+}	t_exec;
 
 struct	s_heredoc
 {
@@ -191,7 +190,7 @@ struct	s_heredoc
 struct s_data
 {
 	t_token	*token_list;
-	t_token *token_list_head;
+	t_token	*token_list_head;
 	t_env	*env;
 	int		std_fds[2];
 };
@@ -204,11 +203,11 @@ struct s_exec_data
 	int		prev_fd;
 	int		is_pipe;
 	int		pipefds[2];
+	t_env	*env;
+	t_token	*token_list;
 };
 
-
 // PROTOTYPES
-
 
 int	is_and_or(t_token *token_list);
 
@@ -223,40 +222,40 @@ int		echo(char **args);
 int		export(char **args, t_env **env);
 char	**split_into_words(char *input);
 void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head);
-void	my_exit_builtin(char **args, struct s_exec_data *exec_data, char **input, t_token **token_list_head);
+void	my_exit_builtin(t_exec *exec_list, struct s_exec_data *exec_data, char **input);
 int		is_string_valid_var(char *str);
 
 // EXEC
 // exec_builtins.c
 int			is_builtin(t_exec *exec_list);
 // pid_t		built_in_exec(t_exec *exec_list, t_env **env);
-pid_t  		 built_in_exec(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
-pid_t		exec_single_builtin(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
+pid_t  		 built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
+pid_t		exec_single_builtin(t_exec *exec_list, struct s_exec_data *exec_data);
 
 // exec_pipeline.c
-pid_t	exec_pipeline(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data);
+pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data);
 int		is_builtin(t_exec *exec_list);
 
 // exec_subshell.c
 pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data);
 
 // exec_utils.c
-char	*set_command_path(t_exec *exec_list, t_env **env, int pipefds[2], int saved_fds[2]);
+char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data);
 
 // exec.c
 int 	execute_list(t_exec **exec_list, struct s_data *data);
 
 // find_command_path.c
-char	*set_command_path(t_exec *exec_list, t_env **env, int pipefds[2], int saved_stds[2]);
-char	*get_path_for_command(t_exec *exec_list, t_env **my_env, int pipefds[2], int saved_stds[2]);
-char	*dup_cmd_arg(t_exec *exec_list, t_env **env, int pipefds[2], int saved_stds[2]);
+char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data);
+char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
+char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data);
 char	**get_paths(t_env **env);
 char	*append_exec_file(char *cmd_name, char *path);
 
 // find_command_path_bis.c
-void	is_executable(char *cmd_path, t_env **env, int pipefds[2], int saved_stds[2]);
+void	is_executable(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);
 void	path_variable_missing(char *cmd_name);
-void	file_exists(char *cmd_path, t_env **env, int pipefds[2], int saved_stds[2]);
+void	file_exists(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);
 int	has_slash(char *cmd_name);
 
 //	clean.c  + clean_bis.c
@@ -268,6 +267,7 @@ void	clean_exec_list(t_exec **exec_list);
 void	clean_exec_node(t_exec **exec_list);
 void	exit_clean(struct s_data *data);
 void	cleaner(t_env **my_env, char **input, t_token **token_list);
+void	clean_data_close_fds(struct s_exec_data *exec_data, t_exec *exec_list);
 
 //	data.c
 void	data_reset_pointers(struct s_data *data);
@@ -330,7 +330,7 @@ int	close_no_exit(int pipefds_r, int pipefds_w, int status);
 int	heredocs(t_token *token_list, int cmd_count, t_env *env);
 
 // find_command_path
-char	*get_path_for_command(t_exec *exec_list, t_env **my_env, int pipefds[2], int saved_stds[2]);
+char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
 void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind kind);
@@ -391,7 +391,7 @@ char	*ft_strjoin(char const *s1, char const *s2);
 char	*str_append(char *from, char *app);
 char	*str_append_sq(char *from, char *app);
 char	*ft_strchr(const char *s, int c);
-int is_only_digit(char *arg);
+int 	only_digit(char *arg);
 
 // subshell_redirections.c
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
