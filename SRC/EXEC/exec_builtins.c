@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 14:52:48 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 17:34:26 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ int	is_builtin(t_exec *exec_list)
 pid_t	exec_single_builtin(
 	t_exec *exec_list, struct s_exec_data *exec_data)
 {
-	printf("Executing single built-in: %s\n", exec_list->command->argv[0]);
 	pid_t	exit_status;
 
 	exit_status = 0;

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 14:59:38 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 17:11:31 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	child_exec(
 
 	my_env = NULL;
 	if (redirect_fds(exec_list, pipefds, exec_data) || !exec_list->command->argv[0])
-		(close_fds(pipefds, exec_data->saved_stds), clean_env(&exec_data->env), exit(0));
+		(clean_data_close_fds(exec_data, exec_list, 1), exit(0));
 	if (pipefds[0] != -1)
 		close(pipefds[0]);
 	if (pipefds[1] != -1)
@@ -29,21 +29,20 @@ void	child_exec(
 	path = get_path_for_command(exec_list, exec_data);
 	if (!path && !is_builtin(exec_list))
 	{
-		close_fds(pipefds, exec_data->saved_stds);
-		clean_exec_list(&exec_list); // LEAK
-		clean_env(&exec_data->env); // LEAK
+		clean_data_close_fds(exec_data, exec_list, 1);
+		// close_fds(pipefds, exec_data->saved_stds);
+		// clean_exec_list(&exec_list); // LEAK
+		// clean_env(&exec_data->env); // LEAK
 		exit (127);
 	}
 	if (is_builtin(exec_list))
 	{
 		status = built_in_exec(exec_list, exec_data);
-		close_fds(pipefds, exec_data->saved_stds);
-		clean_exec_list(&exec_list); // LEAK
-		clean_env(&exec_data->env); // LEAK
+		clean_data_close_fds(exec_data, exec_list, 1);
 		exit(status);
 	}
 	if (transfer_env(&exec_data->env, &my_env))
-		return (print_err(PROMPT, ": malloc: ", "environment transfer failed.", NULL), exit(2));
+		return (malloc_exit(exec_list, exec_data));
 	close_fds(pipefds, exec_data->saved_stds);
 	status = execve(path, exec_list->command->argv, my_env);
 	perror(exec_list->command->argv[0]);
@@ -73,16 +72,13 @@ void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
 
 pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data)
 {
-	// int		pipefds[2];
 	pid_t	pid;
 
-	// pipefds[0] = -1;
-	// pipefds[1] = -1;
 	if (!exec_list || exec_list->is_subshell || !exec_list->is_command || !exec_list->command)
 		return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
 	if (prepare_pipe(exec_list, exec_data->pipefds) != 0)
 		return (1);
-	pid = fork();
+	pid = fork(); // gros caca boudin 
 	if (pid == -1)
 		return (handle_fork_error(exec_data->pipefds));
 	if (pid == 0)
