@@ -1,38 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   path_checks.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/16 12:16:31 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:26:33 by agalleze         ###   ########.fr       */
+/*   Created: 2025/10/21 15:28:28 by agalleze          #+#    #+#             */
+/*   Updated: 2025/10/24 18:57:56 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_putstr_fd(const char *s, int fd)
+int	has_slash(char *cmd_name)
 {
 	int	i;
 
 	i = 0;
-	write(fd, s, ft_strlen(s));
+	while (cmd_name[i])
+	{
+		if (cmd_name[i] == '/')
+			return (TRUE);
+		i ++;
+	}
+	return (FALSE);
 }
 
-int	pwd(void)
+char	*check_access(char *cmd_path, int *first_errno)
 {
-	char	*pwd;
-
-	pwd = getcwd(NULL, 0);
-	if (pwd == NULL)
+	if (!access(cmd_path, F_OK))
 	{
-		print_err(PROMPT, "Maybe next time don't"
-			"delete you current working directory\n", NULL, NULL);
-		return (1);
+		if (access(cmd_path, X_OK) == -1)
+		{
+			if (*first_errno == 0)
+				*first_errno = errno;
+			free(cmd_path);
+		}
+		else
+			return (cmd_path);
 	}
-	ft_putstr_fd(pwd, 1);
-	write(1, "\n", 1);
-	free(pwd);
-	return (0);
+	else
+		free(cmd_path);
+	return (NULL);
 }

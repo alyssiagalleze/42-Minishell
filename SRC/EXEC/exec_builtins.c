@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:18:23 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 19:53:58 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,22 @@ pid_t	exec_single_builtin(
 	if (built_in_redirections(exec_list, exec_data) != 0)
 		return (-1);
 	exit_status = built_in_exec(exec_list, exec_data);
+	if (exit_status == 2)
+		malloc_exit(exec_list, exec_data);
 	if (dup2(exec_data->saved_stds[1], STDOUT_FILENO) == -1)
 		return (perror("dup2 restore stdin"), -1);
 	return (-exit_status);
+}
+
+void	exec_builtin_in_child(t_exec *exec_list, struct s_exec_data *exec_data)
+{
+	int	status;
+
+	status = built_in_exec(exec_list, exec_data);
+	if (status == 2)
+		malloc_exit(exec_list, exec_data);
+	clean_data_close_fds(exec_data, exec_list, 1);
+	exit(status);
 }
 
 pid_t	built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 19:29:45 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 19:53:45 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,6 +207,7 @@ struct s_exec_data
 	int		prev_fd;
 	int		is_pipe;
 	int		pipefds[2];
+	char	**path_tab;
 	t_env	*env;
 	t_token	*token_list;
 };
@@ -242,11 +243,17 @@ void	my_exit_builtin(t_exec *exec_list, struct s_exec_data *exec_data, char **in
 int		is_string_valid_var(char *str);
 
 // EXEC
+// build_paths.c
+int		is_empty_at_start(struct s_exec_data *exec_data);
+int		is_empty_at_end(struct s_exec_data *exec_data);
+char	*append_exec_file(char *cmd_name, char *path, int *err_malloc);
+char	**get_paths(t_env **env, int *err_malloc);
+
 // exec_builtins.c
-int		is_builtin(t_exec *exec_list);
-// pid_t		built_in_exec(t_exec *exec_list, t_env **env);
-pid_t	built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
-pid_t	exec_single_builtin(t_exec *exec_list, struct s_exec_data *exec_data);
+int			is_builtin(t_exec *exec_list);
+pid_t  		 built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
+pid_t		exec_single_builtin(t_exec *exec_list, struct s_exec_data *exec_data);
+void	exec_builtin_in_child(t_exec *exec_list, struct s_exec_data *exec_data);
 
 // exec_pipeline.c
 pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data);
@@ -265,9 +272,13 @@ int 	execute_list(t_exec **exec_list, struct s_data *data);
 char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data);
 char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
 char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data);
-char	**get_paths(t_env **env);
-char	*append_exec_file(char *cmd_name, char *path);
+char	**get_paths(t_env **env, int *err_malloc);
+char	*append_exec_file(char *cmd_name, char *path, int *err_malloc);
 char	*exec_cleaner(char **path_tab, char *path, char *cmd_path);
+
+// path_checks.c
+int	has_slash(char *cmd_name);
+char	*check_access(char *cmd_path, int *first_errno);
 
 // find_command_path_bis.c
 void	is_executable(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);

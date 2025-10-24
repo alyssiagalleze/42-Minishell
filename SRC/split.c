@@ -6,11 +6,14 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 15:40:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/06 17:15:25 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 17:31:20 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+// #include "minishell.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
 int	ft_count_words(const char *s, char c)
 {
@@ -22,7 +25,14 @@ int	ft_count_words(const char *s, char c)
 	while (s[i])
 	{
 		while (s[i] && s[i] == c)
+		{
+			if (s[i] && s[i + 1] == c)
+			{
+				count++;
+				i++;
+			}
 			i++;
+		}
 		if (s[i] && s[i] != c)
 		{
 			count++;

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 18:22:47 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 19:09:43 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,19 @@ int	is_var(t_exec *exec_list)
 	return (exec_list->command->is_var);
 }
 
+int is_pipe(t_exec *exec_list)
+{
+	return (exec_list->next && exec_list->next->is_command);
+}
+
 //TODO: si tu veux fais ca joli
-pid_t	exec_command(t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
+pid_t	exec_command(
+	t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {	
 	pid_t		pid;
 
 	if (exec_data->is_pipe == 0)
-		exec_data->is_pipe = exec_list->next && exec_list->next->is_command;
+			exec_data->is_pipe = is_pipe(exec_list);
 	if (!exec_data->is_pipe
 		&& (is_builtin(exec_list) || exec_list->command->is_var))
 	{
@@ -87,6 +93,7 @@ void	init_exec_data(struct s_exec_data *exec_data, struct s_data *data)
 	exec_data->is_pipe = 0;
 	exec_data->pipefds[0] = -1;
 	exec_data->pipefds[1] = -1;
+	exec_data->path_tab = NULL;
 	exec_data->env = data->env;
 	exec_data->token_list = data->token_list_head;
 }
@@ -118,6 +125,20 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 	return (pid_wait_all(exec_data.exec_count, exec_data.last_pid));
 }
 
+int	set_list_status(int result)
+{
+	int	exit_status;
+
+	exit_status = 0;
+	if (WIFEXITED(result))
+		exit_status = WEXITSTATUS(result);
+	else if (WIFSIGNALED(result))
+		exit_status = WTERMSIG(result) + 128;
+	else
+		exit_status = result;
+	return (exit_status);
+}
+
 int	pid_wait_all(int exec_count, pid_t last_pid)
 {
 	int		status;
@@ -129,8 +150,6 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 	result = 0;
 	while (exec_count)
 	{
-		// printf("waiting for a process !\n");
-		// signal(SIGINT, SIG_DFL);
 		pid = wait(&status);
 		if ((WIFSIGNALED(status)))
 			g_signal = WTERMSIG(status);
@@ -140,14 +159,10 @@ int	pid_wait_all(int exec_count, pid_t last_pid)
 			result = status;
 		exec_count--;
 	}
-	if (WIFEXITED(result))
-		exit_status = WEXITSTATUS(result);
-	else if (WIFSIGNALED(result))
-		exit_status = WTERMSIG(result) + 128;
-	else
-		exit_status = result;
+	exit_status = set_list_status(result);
 	init_readline_signals();
 	if (last_pid < 0)
 		exit_status = -last_pid;
 	return (exit_status);
 }
+
