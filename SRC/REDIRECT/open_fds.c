@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:56:24 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 13:35:18 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 14:01:25 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,14 @@ int	open_hdoc_fds(t_exec *exec_list, int *hdoc_index)
 	int	fd;
 
 	fd = exec_list->command->hdoc_fd[*hdoc_index];
+	printf("-------->fd : %d\n", fd);
 	*hdoc_index += 1;
 	return (fd);
 }
 
 int	open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data)
 {
+	printf("ici pour %s hdoc fd : %d\n", exec_list->command->redir[i], exec_list->command->hdoc_fd[*h]);
 	int	fd;
 
 	fd = -1;
@@ -78,6 +80,7 @@ int	open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data)
 	}
 	else if (exec_list->command->redir_kind[i] == HDOC)
 	{
+		printf("ici ???\n");
 		fd = open_hdoc_fds(exec_list, h);
 		if (fd == -1)
 			return (handle_open_error(exec_list, exec_data, i));
@@ -93,10 +96,11 @@ void	close_previous_fds(int prev, struct s_exec_data *exec_data)
 		ft_close(&exec_data->prev_fd);	
 }
 
-void	close_prev_hdoc(t_exec *exec_list, int h)
+void	close_prev_hdoc(t_exec *exec_list, int h, int i)
 {
 	if (h > 0)
 	{
+		printf("closing hdoc fd for redir : %s\n", exec_list->command->redir[i]);
 		ft_close(&exec_list->command->hdoc_fd[h - 1]);
 		exec_list->command->hdoc_fd[h - 1] = -1;
 	}
@@ -115,7 +119,7 @@ int	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exe
 	prev_out = -1;
 	while (exec_list->command->redir[i])
 	{
-		close_prev_hdoc(exec_list, h);
+		close_prev_hdoc(exec_list, h, i);
 		if (is_in_redirection(exec_list, i))
 		{
 			close_previous_fds(prev_in, exec_data);

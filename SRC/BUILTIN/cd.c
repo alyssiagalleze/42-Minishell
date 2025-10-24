@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 17:58:09 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 19:19:06 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	cd(char **args, t_env **env)
 	}
 	target = find_target(args[1], env, &malloc_fail);
 	if (!target && malloc_fail)
-		return (2);
+		return (printf("yoo lekip\n"), 2);
 	else if (target == NULL)
 		return (1);
 	if (!move_folders(target, env))

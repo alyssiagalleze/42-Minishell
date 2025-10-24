@@ -3,144 +3,138 @@
 /*                                                        :::      ::::::::   */
 /*   find_command_path.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:26:37 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 19:55:59 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 18:57:44 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data)
-{
-	char	*path;
-
-	path = NULL;
-	if (!is_builtin(exec_list) && exec_list->is_subshell == FALSE)
-	{
-		path = set_command_path(exec_list, exec_data);
-		if (!path)
-		{
-			print_err(exec_list->command->argv[0],
-				": command not found\n", NULL, NULL);
-			clean_data_close_fds(exec_data, exec_list, 1);
-			exit(127);
-		}
-	}
-	return (path);
-}
-
-char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data)
+char	*browse_current_dir(
+	t_exec *exec_list, struct s_exec_data *exec_data, int *first_errno)
 {
 	char	*cmd_path;
+	int		err_malloc;
 
 	cmd_path = NULL;
-	cmd_path = ft_strdup(exec_list->command->argv[0]);
-	if (!cmd_path)
-		return (malloc_exit(exec_list, exec_data), NULL);
-	file_exists(cmd_path, exec_list, exec_data);
-	if (access(cmd_path, X_OK) == -1)
+	err_malloc = 0;
+	if (!has_slash(exec_list->command->argv[0]))
 	{
-		perror(cmd_path);
-		free(cmd_path);
-		clean_data_close_fds(exec_data, exec_list, 1);
-		exit(126);
+		cmd_path = append_exec_file(
+				exec_list->command->argv[0], "./", &err_malloc);
+		if (!cmd_path && err_malloc)
+			(malloc_exit(exec_list, exec_data));
 	}
+	else
+	{
+		cmd_path = ft_strdup(exec_list->command->argv[0]);
+		if (!cmd_path)
+			(malloc_exit(exec_list, exec_data));
+	}
+	cmd_path = check_access(cmd_path, first_errno);
 	return (cmd_path);
 }
 
-//TODO pas beau
-//TODO en fait pas juste pas beau, il y a un vrai probleme avec is_executable
+char	*browse_current_path(t_exec *exec_list,
+		struct s_exec_data *exec_data, int *first_errno, char *path)
+{
+	char	*cmd_path;
+	int		err_malloc;
 
-//TODO : je vais ranger cette fonction
-//surtout que je crois que ca fail sur la premiere erreur que ca rencontre ?
-//besoin d'en parler avec toi
+	err_malloc = 0;
+	cmd_path = NULL;
+	if (*path)
+		cmd_path = append_exec_file(
+				exec_list->command->argv[0], path, &err_malloc);
+	else
+		cmd_path = append_exec_file(
+				exec_list->command->argv[0], "./", &err_malloc);
+	if (!cmd_path && err_malloc)
+		(free_env_array(exec_data->path_tab)
+			, malloc_exit(exec_list, exec_data));
+	cmd_path = check_access(cmd_path, first_errno);
+	return (cmd_path);
+}
+
+char	*browse_paths(t_exec *exec_list,
+	char **path_tab, int *first_errno, struct s_exec_data *exec_data)
+{
+	int		i;
+	char	*cmd_path;
+	int		err_malloc;
+
+	i = 0;
+	cmd_path = NULL;
+	err_malloc = 0;
+	if (is_empty_at_start(exec_data))
+		cmd_path = browse_current_dir(exec_list, exec_data, first_errno);
+	if (cmd_path)
+		return (cmd_path);
+	while (path_tab[i])
+	{
+		cmd_path = browse_current_path(
+				exec_list, exec_data, first_errno, path_tab[i]);
+		if (cmd_path)
+			return (cmd_path);
+		i++;
+	}
+	if (is_empty_at_end(exec_data))
+		cmd_path = browse_current_dir(exec_list, exec_data, first_errno);
+	return (cmd_path);
+}
+
+void	error_exit(
+	t_exec *exec_list, struct s_exec_data *exec_data, int first_errno)
+{
+	if (first_errno != 0)
+	{
+		print_err(
+			PROMPT, exec_list->command->argv[0], ": ", strerror(first_errno));
+		write(2, "\n", 1);
+		free_env_array(exec_data->path_tab);
+		clean_data_close_fds(exec_data, exec_list, 1);
+		if (first_errno == EACCES)
+			exit(126);
+		else
+			exit(127);
+	}
+	else
+	{
+		print_err(
+			PROMPT, exec_list->command->argv[0], ": ", "command not found\n");
+		clean_data_close_fds(exec_data, exec_list, 1);
+		free_env_array(exec_data->path_tab);
+		exit(127);
+	}
+	exit(1);
+}
 
 char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data)
 {
-	int		i;
-	char	**path_tab;
+	int		err_malloc;
+	int		first_err;
 	char	*cmd_path;
 
 	cmd_path = NULL;
+	err_malloc = 0;
+	first_err = 0;
 	if (exec_list->command->argv[0] && has_slash(exec_list->command->argv[0]))
-		return (dup_cmd_arg(exec_list, exec_data));
-	path_tab = get_paths(&exec_data->env);
-	if (!path_tab)
-		return (path_variable_missing(exec_data, exec_list), NULL);
-	i = 0;
-	while (path_tab[i])
-	{
-		cmd_path = append_exec_file(exec_list->command->argv[0], path_tab[i]);
-		if (!cmd_path)
-			return (exec_cleaner(path_tab, NULL, NULL), NULL);
-		if (!access(cmd_path, F_OK))
-		{
-			if (access(cmd_path, X_OK) == -1)
-			{
-				perror(cmd_path);
-				exec_cleaner(path_tab, NULL, cmd_path);
-				free(cmd_path);
-				clean_data_close_fds(exec_data, exec_list, 1);
-				exit(126);
-			}
-			return (exec_cleaner(path_tab, NULL, cmd_path));
-		}
-		free(cmd_path);
-		i++;
-	}
-	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
-	if (!access(cmd_path, F_OK))
-	{
-		if (access(cmd_path, X_OK) == -1)
-		{
-			perror(cmd_path);
-			exec_cleaner(path_tab, NULL, cmd_path);
-			free(cmd_path);
-			clean_data_close_fds(exec_data, exec_list, 1);
-			exit(126);
-		}
-		return (exec_cleaner(path_tab, NULL, cmd_path));
-	}
-	return (exec_cleaner(path_tab, NULL, NULL), free(cmd_path), NULL);
-}
-
-//TODO : peut fail malloc ou etre NULL car var PATH existe pas ou renvoit NULL
-char	**get_paths(t_env **env)
-{
-	char	**path_tab;
-	t_env	*current;
-
-	current = *env;
-	path_tab = NULL;
-	while (current)
-	{
-		if (str_ncmp(current->var_name, "PATH=", 3, FALSE))
-		{
-			path_tab = ft_split(current->var_value, ':');
-			break ;
-		}
-		current = current->next;
-	}
-	return (path_tab);
-}
-
-char	*append_exec_file(char *cmd_name, char *path)
-{
-	char	*tmp;
-	char	*cmd_path;
-
-	tmp = NULL;
-	tmp = ft_strjoin(path, "/");
-	if (!tmp)
-		return (NULL);
-	cmd_path = ft_strjoin(tmp, cmd_name);
-	if (!cmd_path)
-	{
-		free(tmp);
-		return (NULL);
-	}
-	free(tmp);
-	return (cmd_path);
+		cmd_path = browse_current_dir(exec_list, exec_data, &first_err);
+	if (cmd_path)
+		return (cmd_path);
+	exec_data->path_tab = get_paths(&exec_data->env, &err_malloc);
+	if (!exec_data->path_tab && err_malloc)
+		return (malloc_exit(exec_list, exec_data), NULL);
+	else if (!exec_data->path_tab)
+		cmd_path = browse_current_dir(exec_list, exec_data, &first_err);
+	if (cmd_path)
+		return (cmd_path);
+	if (exec_data->path_tab)
+		cmd_path = browse_paths(
+				exec_list, exec_data->path_tab, &first_err, exec_data);
+	if (cmd_path)
+		return (cmd_path);
+	return (error_exit(exec_list, exec_data, first_err), NULL);
 }

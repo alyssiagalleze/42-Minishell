@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 17:58:23 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 19:24:31 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ t_env	*create_exported_var(char *argument, t_env **env, int *malloc_fail)
 	t_env	*new;
 	char	*sep;
 
+	new = NULL;
 	sep = NULL;
 	sep = ft_strchr(argument, '=');
 	if (!sep)
@@ -53,17 +54,14 @@ t_env	*create_exported_var(char *argument, t_env **env, int *malloc_fail)
 		if (!new)
 			return (*malloc_fail = 1, NULL);
 	}
-	else
-	{
-		*sep = '\0';
-		if (!is_string_valid_var(argument))
-			return (NULL);
-		if (var_exists(env, argument))
-			unset_single(argument, env);
-		new = env_new_node(argument, sep + 1, FALSE, FALSE);
-		if (!new)
-			return (*malloc_fail = 1, NULL);
-	}
+	*sep = '\0';
+	if (!is_string_valid_var(argument))
+		return (NULL);
+	if (var_exists(env, argument))
+		unset_single(argument, env);
+	new = env_new_node(argument, sep + 1, FALSE, FALSE);
+	if (!new)
+		return (*malloc_fail = 1, NULL);
 	return (new);
 }
 
@@ -73,10 +71,8 @@ int	node_create_fail(t_env **env, t_env *new, char *argument, int malloc_fail)
 		return (0);
 	if (!new && malloc_fail)
 	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
-		clean_env(env);
 		rl_clear_history();
-		exit(2);
+		return (2);
 	}
 	return (1);
 }
