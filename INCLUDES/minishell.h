@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 19:53:45 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 20:10:50 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -461,7 +461,9 @@ void	init_readline_signals(void);
 void	init_exec_father_signals(void);
 void	init_exec_child_signals(void);
 void	init_heredoc_signals(void);
-
+void	sa_readline_handler(int	sig);
+void	sa_heredoc_handler(int sig);
+void	sa_exec_child_handler(int	sig);
 // token_list.c
 void	token_list_empty_node(t_token *token);
 t_token	*token_list_add_node(t_token **token_list_start);

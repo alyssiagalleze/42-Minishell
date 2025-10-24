@@ -5,12 +5,6 @@ INCLUDES=-I INCLUDES
 D_BUILD=.build/
 
 SRC=	SRC/main.c \
-		SRC/data.c \
-		SRC/error.c	\
-		SRC/signals.c \
-		SRC/split.c \
-		SRC/string_manip.c \
-		SRC/utils.c \
 		SRC/BUILD_EXEC/build_exec.c \
 		SRC/BUILD_EXEC/build_exec_scan.c \
 		SRC/BUILD_EXEC/build_exec_utils.c \
@@ -60,7 +54,14 @@ SRC=	SRC/main.c \
 		SRC/REDIRECT/prepare_pipe.c \
 		SRC/REDIRECT/redirections_bis.c \
 		SRC/REDIRECT/redirections.c \
-		SRC/REDIRECT/subshell_redirections.c
+		SRC/REDIRECT/subshell_redirections.c \
+		SRC/SIGNALS/init_sigs.c \
+		SRC/SIGNALS/sig_handlers.c \
+		SRC/UTILS/data.c \
+		SRC/UTILS/error.c \
+		SRC/UTILS/split.c \
+		SRC/UTILS/string_manip.c \
+		SRC/UTILS/utils.c
 		
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 
