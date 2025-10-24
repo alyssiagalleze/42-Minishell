@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:55:02 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 15:35:46 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 13:32:20 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,13 @@ int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd)
 	{
 		if (dup2(*fd_in, STDIN_FILENO) == -1)
 			return (perror("dup2 fd_in"), 1);
-		close(*fd_in);
+		ft_close(fd_in);
 	}
 	else if (prev_fd != -1)
 	{
 		if (dup2(prev_fd, STDIN_FILENO) == -1)
 			return (perror("dup2 prev_fd"), 1);
-		close(prev_fd);
+		ft_close(&prev_fd);
 	}
 	return (0);
 }
