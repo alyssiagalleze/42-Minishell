@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 18:30:48 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 12:24:50 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,7 @@ void	child_exec(
 		close(pipefds[1]);
 	path = get_path_for_command(exec_list, exec_data);
 	if (!path && !is_builtin(exec_list))
-	{
-		clean_data_close_fds(exec_data, exec_list, 1);
-		// close_fds(pipefds, exec_data->saved_stds);
-		// clean_exec_list(&exec_list); // LEAK
-		// clean_env(&exec_data->env); // LEAK
-		exit (127);
-	}
+		(clean_data_close_fds(exec_data, exec_list, 1), exit (127));
 	if (is_builtin(exec_list))
 	{
 		status = built_in_exec(exec_list, exec_data);
@@ -45,6 +39,7 @@ void	child_exec(
 		return (malloc_exit(exec_list, exec_data));
 	close_fds(pipefds, exec_data->saved_stds);
 	status = execve(path, exec_list->command->argv, my_env);
+	printf("Execve returned with status: %d\n", status);
 	perror(exec_list->command->argv[0]);
 	clean_data_close_fds(exec_data, exec_list, 1);
 	free(path);
@@ -80,7 +75,7 @@ pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data)
 		return (print_err(PROMPT, "internal: exec_pipeline called for non-command node\n", NULL, NULL), 1);
 	if (prepare_pipe(exec_list, exec_data->pipefds) != 0)
 		return (1);
-	pid = fork(); // gros caca boudin 
+	pid = fork();
 	if (pid == -1)
 		return (handle_fork_error(exec_data->pipefds));
 	if (pid == 0)
@@ -91,4 +86,3 @@ pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data)
 	parent_after_fork(exec_list, &exec_data->prev_fd, exec_data->pipefds);
 	return (pid);
 }
-

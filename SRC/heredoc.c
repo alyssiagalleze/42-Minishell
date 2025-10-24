@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 14:02:50 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 18:58:37 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 13:35:29 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,8 @@ int	heredoc_input_to_pipe(
 		{
 			write(1, "\n", 1);
 			heredoc_inform_eof(cmd_count, hdoc_data->exp_delim);
+			// close(hdoc_data->heredoc_fds[1]); // fix les fd leack avec ctrl D mais error dup2
+			// close(hdoc_data->heredoc_fds[0]);
 			break ;
 		}
 		heredoc_remove_newline(input);
