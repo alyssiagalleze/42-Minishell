@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 12:24:50 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 17:05:02 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void	child_exec(
 	if (transfer_env(&exec_data->env, &my_env))
 		return (malloc_exit(exec_list, exec_data));
 	close_fds(pipefds, exec_data->saved_stds);
+	clean_token_list(&exec_data->token_list, TRUE);
 	status = execve(path, exec_list->command->argv, my_env);
 	printf("Execve returned with status: %d\n", status);
 	perror(exec_list->command->argv[0]);

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:26:37 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 19:55:59 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 13:58:01 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,6 @@ char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data)
 	return (cmd_path);
 }
 
-//TODO pas beau
-//TODO en fait pas juste pas beau, il y a un vrai probleme avec is_executable
-
 //TODO : je vais ranger cette fonction
 //surtout que je crois que ca fail sur la premiere erreur que ca rencontre ?
 //besoin d'en parler avec toi
@@ -62,7 +59,9 @@ char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data)
 	int		i;
 	char	**path_tab;
 	char	*cmd_path;
+	int		first_errno;
 
+	first_errno = 0;
 	cmd_path = NULL;
 	if (exec_list->command->argv[0] && has_slash(exec_list->command->argv[0]))
 		return (dup_cmd_arg(exec_list, exec_data));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_subshell.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 12:43:43 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 18:00:03 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/24 18:33:31 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	launch_subshell(t_exec *exec_list, struct s_data *data)
 {
 	int	status;
 
-	clean_token_list(&data->token_list_head);
+	clean_token_list(&data->token_list_head, FALSE);
 	rl_clear_history();
 	status = handle_subshell_execution(exec_list, &data->env);
 	clean_env(&data->env);
@@ -69,6 +69,19 @@ void	save_prev_fd(t_exec *exec_list, int pipefds[2], int *prev_fd)
 			close(pipefds[1]);
 		*prev_fd = -1;
 	}
+}
+
+int	handle_subshell_execution(t_exec *exec_list, t_env **env)
+{
+	struct s_data	subshell_data;
+
+	subshell_data.env = *env;
+	data_reset_pointers(&subshell_data);
+	subshell_data.token_list = exec_list->subshell->token_sublist;
+	subshell_data.token_list_head = subshell_data.token_list;
+	exec_list->subshell->token_sublist = NULL;
+	clean_exec_list(&exec_list);
+	return (token_list_to_exec(&subshell_data));
 }
 
 pid_t	exec_subshell(

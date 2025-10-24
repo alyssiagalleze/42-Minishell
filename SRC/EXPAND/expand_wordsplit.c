@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:25:58 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 19:59:12 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 16:07:51 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 		if (new_node == NULL)
 		{
 			ws_free_tab(tab, word_count);
-			clean_token_list(&new_token_list);
+			clean_token_list(&new_token_list, TRUE);
 			return (ERR_MALLOC);
 		}
 		token_list_fill_node(new_node, tab[i], WORD, WORD_ARG);

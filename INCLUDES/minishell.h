@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 19:45:49 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 19:29:45 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,21 +50,25 @@
 // maybe env max ?
 # define PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
 # define PERR_AMBIG		"ambiguous redirect\n"
-# define PERR_MALLOC		"Internal malloc failure. Abort.\n"
+# define PERR_MALLOC	"Internal malloc failure. Abort.\n"
 # define PERR_QUOTE		"unexpected EOF while looking for matching `\'\'\n"
-# define PERR_QUOTES		"unexpected EOF while looking for matching `\"'\n"
-# define PERR_BRA		"unexpected EOF while looking for matching `(\'\n"
+# define PERR_QUOTES	"unexpected EOF while looking for matching `\"'\n"
+# define PERR_BRA_O		"unexpected EOF while looking for matching `(\'\n"
 # define PERR_STX_EOF	"syntax error: unexpected end of file\n"
 # define PERR_STX_Q		"syntax error near unexpected token `"
-# define PERR_STX_NL		"syntax error near unexpected token `newline'\n"
+# define PERR_STX_NL	"syntax error near unexpected token `newline'\n"
 # define PERR_STX_BRA	"syntax error near unexpected token `('\n"
+# define PERR_STX_BRA_C	"syntax error near unexpected token `)'\n"
 # define PERR_STX_OPE	"syntax error : invalid operator "
 # define PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
-# define PERR_ASSIGN		"malloc error, failed assignement of "
+# define PERR_ASSIGN	"malloc error, failed assignement of "
 # define PERR_HDOC		"XxxM3g4sh311xxX: warning: here-document at line "
 # define PERR_EOF		" delimited by end-of-file\n"
 # define PERR_HDOC_EOF	"XxxM3g4sh311xxX: warning: here-document delimited by end-of-file (wanted `"
 # define PERR_HDOC_FDS	"heredoc fds management failed : "
+# define PERR_STDIN		"Incident with the STDIN\n"
+# define PERR_STDOUT	"Incident with the STDOUT\n"
+# define PERR_REDIR		"You might have redirected it, which is not supported.\n"
 
 //treat all metacharacters or only the one in subject ??
 //could also say input invalid if metacharacters we don't use ??
@@ -209,7 +213,19 @@ struct s_exec_data
 
 // PROTOTYPES
 
-int	is_and_or(t_token *token_list);
+// build_exec.c
+int		token_list_to_exec(struct s_data *data);
+// build_exec_scan.c
+int	scan_command_tokens(t_token **token_list, t_command *command);
+t_token	*scan_subshell_tokens(t_token **token_list);
+t_token	*create_and_fill_subtoken(t_token **sublist, t_token *token);
+
+// build_exec_utils.c
+int		is_and_or(t_token *token_list);
+int		should_exec_pipeline(t_token *token, int lvalue);
+void	skip_subshell_tokens(t_token **token_list);
+void	skip_command_tokens(t_token **token_list);
+void	skip_pipeline_tokens(t_token **token_list);
 
 // built-ins
 void	ft_putstr_fd(const char *s, int fd);
@@ -227,10 +243,10 @@ int		is_string_valid_var(char *str);
 
 // EXEC
 // exec_builtins.c
-int			is_builtin(t_exec *exec_list);
+int		is_builtin(t_exec *exec_list);
 // pid_t		built_in_exec(t_exec *exec_list, t_env **env);
-pid_t  		 built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
-pid_t		exec_single_builtin(t_exec *exec_list, struct s_exec_data *exec_data);
+pid_t	built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
+pid_t	exec_single_builtin(t_exec *exec_list, struct s_exec_data *exec_data);
 
 // exec_pipeline.c
 pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data);
@@ -263,7 +279,7 @@ void	malloc_exit(t_exec *exec_list, struct s_exec_data *exec_data);
 //	clean.c  + clean_bis.c
 void	clean_input(char **input);
 void	clean_env(t_env **env);
-void	clean_token_list(t_token	**lexer);
+void	clean_token_list(t_token **lexer, int close_sub_fds);
 void	clean_exec_list(t_exec **exec_list);
 void	clean_exec_node(t_exec **exec_list);
 void	exit_clean(struct s_data *data);
@@ -329,13 +345,29 @@ int	close_no_exit(int pipefds_r, int pipefds_w, int status);
 
 // heredoc.c
 int	heredocs(t_token *token_list, int cmd_count, t_env *env);
+//heredoc_utils.c
+void	reset_hdoc_data(struct s_heredoc *hdoc_data);
+void	init_hdoc_data(struct s_heredoc *hdoc_data);
+t_token	*skip_until_heredoc_delim(t_token *token_list);
+void	heredocs_display_header(char *delim);
+//heredoc_delim.c
+int	heredoc_unquote_delim(char *delim, struct s_heredoc *hdoc_data, int *err);
+//heredoc_input.c
+int	heredoc_input_to_pipe(struct s_heredoc *hdoc_data, int *cmd_count, t_env *env, int *err);
+//heredoc_expand.c
+int	heredoc_expand_input(char **input, t_env *env);
 
 // find_command_path
 char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
+
 //	lexer.c
 t_token	*token_list_add_node(t_token **lexer_start);
 void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind kind);
 void	lexer(t_token **lexer, char *input, struct s_data *data);
+//	lexer_utils.c
+int	match_an_operator_pattern(char *str, int length);
+int	get_operator_type(char *str);
+int	get_operator_kind(char *str);
 
 // token_list_to_exec.c
 int 	handle_subshell_execution(t_exec *exec_list, t_env **env);
@@ -398,8 +430,10 @@ int 	only_digit(char *arg);
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
 
 // parser.c
-int		parser(t_token **lexer);
+int		parser(t_token **token_list, t_token **token_list_head, int *status);
+// parser_bis
 int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind, int *line_has_cmd);
+int		parser_clean_failure(t_token **token_list_head, int *status, int error_id);
 
 // pids
 int		pid_wait_all(int exec_count, pid_t pid);
@@ -423,6 +457,7 @@ t_token	*token_list_add_node(t_token **token_list_start);
 void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
 int		token_list_size(t_token *token_list);
 void	token_list_insert_list(t_token *token_from, t_token *new_list);
+void	token_list_copy_node(t_token *from, t_token *to);
 
 // utils.c
 char	*ft_itoa(int n);

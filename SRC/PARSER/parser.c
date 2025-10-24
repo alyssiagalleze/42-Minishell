@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 17:20:05 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 19:28:28 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ static int	parser_check_bracket(
 		if (*open_brackets < 0 || prev_type == REDIR_OPERATOR
 			|| prev_type == CONTR_OPERATOR || prev_kind == BRACKET_O)
 		{
-			print_err(PROMPT, PERR_STX_BRA, NULL, NULL);
+			print_err(PROMPT, PERR_STX_BRA_C, NULL, NULL);
 			return (TRUE);
 		}
 	}
@@ -103,7 +103,7 @@ static int	parser_check_token_dispatch(t_token *token, t_token *prev_token, int 
 	return (FALSE);
 }
 
-int	parser(t_token **token_list)
+int	parser(t_token **token_list, t_token **token_list_head, int *status)
 {
 	t_token				*token;
 	t_token				*prev_token;
@@ -117,19 +117,13 @@ int	parser(t_token **token_list)
 	while (token)
 	{
 		if (parser_check_token_dispatch(token, prev_token, &brackets, &line_has_cmd))
-			return (FALSE);
+			return (parser_clean_failure(token_list_head, status, 0));
 		prev_token = token;
 		token = token->next;
 	}
 	if (prev_token->type == REDIR_OPERATOR)
-	{
-		print_err(PROMPT, PERR_STX_NL, NULL, NULL);
-		return (FALSE);
-	}
+		return (parser_clean_failure(token_list_head, status, 1));
 	if (brackets)
-	{
-		print_err(PROMPT, PERR_BRA, PROMPT, PERR_STX_EOF);
-		return (FALSE);
-	}
+		return (parser_clean_failure(token_list_head, status, 2));
 	return (TRUE);
 }

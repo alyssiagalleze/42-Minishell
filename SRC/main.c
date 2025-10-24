@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 19:56:57 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 19:20:20 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,10 @@ void	save_last_status(int *status, t_env **env)
 	}
 }
 
-void	get_input(char **input, struct s_data *data, int *status, int *cmd_count)
+void	get_input(
+	char **input, struct s_data *data, int *status, int *cmd_count)
 {
+	*input = NULL;
 	while (!*input)
 	{
 		*input = readline(PROMPT);
@@ -69,18 +71,49 @@ void	get_input(char **input, struct s_data *data, int *status, int *cmd_count)
 	}
 }
 
-// -> str_append qui rajoute une chaine de caractere a une autre (doit etre malloc)
+void	prev_command_check_signal(int	*status)
+{
+	if (g_signal == SIGINT || *status == SIGINT + 128)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+	}
+	if (g_signal == SIGQUIT || *status == SIGQUIT + 128)
+	{
+		write(STDERR_FILENO, "Quit (core dumped)\n", 20);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+	}
+}
 
-// -> avance dans input
-// -> recupere la len de soit 	1) une chaine sans expand
-//									-> recupere copie de chaine
-// 								2) une chaine a expand
-//									-> recupere copie de var equivalente
-//	append la copie a new_string
+int	heredoc_check_signal(struct s_data *data, int *status)
+{
+	if (g_signal == SIGINT)
+	{
+		cleaner(NULL, NULL, &data->token_list_head);
+		*status = SIGINT + 128;
+		g_signal = 0;
+		return (TRUE);
+	}
+	return (FALSE);
+}
+
+int	is_longer_than_arg_max(struct s_data *data, int *status)
+{
+	if (token_list_size(data->token_list) >= ARG_MAX)
+	{
+		print_err(PROMPT, PERR_ARG_MAX, NULL, NULL);
+		cleaner(NULL, NULL, &data->token_list_head);
+		*status = 2;
+		return (TRUE);
+	}
+	return (FALSE);
+}
 
 void	shell_loop(struct s_data *data, int *status)
 {
-	char 	*input;
+	char	*input;
 	int		cmd_count;
 
 	*status = 0;
@@ -88,48 +121,34 @@ void	shell_loop(struct s_data *data, int *status)
 	while (1)
 	{
 		init_readline_signals();
-		if (g_signal == SIGINT || *status == SIGINT + 128)
-		{
-			write(STDOUT_FILENO, "\n", 1);
-			rl_on_new_line();
-			rl_replace_line("", 0);
-		}
-		if (g_signal == SIGQUIT || *status == SIGQUIT + 128)
-		{
-			write(STDERR_FILENO, "Quit (core dumped)\n", 20);
-			rl_on_new_line();
-			rl_replace_line("", 0);
-		}
+		prev_command_check_signal(status);
 		g_signal = 0;
 		save_last_status(status, &data->env);
-		input = NULL;
 		data_reset_pointers(data);
 		get_input(&input, data, status, &cmd_count);
 		lexer(&data->token_list, input, data);
-		input = NULL;
-		if (token_list_size(data->token_list) >= ARG_MAX)
-		{
-			print_err(PROMPT, PERR_ARG_MAX, NULL, NULL);
-			cleaner(NULL, NULL, &data->token_list_head);
-			*status = 2;
-			continue ;
-		}
+		if (is_longer_than_arg_max(data, status))
+			continue;
 		else if (heredocs(data->token_list, cmd_count, data->env))
-			my_exit(2, &data->env, &input, &data->token_list_head); //TODO : le retour se fait dans fonction heredoc ?
-		if (g_signal == SIGINT)
-		{
-			cleaner(NULL, NULL, &data->token_list_head);
-			*status = SIGINT + 128;
-			g_signal = 0;
+			my_exit(2, &data->env, &input, &data->token_list_head);
+		if (heredoc_check_signal(data, status))
 			continue ;
-		}
-		if (parser(&data->token_list))
+		if (parser(&data->token_list, &data->token_list_head, status))
 			*status = token_list_to_exec(data);
-		else
-		{
-			cleaner(NULL, NULL, &data->token_list_head);
-			*status = 2;
-		}
+	}
+}
+
+void	check_std_errors()
+{
+	if (!isatty(STDIN_FILENO))
+	{
+		print_err(PROMPT, PERR_STDIN, PERR_REDIR, NULL);
+		exit (2);
+	}
+	if (!isatty(STDOUT_FILENO))
+	{
+		print_err(PROMPT, PERR_STDOUT, PERR_REDIR, NULL);
+		exit (2);
 	}
 }
 
@@ -142,16 +161,7 @@ int	main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
-	if (!isatty(STDIN_FILENO))
-	{
-		print_err(PROMPT, "Incident with the STDIN\n", "You might have redirected it, which is not supported.\n", NULL);
-		exit (2);
-	}
-	if (!isatty(STDOUT_FILENO))
-	{
-		print_err(PROMPT, "Incident with the STDOUT\n", "You might have redirected it, which is not supported.\n", NULL);
-		exit (2);
-	}
+	check_std_errors();
 	g_signal = 0;
 	if (init_env_list(env, &data.env))
 		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), 2);
@@ -160,10 +170,3 @@ int	main(int ac, char **av, char **env)
 	exit_clean(&data);
 	return (status);
 }
-
-// TO FIX !!
-
-// mkdir -> rm ../. -> pwd ou cd ..
-
-// <a <b pwd
-// (<< a << b << c)

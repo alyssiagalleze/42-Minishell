@@ -3,23 +3,17 @@ CC=cc
 CFLAGS=-Wall -Wextra -Werror -g -MMD  
 INCLUDES=-I INCLUDES
 D_BUILD=.build/
-# HEADERS=minishell.h
 
 SRC=	SRC/main.c \
-		SRC/clean.c \
-		SRC/clean_bis.c \
-		SRC/clean_ter.c \
 		SRC/data.c \
 		SRC/error.c	\
-		SRC/heredoc.c \
-		SRC/lexer.c \
-		SRC/lister.c \
-		SRC/parser.c \
-		SRC/parser_bis.c \
 		SRC/signals.c \
 		SRC/split.c \
 		SRC/string_manip.c \
 		SRC/utils.c \
+		SRC/BUILD_EXEC/build_exec.c \
+		SRC/BUILD_EXEC/build_exec_scan.c \
+		SRC/BUILD_EXEC/build_exec_utils.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \
@@ -28,6 +22,9 @@ SRC=	SRC/main.c \
 		SRC/BUILTIN/export.c \
 		SRC/BUILTIN/export_bis.c \
 		SRC/BUILTIN/exit.c \
+		SRC/CLEAN/clean.c \
+		SRC/CLEAN/clean_bis.c \
+		SRC/CLEAN/clean_ter.c \
 		SRC/EXEC/exec.c \
 		SRC/EXEC/exec_builtins.c \
 		SRC/EXEC/exec_pipeline.c \
@@ -44,10 +41,19 @@ SRC=	SRC/main.c \
 		SRC/EXPAND/wordsplit_utils.c \
 		SRC/GNL/get_next_line.c \
 		SRC/GNL/get_next_line_utils.c \
+		SRC/HEREDOC/heredoc.c \
+		SRC/HEREDOC/heredoc_delim.c \
+		SRC/HEREDOC/heredoc_expand.c \
+		SRC/HEREDOC/heredoc_input.c \
+		SRC/HEREDOC/heredoc_utils.c \
+		SRC/LEXER/lexer.c \
+		SRC/LEXER/lexer_utils.c \
 		SRC/LIST/env_list.c \
 		SRC/LIST/exec_list.c \
 		SRC/LIST/pid_list.c \
 		SRC/LIST/token_list.c \
+		SRC/PARSER/parser.c \
+		SRC/PARSER/parser_bis.c \
 		SRC/REDIRECT/close_fds.c \
 		SRC/REDIRECT/open_fds.c \
 		SRC/REDIRECT/prepare_pipe.c \
@@ -55,7 +61,6 @@ SRC=	SRC/main.c \
 		SRC/REDIRECT/redirections.c \
 		SRC/REDIRECT/subshell_redirections.c
 		
-
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 
 RM=rm -rf

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:54:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 12:28:15 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 14:19:15 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,16 @@ t_token	*token_list_add_node(t_token **token_list_start)
 		*token_list_start = new_node;
 	token_list_empty_node(new_node);
 	return (new_node);
+}
+
+void	token_list_copy_node(t_token *from, t_token *to)
+{
+	to->str = from->str;
+	to->type = from->type;
+	to->kind = from->kind;
+	to->hdoc_fd = from->hdoc_fd;
+	to->wild_expanded = from->wild_expanded;
+	to->dollar_expanded = from->dollar_expanded;
 }
 
 //TODO : token_list_copy_node pour subshell

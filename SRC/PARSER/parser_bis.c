@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:47:41 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/15 11:41:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 19:28:32 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,16 @@ int	parser_check_and_assign_word(
 	{
 		(*token)->kind = WORD_ARG;
 	}
+	return (FALSE);
+}
+
+int parser_clean_failure(t_token **token_list_head, int *status, int error_id)
+{
+	if (error_id == 1)
+		print_err(PROMPT, PERR_STX_NL, NULL, NULL);
+	else if (error_id == 2)
+		print_err(PROMPT, PERR_BRA_O, PROMPT, PERR_STX_EOF);
+	*status = 2;
+	cleaner(NULL, NULL, token_list_head);
 	return (FALSE);
 }

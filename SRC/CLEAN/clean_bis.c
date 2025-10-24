@@ -6,14 +6,12 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 19:01:11 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 19:53:48 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/24 17:59:05 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//TODO : je comprend pas pourquoi tu met cmd_path ici ?
-// est ce que c'est juste pour pouvoir faire " return (exec_cleaner(..., ... ,...)) " ?
 char	*exec_cleaner(char **path_tab, char *path, char *cmd_path)
 {
 	int	i;
@@ -51,7 +49,7 @@ void	clean_exec_command_node(t_exec *exec_list)
 void	clean_exec_subshell_node(t_exec *exec_list)
 {
 	if (exec_list->subshell->token_sublist)
-		clean_token_list(&exec_list->subshell->token_sublist);
+		clean_token_list(&exec_list->subshell->token_sublist, FALSE);
 	free(exec_list->subshell);
 }
 
