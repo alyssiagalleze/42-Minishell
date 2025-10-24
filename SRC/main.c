@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:26:27 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 19:23:05 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/23 19:56:57 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,4 @@ int	main(int ac, char **av, char **env)
 // mkdir -> rm ../. -> pwd ou cd ..
 
 // <a <b pwd
-// chmod 000 a ; a
-// chmod 777 a ; a
 // (<< a << b << c)

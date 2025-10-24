@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   clean_bis.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 19:01:11 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/23 17:33:56 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 19:53:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+//TODO : je comprend pas pourquoi tu met cmd_path ici ?
+// est ce que c'est juste pour pouvoir faire " return (exec_cleaner(..., ... ,...)) " ?
 char	*exec_cleaner(char **path_tab, char *path, char *cmd_path)
 {
 	int	i;
@@ -27,6 +29,7 @@ char	*exec_cleaner(char **path_tab, char *path, char *cmd_path)
 	{
 		free(path);
 	}
+	printf("exec cleaner : cmd_path is %p", cmd_path);
 	return (cmd_path);
 }
 

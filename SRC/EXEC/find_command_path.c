@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   find_command_path.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:26:37 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/23 17:39:00 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/23 19:55:59 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,22 @@ char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data)
 	if (!cmd_path)
 		return (malloc_exit(exec_list, exec_data), NULL);
 	file_exists(cmd_path, exec_list, exec_data);
-	is_executable(cmd_path, exec_list, exec_data);
+	if (access(cmd_path, X_OK) == -1)
+	{
+		perror(cmd_path);
+		free(cmd_path);
+		clean_data_close_fds(exec_data, exec_list, 1);
+		exit(126);
+	}
 	return (cmd_path);
 }
+
+//TODO pas beau
+//TODO en fait pas juste pas beau, il y a un vrai probleme avec is_executable
+
+//TODO : je vais ranger cette fonction
+//surtout que je crois que ca fail sur la premiere erreur que ca rencontre ?
+//besoin d'en parler avec toi
 
 char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data)
 {
@@ -63,16 +76,37 @@ char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data)
 		if (!cmd_path)
 			return (exec_cleaner(path_tab, NULL, NULL), NULL);
 		if (!access(cmd_path, F_OK))
-			return (is_executable(cmd_path, exec_list, exec_data), exec_cleaner(path_tab, NULL, cmd_path));
+		{
+			if (access(cmd_path, X_OK) == -1)
+			{
+				perror(cmd_path);
+				exec_cleaner(path_tab, NULL, cmd_path);
+				free(cmd_path);
+				clean_data_close_fds(exec_data, exec_list, 1);
+				exit(126);
+			}
+			return (exec_cleaner(path_tab, NULL, cmd_path));
+		}
 		free(cmd_path);
 		i++;
 	}
 	cmd_path = append_exec_file(exec_list->command->argv[0], ".");
 	if (!access(cmd_path, F_OK))
-		return (is_executable(cmd_path, exec_list, exec_data), exec_cleaner(path_tab, NULL, cmd_path));
+	{
+		if (access(cmd_path, X_OK) == -1)
+		{
+			perror(cmd_path);
+			exec_cleaner(path_tab, NULL, cmd_path);
+			free(cmd_path);
+			clean_data_close_fds(exec_data, exec_list, 1);
+			exit(126);
+		}
+		return (exec_cleaner(path_tab, NULL, cmd_path));
+	}
 	return (exec_cleaner(path_tab, NULL, NULL), free(cmd_path), NULL);
 }
 
+//TODO : peut fail malloc ou etre NULL car var PATH existe pas ou renvoit NULL
 char	**get_paths(t_env **env)
 {
 	char	**path_tab;
@@ -85,8 +119,7 @@ char	**get_paths(t_env **env)
 		if (str_ncmp(current->var_name, "PATH=", 3, FALSE))
 		{
 			path_tab = ft_split(current->var_value, ':');
-			if (!path_tab)
-				return (NULL);
+			break ;
 		}
 		current = current->next;
 	}
