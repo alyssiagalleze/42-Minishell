@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_delim.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 18:01:15 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 18:02:46 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/28 17:45:51 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	heredoc_copy_delim_until_quote(
 		iter[1]++;
 	}
 }
-
 
 int	heredoc_skip_quotes(
 	char *delim, char *new_delim, int iter[3], int *is_quoted)

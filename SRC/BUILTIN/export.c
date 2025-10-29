@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 18:30:56 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:24:31 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:17:17 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ int	node_create_fail(t_env **env, t_env *new, char *argument, int malloc_fail)
 	return (1);
 }
 
-//TODO: malloc fail
 int	export(char **args, t_env **env)
 {
 	int		i;
@@ -93,14 +92,13 @@ int	export(char **args, t_env **env)
 		if (args[i][0] != '\0')
 		{
 			new_node = create_exported_var(args[i], env, &malloc_fail);
-			if (!new_node)
+			if (!new_node && malloc_fail)
 				return (node_create_fail(env, new_node, args[i], malloc_fail));
-			env_add_node(env, new_node);
+			if (new_node)
+				env_add_node(env, new_node);
 		}
 		else
 			print_err(PROMPT, ": export:", "\'\'", ": not a valid identifier\n");
-		if (args[i][0] == '\0' && args[i + 1] == NULL)
-			return (1);
 		i++;
 	}
 	return (0);

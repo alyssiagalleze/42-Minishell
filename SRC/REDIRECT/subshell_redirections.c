@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   subshell_redirections.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 18:59:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/20 18:53:35 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 13:12:46 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,6 @@ int	sub_redirect_out(t_exec *exec_list, int pipefds[2], int *fd_out)
 			return (perror("dup2 fd_out"), 1);
 		close(*fd_out);
 	}
-    // else if (!exec_list->next)
-    // {
-	// 	saved_std_out = -1;
-	// 	if (dup2(saved_std_out, STDOUT_FILENO) == -1)
-	// 		// exit(1);
-	// 	close(saved_std_out);
-    // }
 	else if (pipefds[1] != -1)
 	{
 		if (dup2(pipefds[1], STDOUT_FILENO) == -1)
@@ -38,12 +31,12 @@ int	sub_redirect_out(t_exec *exec_list, int pipefds[2], int *fd_out)
 
 int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd)
 {
-	int fd_in;
-	int fd_out;
+	int	fd_in;
+	int	fd_out;
 
 	if (redirect_in(exec_list, &fd_in, prev_fd))
 		return (1);
 	if (sub_redirect_out(exec_list, pipefds, &fd_out))
 		return (1);
-	return (0);	
+	return (0);
 }

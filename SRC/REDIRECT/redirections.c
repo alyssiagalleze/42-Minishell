@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:55:02 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 13:59:56 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:16:03 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ int	out_redirections(t_exec *exec_list)
 
 int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd)
 {
-	printf("fd in redirect : %d\n", *fd_in);
 	if (in_redirections(exec_list) == TRUE)
 	{
 		if (dup2(*fd_in, STDIN_FILENO) == -1)
@@ -95,30 +94,3 @@ int	redirect_fds(t_exec *exec_list,
 		close(pipefds[1]);
 	return (0);
 }
-
-// int	here_doc_input(int i, t_exec *exec_list)
-// {
-// 	int		pipefds[2];
-// 	char	*line;
-// 
-// 	if (pipe(pipefds) == -1)
-// 		return (print_err("heredoc pipe : pipe creation failed.\n", NULL, NULL, NULL), -1);
-// 
-// 	line = NULL;
-// 	while (1)
-// 	{
-// 		line = readline("> ");
-// 		if (!line)
-// 		{
-// 			print_err(PROMPT, "warning: here-document (at line .. )delimited by end-of-file (wanted '", exec_list->command->redir_in[i], "')\n" );
-// 			break;
-// 		}
-// 		if (str_ncmp(line, exec_list->command->redir_in[i], ft_strlen(exec_list->command->redir_in[i]) - 3, FALSE) == TRUE)
-// 			break;
-// 		write(pipefds[1], line, ft_strlen(line));
-// 		write(pipefds[1], "\n", 1);
-// 		free(line);
-// 	}
-// 	close(pipefds[1]);
-// 	return (pipefds[0]);
-// }

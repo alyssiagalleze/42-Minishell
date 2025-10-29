@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wordsplit_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:30:18 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 19:37:11 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 13:08:43 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,6 @@ void	check_wordsplit_failure(char **tab, const int word_count)
 	}
 	if (failure == TRUE)
 	{
-		// printf("Found failure\n");
 		while (words)
 		{
 			words--;

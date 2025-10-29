@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 17:32:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/21 19:28:15 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/28 14:26:12 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,4 +93,26 @@ void	ft_close(int *fd)
 	if (*fd != -1)
 		close(*fd);
 	*fd = -1;
+}
+
+long long	ft_atoll(const char *nptr)
+{
+	int			i;
+	long long	sign;
+	long long	res;
+
+	res = 0;
+	sign = 1;
+	i = 0;
+	while ((nptr[i] >= 9 && nptr[i] <= 13) || (nptr[i] == ' '))
+		i++;
+	if (nptr[i] == '-' || nptr[i] == '+')
+	{
+		if (nptr[i] == '-')
+			sign = -1;
+		i++;
+	}
+	while (nptr[i] >= '0' && nptr[i] <= '9')
+		res = res * 10 + nptr[i++] - '0';
+	return (sign * res);
 }

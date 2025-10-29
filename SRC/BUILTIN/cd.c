@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:46:57 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:19:06 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/28 11:41:42 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ char	*find_target(char *path, t_env **env, int *malloc_fail)
 	{
 		target = get_var_value(env, "HOME");
 		if (!target || target[0] == 0)
-			return (print_err(PROMPT, ": cd: ", "HOME not set\n", NULL), NULL);
+			return (print_err(PROMPT, "cd: ", "HOME not set\n", NULL), NULL);
 		else
 			return (target);
 	}
@@ -33,7 +33,7 @@ char	*find_target(char *path, t_env **env, int *malloc_fail)
 	{
 		target = get_var_value(env, "OLDPWD");
 		if (target == NULL)
-			return (print_err(PROMPT, ": cd: ", "OLDPWD not set\n", NULL),
+			return (print_err(PROMPT, "cd: ", "OLDPWD not set\n", NULL),
 				NULL);
 		else
 			return (target);
@@ -53,10 +53,10 @@ int	move_folders(char *target, t_env **env)
 	{
 		if (update_variable(env, "OLDPWD", working_dir) != 0)
 			return (free(working_dir), free(target), print_err(PROMPT,
-					": cd: could not update OLDPWD", NULL, NULL), 0);
+					"cd: could not update OLDPWD", NULL, NULL), 0);
 	}
 	if (chdir(target) == -1)
-		return (free(working_dir), print_err(PROMPT, ": cd: ",
+		return (free(working_dir), print_err(PROMPT, "cd: ",
 				NULL, NULL), perror(target), free(target), 0);
 	free(working_dir);
 	free(target);
@@ -69,7 +69,7 @@ int	move_folders(char *target, t_env **env)
 	}
 	if (update_variable(env, "PWD", working_dir) != 0)
 		return (free(working_dir), free(target), print_err(PROMPT
-				, ": cd: could not update PWD", NULL, NULL), 0);
+				, "cd: could not update PWD", NULL, NULL), 0);
 	return (free(working_dir), 1);
 }
 
@@ -82,12 +82,12 @@ int	cd(char **args, t_env **env)
 	malloc_fail = 0;
 	if (args[2] != NULL)
 	{
-		print_err(PROMPT, ": cd:", " too many arguments\n", NULL);
+		print_err(PROMPT, "cd:", " too many arguments\n", NULL);
 		return (1);
 	}
 	target = find_target(args[1], env, &malloc_fail);
 	if (!target && malloc_fail)
-		return (printf("yoo lekip\n"), 2);
+		return (2);
 	else if (target == NULL)
 		return (1);
 	if (!move_folders(target, env))

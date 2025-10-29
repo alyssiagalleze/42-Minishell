@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand_dollar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 17:12:31 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/17 13:14:58 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 13:16:06 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	should_expand_dollar(t_token *token_list)
 char	*get_expand_dollar_value(char *var_name, t_env *env)
 {
 	char	*var_value;
-	
+
 	var_value = NULL;
 	while (env)
 	{
@@ -119,7 +119,7 @@ void	dollar_expand_unquote(char *str)
 			if (str[i] == '"')
 			{
 				i ++;
-				continue;
+				continue ;
 			}
 		}
 		if (str[j] != str[i])
@@ -142,7 +142,6 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 
 	len = 1;
 	var_name = NULL;
-	// printf("EXP : %s\n", token_list->str);
 	if (str_ncmp(token_list->str + index, "$?", 2, FALSE))
 		len = 2;
 	else
@@ -157,8 +156,6 @@ int	expand_dollar(t_token *token_list, t_env *env, int index)
 	var_value = get_expand_dollar_value(var_name, env);
 	new_str = expand_dollar_restring(token_list->str, index, len, var_value);
 	free(var_name);
-	// printf("ENDEXP : %s\n", token_list->str);
-	// printf("newstr : %s\n", new_str);
 	return (expand_dollar_check_error(token_list, new_str));
 }
 
@@ -167,7 +164,8 @@ int	check_expand_dollar(t_token *token_list, t_env *env)
 	int			index;
 	enum e_err	err;
 
-	while (token_list && token_list->type != CONTR_OPERATOR && token_list->type != BRACKET)
+	while (token_list && token_list->type != CONTR_OPERATOR
+		&& token_list->type != BRACKET)
 	{
 		index = should_expand_dollar(token_list);
 		if (index == -1)

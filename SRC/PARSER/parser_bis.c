@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_bis.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:47:41 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 19:28:32 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 13:15:44 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int	parser_check_and_assign_word(
 	return (FALSE);
 }
 
-int parser_clean_failure(t_token **token_list_head, int *status, int error_id)
+int	parser_clean_failure(t_token **token_list_head, int *status, int error_id)
 {
 	if (error_id == 1)
 		print_err(PROMPT, PERR_STX_NL, NULL, NULL);

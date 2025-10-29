@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 11:56:24 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:55:52 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/29 13:14:05 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,12 @@ int	open_hdoc_fds(t_exec *exec_list, int *hdoc_index)
 	int	fd;
 
 	fd = exec_list->command->hdoc_fd[*hdoc_index];
-	printf("-------->fd : %d\n", fd);
 	*hdoc_index += 1;
 	return (fd);
 }
 
 int	open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data)
 {
-	printf("ici pour %s hdoc fd : %d\n", exec_list->command->redir[i], exec_list->command->hdoc_fd[*h]);
 	int	fd;
 
 	fd = -1;
@@ -80,7 +78,6 @@ int	open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data)
 	}
 	else if (exec_list->command->redir_kind[i] == HDOC)
 	{
-		printf("ici ???\n");
 		fd = open_hdoc_fds(exec_list, h);
 		if (fd == -1)
 			return (handle_open_error(exec_list, exec_data, i));
@@ -93,25 +90,25 @@ void	close_previous_fds(int prev, struct s_exec_data *exec_data)
 	if (prev != -1)
 		ft_close(&prev);
 	if (exec_data && exec_data->prev_fd != -1)
-		ft_close(&exec_data->prev_fd);	
+		ft_close(&exec_data->prev_fd);
 }
 
-void	close_prev_hdoc(t_exec *exec_list, int h, int i)
-{
-	if (h > 0)
-	{
-		printf("closing hdoc fd for redir : %s\n", exec_list->command->redir[i]);
-		ft_close(&exec_list->command->hdoc_fd[h - 1]);
-		exec_list->command->hdoc_fd[h - 1] = -1;
-	}
-}
+// void	close_prev_hdoc(t_exec *exec_list, int h, int i)
+// {
+// 	if (h > 0)
+// 	{
+// 		ft_close(&exec_list->command->hdoc_fd[h - 1]);
+// 		exec_list->command->hdoc_fd[h - 1] = -1;
+// 	}
+// }
 
-int	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data)
+int	open_fds(
+	t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data)
 {
 	int	i;
 	int	h;
-	int prev_in;
-	int prev_out;
+	int	prev_in;
+	int	prev_out;
 
 	i = 0;
 	h = 0;
@@ -119,21 +116,20 @@ int	open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exe
 	prev_out = -1;
 	while (exec_list->command->redir[i])
 	{
-		close_prev_hdoc(exec_list, h, i);
 		if (is_in_redirection(exec_list, i))
 		{
-			close_previous_fds(prev_in, exec_data);
 			*fd_in = open_fd_in(i, &h, exec_list, exec_data);
 			if (*fd_in == -1)
 				return (ft_close(fd_out), -1);
+			close_previous_fds(prev_in, exec_data);
 			prev_in = *fd_in;
 		}
 		if (is_out_redirection(exec_list, i))
 		{
-			close_previous_fds(prev_out, NULL);
 			*fd_out = open_fd_out(i, exec_list, exec_data);
 			if (*fd_out == -1)
 				return (ft_close(fd_in), -1);
+			close_previous_fds(prev_out, NULL);
 			prev_out = *fd_out;
 		}
 			i++;

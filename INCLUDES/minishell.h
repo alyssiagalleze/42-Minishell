@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 20:10:50 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/29 16:50:10 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,13 @@
 # define HDOC_HEADER	"heredoc << "
 # define HDOC_PROMPT	"> "
 
-# define	MAX_ERROR_LEN	256
-# define	ERROR_TOO_LONG	"encountered an error too large to display\n"
+# define MAX_ERROR_LEN	256
+# define ERROR_TOO_LONG	"encountered an error too large to display\n"
 
-// # define	ARG_MAX	2097152 //actually more complicated, 18char per command and take in account PATH
+# define INT_MIN	-2147483647
+# define INT_MAX	2147483647
+
 # define ARG_MAX			4096 //minimum POSIX arg_max
-// maybe env max ?
 # define PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
 # define PERR_AMBIG		"ambiguous redirect\n"
 # define PERR_MALLOC	"Internal malloc failure. Abort.\n"
@@ -62,16 +63,14 @@
 # define PERR_STX_OPE	"syntax error : invalid operator "
 # define PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
 # define PERR_ASSIGN	"malloc error, failed assignement of "
-# define PERR_HDOC		"XxxM3g4sh311xxX: warning: here-document at line "
+# define PERR_HDOC		"warning: here-document at line "
 # define PERR_EOF		" delimited by end-of-file\n"
-# define PERR_HDOC_EOF	"XxxM3g4sh311xxX: warning: here-document delimited by end-of-file (wanted `"
+# define PERR_HDOC_EOF	"warning: here-document delimited by end-of-file (wanted `"
 # define PERR_HDOC_FDS	"heredoc fds management failed : "
 # define PERR_STDIN		"Incident with the STDIN\n"
 # define PERR_STDOUT	"Incident with the STDOUT\n"
 # define PERR_REDIR		"You might have redirected it, which is not supported.\n"
 
-//treat all metacharacters or only the one in subject ??
-//could also say input invalid if metacharacters we don't use ??
 # define METACHARACTERS	"|&;()<>"
 # define METASEPARATORS	"\t \n"
 
@@ -212,280 +211,234 @@ struct s_exec_data
 	t_token	*token_list;
 };
 
-// PROTOTYPES
+//// PROTOTYPES ////
 
-// build_exec.c
-int		token_list_to_exec(struct s_data *data);
+// BUILD_EXEC //
 // build_exec_scan.c
-int	scan_command_tokens(t_token **token_list, t_command *command);
-t_token	*scan_subshell_tokens(t_token **token_list);
-t_token	*create_and_fill_subtoken(t_token **sublist, t_token *token);
-
+t_token		*scan_subshell_tokens(t_token **token_list);
+int			scan_command_tokens(t_token **token_list, t_command *command);
 // build_exec_utils.c
-int		is_and_or(t_token *token_list);
-int		should_exec_pipeline(t_token *token, int lvalue);
-void	skip_subshell_tokens(t_token **token_list);
-void	skip_command_tokens(t_token **token_list);
-void	skip_pipeline_tokens(t_token **token_list);
+int			is_and_or(t_token *token_list);
+int			should_exec_pipeline(t_token *token, int lvalue);
+void		skip_pipeline_tokens(t_token **token_list);
+// build_exec.c
+int			token_list_to_exec(struct s_data *data);
+t_token		*create_and_fill_subtoken(t_token **sublist, t_token *token);
 
-// built-ins
-void	ft_putstr_fd(const char *s, int fd);
-char	**ft_split(char const *s, char c);
-int		unset(char **args, t_env **env);
-int		cd(char **args, t_env **env);
-int		print_env(t_env **env);
-int 	pwd(void);
-int		echo(char **args);
-int		export(char **args, t_env **env);
-char	**split_into_words(char *input);
-void	my_exit(int status, t_env **my_env, char **input, t_token **token_list_head);
-void	my_exit_builtin(t_exec *exec_list, struct s_exec_data *exec_data, char **input);
-int		is_string_valid_var(char *str);
+// BUILTIN //
+// cd.c
+int			cd(char **args, t_env **env);
+// echo.c
+int			echo(char **args);
+// env.c
+int			print_env(t_env **env);
+// exit.c
+void		my_exit(int status, t_env **my_env,
+				char **input, t_token **token_list_head);
+int			my_exit_builtin(t_exec *exec_list,
+				struct s_exec_data *exec_data, char **input);
+//export.c & export_bis.c
+t_env		*var_exists(t_env **env, char *name);
+int			is_string_valid_var(char *str);
+int			export(char **args, t_env **env);
+// pwd.c
+void		ft_putstr_fd(const char *s, int fd);
+int			pwd(void);
+// unset.c
+int			unset_single(char *arg, t_env **env);
+int			unset(char **args, t_env **env);
 
-// EXEC
+// CLEAN //
+// clean.c
+void		clean_input(char **input);
+void		cleaner(t_env **my_env, char **input, t_token **token_list);
+void		clean_env(t_env **env);
+void		exit_clean(struct s_data *data);
+void		clean_token_list(t_token **token_list, int close_sub_fds);
+// clean_bis.c
+void		clean_exec_list(t_exec **exec_list);
+void		clean_exec_node(t_exec **exec_list);
+// clean_ter.c
+void		clean_data_close_fds(struct s_exec_data *exec_data,
+				t_exec *exec_list, int is_in_child);
+
+// EXEC //
+// assign_var.c
+pid_t		exec_assign_var(t_exec *exec_list, t_env **env);
+int			is_var(t_exec *exec_list);
 // build_paths.c
-int		is_empty_at_start(struct s_exec_data *exec_data);
-int		is_empty_at_end(struct s_exec_data *exec_data);
-char	*append_exec_file(char *cmd_name, char *path, int *err_malloc);
-char	**get_paths(t_env **env, int *err_malloc);
-
+char		**get_paths(t_env **env, int *err_malloc);
+char		*append_exec_file(char *cmd_name, char *path, int *err_malloc);
+int			is_empty_at_start(struct s_exec_data *exec_data);
+int			is_empty_at_end(struct s_exec_data *exec_data);
+// exec.c
+int			execute_list(t_exec **exec_list, struct s_data *data);
 // exec_builtins.c
 int			is_builtin(t_exec *exec_list);
-pid_t  		 built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
-pid_t		exec_single_builtin(t_exec *exec_list, struct s_exec_data *exec_data);
-void	exec_builtin_in_child(t_exec *exec_list, struct s_exec_data *exec_data);
-
+pid_t		exec_single_builtin(t_exec *exec_list,
+				struct s_exec_data *exec_data);
+pid_t		built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data);
+void		exec_builtin_in_child(t_exec *exec_list,
+				struct s_exec_data *exec_data);
 // exec_pipeline.c
-pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data);
-int		is_builtin(t_exec *exec_list);
-
+pid_t		exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data);
 // exec_subshell.c
-pid_t	exec_subshell(t_exec *exec_list, struct s_data *data, struct s_exec_data *exec_data);
-
+pid_t		exec_subshell(t_exec *exec_list,
+				struct s_data *data, struct s_exec_data *exec_data);
+int			handle_subshell_execution(t_exec *exec_list, t_env **env);
 // exec_utils.c
-char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data);
-
-// exec.c
-int 	execute_list(t_exec **exec_list, struct s_data *data);
-
+void		malloc_exit(t_exec *exec_list, struct s_exec_data *exec_data);
+int			transfer_env(t_env **env, char ***new_env);
 // find_command_path.c
-char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data);
-char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
-char	*dup_cmd_arg(t_exec *exec_list, struct s_exec_data *exec_data);
-char	**get_paths(t_env **env, int *err_malloc);
-char	*append_exec_file(char *cmd_name, char *path, int *err_malloc);
-char	*exec_cleaner(char **path_tab, char *path, char *cmd_path);
-
+char		*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data);
 // path_checks.c
-int	has_slash(char *cmd_name);
-char	*check_access(char *cmd_path, int *first_errno);
+int			has_slash(char *cmd_name);
+char		*check_access(char *cmd_path, int *first_errno);
+// wait_set_status.c
+int			pid_wait_all(int exec_count, pid_t last_pid);
 
-// find_command_path_bis.c
-void	is_executable(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);
-void	path_variable_missing(struct s_exec_data *exec_data, t_exec *exec_list);
-void	file_exists(char *cmd_path, t_exec *exec_list, struct s_exec_data *exec_data);
-int	has_slash(char *cmd_name);
-void	malloc_exit(t_exec *exec_list, struct s_exec_data *exec_data);
-
-//	clean.c  + clean_bis.c
-void	clean_input(char **input);
-void	clean_env(t_env **env);
-void	clean_token_list(t_token **lexer, int close_sub_fds);
-void	clean_exec_list(t_exec **exec_list);
-void	clean_exec_node(t_exec **exec_list);
-void	exit_clean(struct s_data *data);
-void	cleaner(t_env **my_env, char **input, t_token **token_list);
-void	clean_data_close_fds(struct s_exec_data *exec_data, t_exec *exec_list, int is_in_child);
-
-//	data.c
-void	data_reset_pointers(struct s_data *data);
-void	data_save_head(struct s_data *data);
-
-//	debug.c
-void	debug_lexer_print_type(t_token *lexer_node);
-void	debug_lexer_print_kind(t_token *lexer_node);
-void	debug_lexer_print_line(t_token *lexer_node);
-// void	debug_lexer_print_subline(t_token *lexer_node);
-void	debug_print_env(t_env *env);
-void	debug_print_env_tab(char **env);
-void	debug_print_wordsplit(char **tab);
-
-// env_list.c
-int		init_env_list(char **env, t_env **env_list);
-int		update_variable(t_env **env, char *var, char *value);
-char	*get_var_value(t_env **env, char *var_name);
-void	env_add_node(t_env **top, t_env *node);
-t_env   *env_new_node(const char *var_name, const char *var_value, int is_exported, int is_local);
-t_env	*var_exists(t_env **env, char *name);
-int		unset_single(char *arg, t_env **env);
-int		transfer_env(t_env **env, char ***new_env);
-int		env_size(t_env *lst);
-
-//	error.c
-void	print_err(const char *str1, const char *str2, const char *str3, const char *str4);
-
-// exec_list.c
-void	exec_list_init_command(t_command *command);
-void	exec_list_init_node(t_exec *exec);
-t_exec	*exec_list_add_node(t_exec **exec_list_start);
-
+// EXPAND //
 // expand.c
-int		expand_command(t_token *token_list, t_env **env);
-int		is_expandable_char(char c);
-void	expand_unquote(char *str);
-
-
-// expand_asterisk.c + expand_aterisk_bis
-int		check_expand_asterisk(t_token *token_list);
-//
-int		hide_file(char *file, char *pattern);
-int		is_dir_only(char **pattern);
-int		is_dir(struct dirent *file_info);
-int		should_expand_file(
-char	*file_name, char *pattern, int dir_only, struct dirent	*file);
-	
+int			expand_command(t_token *token_list, t_env **env);
+int			is_expandable_char(char c);
 // expand_dollar.c
-int		check_expand_dollar(t_token *token_list, t_env *env);
-	
-//expand_wordsplit.c
-int		check_expand_wordsplit(t_token *token_list);
-	
-// fd_utils.c
-void close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);
-int	close_no_exit(int pipefds_r, int pipefds_w, int status);
+int			check_expand_dollar(t_token *token_list, t_env *env);
+// expand_asterix.c & expand_asterix_bis.c
+int			check_expand_asterisk(t_token *token_list);
+int			is_dir_only(char **pattern);
+int			should_expand_file(char *file_name,
+				char *pattern, int dir_only, struct dirent *file);
+// expand_wordsplit.c
+int			check_expand_wordsplit(t_token *token_list);
+// wordsplit_sort.c
+void		sort_tab(char **tab, int word_count);
+// wordsplit_utils.c
+void		ws_free_tab(char **tab, int word_count);
+int			ws_fill_string(char *to, char *from, int curr_char);
+int			ws_count_words(char *str);
+int			ws_allocate_string(char **tab,
+				char *str, int curr_char, int curr_word);
+void		check_wordsplit_failure(char **tab, const int word_count);
 
+// HEREDOCS //
+// herdoc_delim.c
+int			heredoc_unquote_delim(char *delim,
+				struct s_heredoc *hdoc_data, int *err);
+// heredoc_expand.c
+int			heredoc_expand_input(char **input, t_env *env);
 // heredoc.c
-int	heredocs(t_token *token_list, int cmd_count, t_env *env);
-//heredoc_utils.c
-void	reset_hdoc_data(struct s_heredoc *hdoc_data);
-void	init_hdoc_data(struct s_heredoc *hdoc_data);
-t_token	*skip_until_heredoc_delim(t_token *token_list);
-void	heredocs_display_header(char *delim);
-//heredoc_delim.c
-int	heredoc_unquote_delim(char *delim, struct s_heredoc *hdoc_data, int *err);
-//heredoc_input.c
-int	heredoc_input_to_pipe(struct s_heredoc *hdoc_data, int *cmd_count, t_env *env, int *err);
-//heredoc_expand.c
-int	heredoc_expand_input(char **input, t_env *env);
+int			heredocs(t_token *token_list, int cmd_count, t_env *env);
+// heredoc_input.c
+int			heredoc_input_to_pipe(struct s_heredoc *hdoc_data,
+				int *cmd_count, t_env *env, int *err);
+// heredoc_utils.c
+void		reset_hdoc_data(struct s_heredoc *hdoc_data);
+void		init_hdoc_data(struct s_heredoc *hdoc_data);
+t_token		*skip_until_heredoc_delim(t_token *token_list);
+void		heredocs_display_header(char *delim);
 
-// find_command_path
-char	*get_path_for_command(t_exec *exec_list, struct s_exec_data *exec_data);
+// LEXER //
+// lexer.c
+void		lexer(t_token **token_list, char *input, struct s_data *data);
+// lexer_utils.c
+int			match_an_operator_pattern(char *str, int length);
+int			get_operator_type(char *str);
+int			get_operator_kind(char *str);
 
-//	lexer.c
-t_token	*token_list_add_node(t_token **lexer_start);
-void	token_list_fill_node(t_token *lexer_node, char *str, enum e_type type, enum e_kind kind);
-void	lexer(t_token **lexer, char *input, struct s_data *data);
-//	lexer_utils.c
-int	match_an_operator_pattern(char *str, int length);
-int	get_operator_type(char *str);
-int	get_operator_kind(char *str);
-
-// token_list_to_exec.c
-int 	handle_subshell_execution(t_exec *exec_list, t_env **env);
-int		token_list_to_exec(struct s_data *data);
-
-// pipe_utils.c
-void free_env_array(char **envp);
-int prepare_pipe(t_exec *exec_list, int pipefds[2]);
-int	handle_fork_error(int pipefds[2]);
-int	save_std_fds(int *std_in, int *std_out);
-
-// REDIRECT
-// close_fds.c
-void	close_and_exit(int pipefds_r, int pipefds_w, char **my_env, int status);
-int		close_no_exit(int pipefds_r, int pipefds_w, int status);
-void	close_fds(int pipefds[2], int saved_stds[2]);
-
-// open_fds.c
-int     open_fd_out(int i, t_exec *exec_list, struct s_exec_data *exec_data);
-int     open_fd_in(int i, int *h, t_exec *exec_list, struct s_exec_data *exec_data);
-int    open_fds(t_exec *exec_list, int *fd_in, int *fd_out, struct s_exec_data *exec_data);
-
-// prepare_pipe.c
-int 	prepare_pipe(t_exec *exec_list, int pipefds[2]);
-int		handle_fork_error(int pipefds[2]);
-void 	free_env_array(char **envp);
-void	init_std_fds(struct s_data *subshell_data);
-int		save_std_fds(int *std_in, int *std_out);
-
-// redirections_bis.c
-int		is_out_redirection(t_exec *exec_list, int i);
-int		is_in_redirection(t_exec *exec_list, int i);
-void	close_fds(int pipefds[2], int saved_stds[2]);
-void	init_std_fds(struct s_data *subshell_data);
-void	restore_std_fds(int saved_stds[2]);
-
-// redirections.c
-int in_redirections(t_exec *exec_list);
-int	out_redirections(t_exec *exec_list);
-int	redirect_in(t_exec *exec_list, int *fd_in, int prev_fd);
-
-//	string_manip.c
-int		is_white_space(const char c);
-int		is_char_operator(const char c);
-int		is_char_separator(const char c);
-int		is_char_in_string(const char c, const char *str, int accept_null, int give_index);
-int		is_str_empty_or_null(const char *str);
-int		ft_strlen(const char *str);
-int		str_cmp(char *str1, char *str2, int accept_null);
-int		str_ncmp(char *str1, char *str2, int n, int accept_null);
-char	*extract_string(const char *start, int len);
-char	*ft_strdup(const char *s);
-char	*ft_strjoin(char const *s1, char const *s2);
-char	*str_append(char *from, char *app);
-char	*str_append_sq(char *from, char *app);
-char	*ft_strchr(const char *s, int c);
-int 	only_digit(char *arg);
-
-// subshell_redirections.c
-int	sub_redirect_fds(t_exec *exec_list, int pipefds[2], int prev_fd);
-
-// parser.c
-int		parser(t_token **token_list, t_token **token_list_head, int *status);
-// parser_bis
-int		parser_check_and_assign_word(t_token **token, int prev_type, int prev_kind, int *line_has_cmd);
-int		parser_clean_failure(t_token **token_list_head, int *status, int error_id);
-
-// pids
-int		pid_wait_all(int exec_count, pid_t pid);
-void 	clean_pid(t_pid_list **list);
-void	pid_add_back(t_pid_list **list, pid_t pid);
-
-// redirections.c
-int	redirect_fds(t_exec *exec_list, int pipefds[2], struct s_exec_data *exec_data);
-
-// // signals.c
-// void sigint_handler(int sig, siginfo_t *info, void *context);
-// void init_signals(void);
-void	init_readline_signals(void);
-void	init_exec_father_signals(void);
-void	init_exec_child_signals(void);
-void	init_heredoc_signals(void);
-void	sa_readline_handler(int	sig);
-void	sa_heredoc_handler(int sig);
-void	sa_exec_child_handler(int	sig);
+// LIST //
+// env_list.c
+t_env		*env_new_node(const char *var_name,
+				const char *var_value, int is_exported, int is_local);
+void		env_add_node(t_env **top, t_env *node);
+int			init_env_list(char **env, t_env **env_list);
+// env_list_utils.c
+int			update_variable(t_env **env, char *var, char *value);
+char		*get_var_value(t_env **env, char *var_name);
+int			env_size(t_env *lst);
+// exec_list.c
+void		exec_list_init_command(t_command *command);
+t_exec		*exec_list_add_node(t_exec **exec_list_start);
 // token_list.c
-void	token_list_empty_node(t_token *token);
-t_token	*token_list_add_node(t_token **token_list_start);
-void	token_list_fill_node(t_token *token, char *str, enum e_type type, enum e_kind kind);
-int		token_list_size(t_token *token_list);
-void	token_list_insert_list(t_token *token_from, t_token *new_list);
-void	token_list_copy_node(t_token *from, t_token *to);
+int			token_list_size(t_token *token_list);
+t_token		*token_list_add_node(t_token **token_list_start);
+void		token_list_copy_node(t_token *from, t_token *to);
+void		token_list_fill_node(t_token *token,
+				char *str, enum e_type type, enum e_kind kind);
+void		token_list_insert_list(t_token *token_from, t_token *new_list);
 
+// PARSER //
+// parser.c & parser_bis.c
+int			parser(t_token **token_list,
+				t_token **token_list_head, int *status);
+int			parser_check_and_assign_word(t_token **token,
+				int prev_type, int prev_kind, int *line_has_cmd);
+int			parser_clean_failure(t_token **token_list_head,
+				int *status, int error_id);
+
+// REDIRECT //
+
+// close_fds.c
+void		close_fds(int pipefds[2], int saved_stds[2]);
+// open_fds.c
+int			is_in_redirection(t_exec *exec_list, int i);
+int			is_out_redirection(t_exec *exec_list, int i);
+int			open_fds(t_exec *exec_list,
+				int *fd_in, int *fd_out, struct s_exec_data *exec_data);
+// prepare_pipe.c
+int			save_std_fds(int *std_in, int *std_out);
+void		free_env_array(char **envp);
+int			handle_fork_error(int pipefds[2]);
+int			prepare_pipe(t_exec *exec_list, int pipefds[2]);
+// redirections.c & redirections_bis.c
+int			in_redirections(t_exec *exec_list);
+int			out_redirections(t_exec *exec_list);
+void		restore_std_fds(int saved_stds[2]);
+int			redirect_fds(t_exec *exec_list,
+				int pipefds[2], struct s_exec_data *exec_data);
+int			redirect_in(t_exec *exec_list, int *fd_in, int prev_fd);
+int			redirect_out(t_exec *exec_list, int *fd_out, int pipefd_out);
+
+// SIGNALS //
+// init_sigs.c
+void		init_readline_signals(void);
+void		init_heredoc_signals(void);
+void		init_exec_father_signals(void);
+void		init_exec_child_signals(void);
+// sig_handlers.c
+void		sa_readline_handler(int sig);
+void		sa_heredoc_handler(int sig);
+void		sa_exec_child_handler(int sig);
+
+// UTILS //
+// data.c
+void		data_reset_pointers(struct s_data *data);
+void		data_save_head(struct s_data *data);
+// split.c
+char		**ft_split(char const *s, char c);
+// string_manip.c & string_manip_bis.c & string_manip_ter.c
+int			is_white_space(const char c);
+int			is_str_empty_or_null(const char *str);
+int			is_char_in_string(const char c,
+				const char *str, int accept_null, int give_index);
+int			is_char_operator(const char c);
+int			is_char_separator(const char c);
+int			str_cmp(char *str1, char *str2, int accept_null);
+int			ft_strlen(const char *str);
+int			str_ncmp(char *str1, char *str2, int n, int accept_null);
+char		*ft_strchr(const char *s, int c);
+int			only_digit_no_overflow(char *arg);
+char		*ft_strjoin(char *s1, char *s2);
+char		*str_append_sq(char *from, char *app);
+char		*extract_string(const char *start, int len);
+char		*str_append(char *from, char *app);
+// error.c
+void		print_err(const char *str1,
+				const char *str2, const char *str3, const char *str4);
 // utils.c
-char	*ft_itoa(int n);
-int		ft_atoi(const char *nptr);
-void	*ft_free(void *ptr);
-void	ft_close(int *fd);
-
-//	wordsplit_sort.c
-void	sort_tab(char **tab, int word_count);
-
-//	wordsplit_utils.c
-int		ws_count_words(char *str);
-int		ws_allocate_string(char **tab, char *str, int curr_char, int curr_word);
-int		ws_fill_string(char *to, char *from, int curr_char);
-void	check_wordsplit_failure(char **tab, const int word_count);
-void	ws_free_tab(char **tab, int word_count);
+char		*ft_itoa(int n);
+int			ft_atoi(const char *nptr);
+void		ft_close(int *fd);
+void		*ft_free(void *ptr);
+long long	ft_atoll(const char *nptr);
 
 #endif

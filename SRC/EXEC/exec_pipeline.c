@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:36:21 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:55:12 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/29 13:08:22 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,13 @@ void	child_exec(
 	close_fds(pipefds, exec_data->saved_stds);
 	clean_token_list(&exec_data->token_list, TRUE);
 	status = execve(path, exec_list->command->argv, my_env);
-	printf("Execve returned with status: %d\n", status);
-	perror(exec_list->command->argv[0]);
-	clean_data_close_fds(exec_data, exec_list, 1);
-	free(path);
-	free_env_array(my_env);
-	exit(status);
+	if (status == -1)
+	{
+		clean_data_close_fds(exec_data, exec_list, 1);
+		free(path);
+		free_env_array(my_env);
+		exit(status);
+	}
 }
 
 void	parent_after_fork(t_exec *exec_list, int *prev_fd, int pipefds[2])
@@ -66,7 +67,7 @@ pid_t	exec_pipeline(t_exec *exec_list, struct s_exec_data *exec_data)
 
 	if (!exec_list || exec_list->is_subshell
 		|| !exec_list->is_command || !exec_list->command)
-		return (print_err(PROMPT, "internal: exec_pipeline called"
+		return (print_err(PROMPT, "internal: exec_pipeline called "
 				"for non-command node\n", NULL, NULL), 1);
 	if (prepare_pipe(exec_list, exec_data->pipefds) != 0)
 		return (1);

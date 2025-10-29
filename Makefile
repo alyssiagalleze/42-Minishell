@@ -19,6 +19,7 @@ SRC=	SRC/main.c \
 		SRC/CLEAN/clean.c \
 		SRC/CLEAN/clean_bis.c \
 		SRC/CLEAN/clean_ter.c \
+		SRC/EXEC/assign_var.c \
 		SRC/EXEC/build_paths.c \
 		SRC/EXEC/exec.c \
 		SRC/EXEC/exec_builtins.c \
@@ -27,6 +28,7 @@ SRC=	SRC/main.c \
 		SRC/EXEC/exec_utils.c \
 		SRC/EXEC/find_command_path.c \
 		SRC/EXEC/path_checks.c \
+		SRC/EXEC/wait_set_status.c \
 		SRC/EXPAND/expand.c \
 		SRC/EXPAND/expand_asterisk.c \
 		SRC/EXPAND/expand_asterisk_bis.c \
@@ -44,6 +46,7 @@ SRC=	SRC/main.c \
 		SRC/LEXER/lexer.c \
 		SRC/LEXER/lexer_utils.c \
 		SRC/LIST/env_list.c \
+		SRC/LIST/env_list_utils.c \
 		SRC/LIST/exec_list.c \
 		SRC/LIST/pid_list.c \
 		SRC/LIST/token_list.c \
@@ -61,6 +64,8 @@ SRC=	SRC/main.c \
 		SRC/UTILS/error.c \
 		SRC/UTILS/split.c \
 		SRC/UTILS/string_manip.c \
+		SRC/UTILS/string_manip_bis.c \
+		SRC/UTILS/string_manip_ter.c \
 		SRC/UTILS/utils.c
 		
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))

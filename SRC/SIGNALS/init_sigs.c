@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 12:48:07 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 20:09:53 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/28 17:46:54 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,6 @@ void	init_readline_signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-
-
 void	init_heredoc_signals(void)
 {
 	struct sigaction	sa;
@@ -52,8 +50,6 @@ void	init_heredoc_signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-
-
 void	init_exec_father_signals(void)
 {
 	struct sigaction	sa;
@@ -72,7 +68,7 @@ void	init_exec_father_signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-void	init_exec_child_signals()
+void	init_exec_child_signals(void)
 {
 	struct sigaction	sa;
 	char				*sa_ptr;

@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:45:10 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:53:58 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/29 13:08:11 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	built_in_redirections(t_exec *exec_list, struct s_exec_data *exec_data)
 		close(fd_in);
 	if (out_redirections(exec_list))
 		if (dup2(fd_out, STDOUT_FILENO) == -1)
-			return (perror("dup2 fd_out"), 1);		
+			return (perror("dup2 fd_out"), 1);
 	if (fd_out != -1)
 		close(fd_out);
 	return (0);
@@ -104,6 +104,6 @@ pid_t	built_in_exec(t_exec *exec_list, struct s_exec_data *exec_data)
 	else if (str_cmp(exec_list->command->argv[0], "env", FALSE))
 		exit_status = print_env(&exec_data->env);
 	else if (str_cmp(exec_list->command->argv[0], "exit", FALSE))
-		my_exit_builtin(exec_list, exec_data, NULL);
+		exit_status = my_exit_builtin(exec_list, exec_data, NULL);
 	return (exit_status);
 }

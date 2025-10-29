@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 18:07:17 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 18:07:48 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 13:07:47 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,3 @@ void	heredocs_display_header(char *delim)
 	write(1, delim, ft_strlen(delim));
 	write(1, "\n", 1);
 }
-

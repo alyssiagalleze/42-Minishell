@@ -6,13 +6,13 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 20:07:45 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 20:08:32 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/28 17:46:31 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sa_readline_handler(int	sig)
+void	sa_readline_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -34,7 +34,7 @@ void	sa_heredoc_handler(int sig)
 }
 
 //TODO : normal juste exit ?? Sans clean ??
-void	sa_exec_child_handler(int	sig)
+void	sa_exec_child_handler(int sig)
 {
 	printf("HERE ?? MAYBE BAD");
 	if (sig == SIGINT)

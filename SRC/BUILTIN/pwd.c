@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 12:16:31 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:26:33 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:17:33 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	pwd(void)
 	pwd = getcwd(NULL, 0);
 	if (pwd == NULL)
 	{
-		print_err(PROMPT, "Maybe next time don't"
+		print_err(PROMPT, "Maybe next time don't "
 			"delete you current working directory\n", NULL, NULL);
 		return (1);
 	}

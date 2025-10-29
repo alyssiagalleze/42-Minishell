@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 19:28:28 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 13:16:44 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	parser_check_contr_operator(t_token *token, int prev_type, int prev_kind)
+static int	parser_check_contr_operator(
+	t_token *token, int prev_type, int prev_kind)
 {
 	if (prev_type == NONE || prev_type == REDIR_OPERATOR
 		|| prev_type == CONTR_OPERATOR || prev_kind == BRACKET_O)
@@ -28,7 +29,8 @@ static int	parser_check_contr_operator(t_token *token, int prev_type, int prev_k
 	return (FALSE);
 }
 
-static int	parser_check_redir_operator(t_token *token, int prev_type, int prev_kind)
+static int	parser_check_redir_operator(
+	t_token *token, int prev_type, int prev_kind)
 {
 	if (prev_kind == BRACKET_C)
 	{
@@ -74,11 +76,12 @@ static int	parser_check_bracket(
 	return (FALSE);
 }
 
-static int	parser_check_token_dispatch(t_token *token, t_token *prev_token, int *open_brackets, int *line_has_cmd)
+static int	parser_check_token_dispatch(
+	t_token *token, t_token *prev_token, int *open_brackets, int *line_has_cmd)
 {
 	enum e_type	prev_type;
 	enum e_kind	prev_kind;
-	
+
 	prev_type = NONE;
 	prev_kind = UNKNOWN;
 	if (token->type == NONE)
@@ -94,12 +97,14 @@ static int	parser_check_token_dispatch(t_token *token, t_token *prev_token, int 
 	if (token->type == REDIR_OPERATOR)
 		return (parser_check_redir_operator(token, prev_type, prev_kind));
 	if (token->type == WORD)
-		return (parser_check_and_assign_word(&token, prev_type, prev_kind, line_has_cmd));
+		return (parser_check_and_assign_word(
+				&token, prev_type, prev_kind, line_has_cmd));
 	*line_has_cmd = FALSE;
 	if (token->type == CONTR_OPERATOR)
 		return (parser_check_contr_operator(token, prev_type, prev_kind));
 	if (token->type == BRACKET)
-		return (parser_check_bracket(token, prev_type, prev_kind, open_brackets));
+		return (parser_check_bracket(
+				token, prev_type, prev_kind, open_brackets));
 	return (FALSE);
 }
 
@@ -116,7 +121,8 @@ int	parser(t_token **token_list, t_token **token_list_head, int *status)
 	line_has_cmd = FALSE;
 	while (token)
 	{
-		if (parser_check_token_dispatch(token, prev_token, &brackets, &line_has_cmd))
+		if (parser_check_token_dispatch(
+				token, prev_token, &brackets, &line_has_cmd))
 			return (parser_clean_failure(token_list_head, status, 0));
 		prev_token = token;
 		token = token->next;

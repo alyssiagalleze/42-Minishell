@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_input.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 18:04:03 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 18:05:15 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/10/29 16:50:04 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,11 +55,11 @@ void	heredoc_inform_eof(int *cmd_count, char *exp_delim)
 	line_count_str = ft_itoa(*cmd_count);
 	if (line_count_str)
 	{
-		print_err(PERR_HDOC, line_count_str, PERR_EOF, NULL);
+		print_err(PROMPT, PERR_HDOC, line_count_str, PERR_EOF);
 		free(line_count_str);
 	}			
 	else
-		print_err(PERR_HDOC_EOF, exp_delim, "/')\n", NULL);
+		print_err(PROMPT, PERR_HDOC_EOF, exp_delim, "/')\n");
 }
 
 int	heredoc_input_to_pipe(
