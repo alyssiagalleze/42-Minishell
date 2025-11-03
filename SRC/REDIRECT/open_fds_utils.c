@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:57:03 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/29 16:59:56 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 14:29:02 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ int	handle_open_error(t_exec *exec_list, struct s_exec_data *exec_data, int i)
 	exit(1);
 	return (0);
 }
-
 
 int	open_fd_out(int i, t_exec *exec_list, struct s_exec_data *exec_data)
 {

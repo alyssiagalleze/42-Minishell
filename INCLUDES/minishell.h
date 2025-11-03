@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/11/03 14:24:25 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:32:35 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,6 @@ typedef struct s_token
 	int					dollar_expanded;
 }	t_token;
 
-//TODO : replace assigned by local
 typedef struct s_env_list
 {
 	char				*var_name;
@@ -387,11 +386,17 @@ int			parser_clean_failure(t_token **token_list_head,
 // REDIRECT //
 // close_fds.c
 void		close_fds(int pipefds[2], int saved_stds[2]);
-// open_fds.c
+// open_fds.c & open_fd_utils.c
 int			is_in_redirection(t_exec *exec_list, int i);
 int			is_out_redirection(t_exec *exec_list, int i);
 int			open_fds(t_exec *exec_list,
 				int *fd_in, int *fd_out, struct s_exec_data *exec_data);
+int			handle_open_error(t_exec *exec_list,
+				struct s_exec_data *exec_data, int i);
+int			open_hdoc_fds(t_exec *exec_list, int *hdoc_index);
+int			open_fd_out(int i,
+				t_exec *exec_list, struct s_exec_data *exec_data);
+
 // prepare_pipe.c
 int			save_std_fds(int *std_in, int *std_out);
 void		free_env_array(char **envp);

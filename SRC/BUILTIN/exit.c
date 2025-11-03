@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 14:53:12 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/28 17:45:39 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 14:40:46 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ void	my_exit(
 	int status, t_env **my_env, char **input, t_token **token_list_head)
 {
 	cleaner(my_env, input, token_list_head);
-	printf("%s", RESET_FONT);
-	printf("exit\n");
+	ft_putstr_fd(RESET_FONT, 1);
+	ft_putstr_fd("exit\n", 1);
 	exit(status);
 }
 
@@ -29,7 +29,7 @@ int	exit_on_error(t_exec *exec_list, struct s_exec_data *exec_data)
 		print_err(PROMPT, "exit: ",
 			exec_list->command->argv[1], ": numeric argument required\n");
 		clean_data_close_fds(exec_data, exec_list, 1);
-		printf("%s", RESET_FONT);
+		ft_putstr_fd(RESET_FONT, 1);
 		exit(2);
 	}
 	if (exec_list->command->argv[2] != NULL)
@@ -53,7 +53,7 @@ int	my_exit_builtin(
 	if (exec_list->command->argv[1])
 		status = ft_atoi(exec_list->command->argv[1]);
 	if (!exec_data->is_pipe)
-		printf("%s", RESET_FONT);
+		ft_putstr_fd(RESET_FONT, 1);
 	if (input && !exec_data->is_pipe)
 		clean_input(input);
 	clean_data_close_fds(exec_data, exec_list, 1);

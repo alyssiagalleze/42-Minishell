@@ -6,7 +6,7 @@
 /*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:26:37 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/29 13:05:47 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 14:40:58 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,6 @@ char	*set_command_path(t_exec *exec_list, struct s_exec_data *exec_data)
 		cmd_path = browse_paths(
 				exec_list, exec_data->path_tab, &first_err, exec_data);
 	if (cmd_path)
-		return (printf("cmd_path : %s\n", cmd_path), cmd_path);
+		return (cmd_path);
 	return (error_exit(exec_list, exec_data, first_err), NULL);
 }

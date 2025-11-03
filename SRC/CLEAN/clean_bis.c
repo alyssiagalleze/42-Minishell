@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean_bis.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
+/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 19:01:11 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 17:59:05 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:40:52 by agalleze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ char	*exec_cleaner(char **path_tab, char *path, char *cmd_path)
 	{
 		free(path);
 	}
-	printf("exec cleaner : cmd_path is %p", cmd_path);
 	return (cmd_path);
 }
 

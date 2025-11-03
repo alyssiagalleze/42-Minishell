@@ -59,6 +59,7 @@ SRC=	SRC/main.c \
 		SRC/PARSER/parser_bis.c \
 		SRC/REDIRECT/close_fds.c \
 		SRC/REDIRECT/open_fds.c \
+		SRC/REDIRECT/open_fds_utils.c \
 		SRC/REDIRECT/prepare_pipe.c \
 		SRC/REDIRECT/redirections_bis.c \
 		SRC/REDIRECT/redirections.c \
