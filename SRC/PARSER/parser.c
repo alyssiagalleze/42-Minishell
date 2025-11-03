@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:27:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/29 13:16:44 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 12:50:08 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ static int	parser_check_contr_operator(
 	if (prev_type == NONE || prev_type == REDIR_OPERATOR
 		|| prev_type == CONTR_OPERATOR || prev_kind == BRACKET_O)
 	{
-		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
+		print_err(PROMPT, E_STX_Q, token->str, "\'\n");
 		return (TRUE);
 	}
 	if (token->next == NULL)
 	{
-		print_err(PROMPT, PERR_STX_EOF, NULL, NULL);
+		print_err(PROMPT, E_STX_EOF, NULL, NULL);
 		return (TRUE);
 	}
 	return (FALSE);
@@ -34,17 +34,17 @@ static int	parser_check_redir_operator(
 {
 	if (prev_kind == BRACKET_C)
 	{
-		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
+		print_err(PROMPT, E_STX_Q, token->str, "\'\n");
 		return (TRUE);
 	}
 	if (prev_type == REDIR_OPERATOR)
 	{
-		print_err(PROMPT, PERR_STX_Q, token->str, "\'\n");
+		print_err(PROMPT, E_STX_Q, token->str, "\'\n");
 		return (TRUE);
 	}
 	if (token->next == NULL)
 	{
-		print_err(PROMPT, PERR_STX_NL, NULL, NULL);
+		print_err(PROMPT, E_STX_NL, NULL, NULL);
 		return (TRUE);
 	}
 	return (FALSE);
@@ -59,7 +59,7 @@ static int	parser_check_bracket(
 		if (prev_type != NONE && prev_type != CONTR_OPERATOR
 			&& prev_kind != BRACKET_O)
 		{
-			print_err(PROMPT, PERR_STX_BRA, NULL, NULL);
+			print_err(PROMPT, E_STX_BRA, NULL, NULL);
 			return (TRUE);
 		}
 	}
@@ -69,7 +69,7 @@ static int	parser_check_bracket(
 		if (*open_brackets < 0 || prev_type == REDIR_OPERATOR
 			|| prev_type == CONTR_OPERATOR || prev_kind == BRACKET_O)
 		{
-			print_err(PROMPT, PERR_STX_BRA_C, NULL, NULL);
+			print_err(PROMPT, E_STX_BRA_C, NULL, NULL);
 			return (TRUE);
 		}
 	}
@@ -85,10 +85,7 @@ static int	parser_check_token_dispatch(
 	prev_type = NONE;
 	prev_kind = UNKNOWN;
 	if (token->type == NONE)
-	{
-		print_err(PROMPT, PERR_STX_OPE, token->str, "\n");
-		return (TRUE);
-	}
+		return (print_err(PROMPT, E_STX_OPE, token->str, "\n"), TRUE);
 	if (prev_token)
 	{
 		prev_type = prev_token->type;

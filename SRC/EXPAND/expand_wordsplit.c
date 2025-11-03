@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:25:58 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 16:07:51 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:06:06 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,32 +38,20 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 	return (ERR_SUCCESS);
 }
 
-//TODO : LONG
-char	**wordsplit(int *word_count, char *str)
+int wordsplit_allocate_fill_strings(char **tab, char *str, int *word_count)
 {
-	char	**tab;
-	int		curr_word;
-	int		curr_char;
-
+	int curr_word;
+	int curr_char;
+	
 	curr_word = 0;
 	curr_char = 0;
-	*word_count = ws_count_words(str);
-	tab = malloc(sizeof(*tab) * (*word_count + 1));
-	if (tab == NULL)
-		return (tab);
-	while (curr_word <= *word_count)
-	{
-		tab[curr_word] = NULL;
-		curr_word ++;
-	}
-	curr_word = 0;
 	while (curr_word < *word_count)
 	{
 		curr_char = ws_allocate_string(tab, str, curr_char, curr_word);
 		if (curr_char == -1)
 		{
 			ws_free_tab(tab, *word_count);
-			return (NULL);
+			return (FALSE);
 		}
 		curr_word ++;
 	}
@@ -75,6 +63,26 @@ char	**wordsplit(int *word_count, char *str)
 		curr_char = ws_fill_string(tab[curr_word], str, curr_char);
 		curr_word ++;
 	}
+	return (TRUE);
+}
+
+char	**wordsplit(int *word_count, char *str)
+{
+	char	**tab;
+	int		curr_word;
+
+	curr_word = 0;
+	*word_count = ws_count_words(str);
+	tab = malloc(sizeof(*tab) * (*word_count + 1));
+	if (tab == NULL)
+		return (tab);
+	while (curr_word <= *word_count)
+	{
+		tab[curr_word] = NULL;
+		curr_word ++;
+	}
+	if (!wordsplit_allocate_fill_strings(tab, str, word_count))
+		return (NULL);
 	check_wordsplit_failure(tab, *word_count);
 	return (tab);
 }
@@ -86,7 +94,7 @@ int	expand_wordsplit(t_token *token_list)
 
 	tab = wordsplit(&word_count, token_list->str);
 	if (tab == NULL)
-		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), ERR_MALLOC);
+		return (print_err(PROMPT, E_MALLOC, NULL, NULL), ERR_MALLOC);
 	if (word_count == 1)
 	{
 		free(token_list->str);
@@ -105,23 +113,17 @@ int	expand_wordsplit(t_token *token_list)
 
 int	should_expand_wordsplit(t_token *token_list)
 {
-	int	i;
+	int		i;
+	char	c;
 
 	i = 0;
 	while (token_list->str[i])
 	{
-		if (token_list->str[i] == '"')
+		if (token_list->str[i] == '"' || token_list->str[i] == '\'')
 		{
+			c = token_list->str[i];
 			i++;
-			while (token_list->str[i] && token_list->str[i] != '"')
-				i++;
-			if (!token_list->str[i])
-				break ;
-		}
-		else if (token_list->str[i] == '\'')
-		{
-			i++;
-			while (token_list->str[i] && token_list->str[i] != '\'')
+			while (token_list->str[i] && token_list->str[i] != c)
 				i++;
 			if (!token_list->str[i])
 				break ;

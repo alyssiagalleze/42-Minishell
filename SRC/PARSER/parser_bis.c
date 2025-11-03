@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_bis.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:47:41 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/29 13:15:44 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 10:51:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@ static int	parser_check_last_word(t_token *token)
 		i ++;
 	}
 	if (single_quotes)
-		print_err(PROMPT, PERR_QUOTE, PROMPT, PERR_STX_EOF);
+		print_err(PROMPT, E_QUOTE, PROMPT, E_STX_EOF);
 	if (double_quotes)
-		print_err(PROMPT, PERR_QUOTES, PROMPT, PERR_STX_EOF);
+		print_err(PROMPT, E_QUOTES, PROMPT, E_STX_EOF);
 	return (single_quotes || double_quotes);
 }
 
@@ -67,9 +67,9 @@ int	parser_check_and_assign_word(
 int	parser_clean_failure(t_token **token_list_head, int *status, int error_id)
 {
 	if (error_id == 1)
-		print_err(PROMPT, PERR_STX_NL, NULL, NULL);
+		print_err(PROMPT, E_STX_NL, NULL, NULL);
 	else if (error_id == 2)
-		print_err(PROMPT, PERR_BRA_O, PROMPT, PERR_STX_EOF);
+		print_err(PROMPT, E_BRA_O, PROMPT, E_STX_EOF);
 	*status = 2;
 	cleaner(NULL, NULL, token_list_head);
 	return (FALSE);

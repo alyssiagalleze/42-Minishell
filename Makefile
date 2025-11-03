@@ -5,9 +5,11 @@ INCLUDES=-I INCLUDES
 D_BUILD=.build/
 
 SRC=	SRC/main.c \
+		SRC/loop_utils.c \
 		SRC/BUILD_EXEC/build_exec.c \
 		SRC/BUILD_EXEC/build_exec_scan.c \
 		SRC/BUILD_EXEC/build_exec_utils.c \
+		SRC/BUILD_EXEC/build_exec_utils_bis.c \
 		SRC/BUILTIN/cd.c \
 		SRC/BUILTIN/echo.c \
 		SRC/BUILTIN/env.c \
@@ -33,6 +35,7 @@ SRC=	SRC/main.c \
 		SRC/EXPAND/expand_asterisk.c \
 		SRC/EXPAND/expand_asterisk_bis.c \
 		SRC/EXPAND/expand_dollar.c \
+		SRC/EXPAND/expand_dollar_bis.c \
 		SRC/EXPAND/expand_wordsplit.c \
 		SRC/EXPAND/wordsplit_sort.c \
 		SRC/EXPAND/wordsplit_utils.c \
@@ -58,6 +61,7 @@ SRC=	SRC/main.c \
 		SRC/REDIRECT/redirections_bis.c \
 		SRC/REDIRECT/redirections.c \
 		SRC/REDIRECT/subshell_redirections.c \
+		SRC/SIGNALS/check_signals.c \
 		SRC/SIGNALS/init_sigs.c \
 		SRC/SIGNALS/sig_handlers.c \
 		SRC/UTILS/data.c \

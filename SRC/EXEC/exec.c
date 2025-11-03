@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:45:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/28 17:49:26 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 12:10:55 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int	is_pipe(t_exec *exec_list)
 	return (exec_list->next && exec_list->next->is_command);
 }
 
-//TODO: si tu veux fais ca joli
 pid_t	exec_command(
 	t_exec *exec_list, t_env **env, struct s_exec_data *exec_data)
 {	
@@ -80,4 +79,3 @@ int	execute_list(t_exec **exec_list, struct s_data *data)
 		return (-7);
 	return (pid_wait_all(exec_data.exec_count, exec_data.last_pid));
 }
-

@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/17 12:04:22 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/22 18:09:22 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 10:50:08 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,5 @@ char	*ft_strcat(char *str1, char *str2);
 void	*ft_free_all(char *result, t_buff **buffer);
 int		ft_get_line_len(char *buffer);
 char	*ft_strdup(const char *s);
-
 
 #endif

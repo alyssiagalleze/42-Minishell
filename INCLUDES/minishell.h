@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/29 16:50:10 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 12:30:25 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,27 +49,27 @@
 # define INT_MAX	2147483647
 
 # define ARG_MAX			4096 //minimum POSIX arg_max
-# define PERR_ARG_MAX	"Too many tokens in command line. Abort.\n"
-# define PERR_AMBIG		"ambiguous redirect\n"
-# define PERR_MALLOC	"Internal malloc failure. Abort.\n"
-# define PERR_QUOTE		"unexpected EOF while looking for matching `\'\'\n"
-# define PERR_QUOTES	"unexpected EOF while looking for matching `\"'\n"
-# define PERR_BRA_O		"unexpected EOF while looking for matching `(\'\n"
-# define PERR_STX_EOF	"syntax error: unexpected end of file\n"
-# define PERR_STX_Q		"syntax error near unexpected token `"
-# define PERR_STX_NL	"syntax error near unexpected token `newline'\n"
-# define PERR_STX_BRA	"syntax error near unexpected token `('\n"
-# define PERR_STX_BRA_C	"syntax error near unexpected token `)'\n"
-# define PERR_STX_OPE	"syntax error : invalid operator "
-# define PERR_STX_HDOC	"syntax error: invalid heredoc delim \n"
-# define PERR_ASSIGN	"malloc error, failed assignement of "
-# define PERR_HDOC		"warning: here-document at line "
-# define PERR_EOF		" delimited by end-of-file\n"
-# define PERR_HDOC_EOF	"warning: here-document delimited by end-of-file (wanted `"
-# define PERR_HDOC_FDS	"heredoc fds management failed : "
-# define PERR_STDIN		"Incident with the STDIN\n"
-# define PERR_STDOUT	"Incident with the STDOUT\n"
-# define PERR_REDIR		"You might have redirected it, which is not supported.\n"
+# define E_ARG_MAX	"Too many tokens in command line. Abort.\n"
+# define E_AMBIG		"ambiguous redirect\n"
+# define E_MALLOC	"Internal malloc failure. Abort.\n"
+# define E_QUOTE		"unexpected EOF while looking for matching `\'\'\n"
+# define E_QUOTES	"unexpected EOF while looking for matching `\"'\n"
+# define E_BRA_O		"unexpected EOF while looking for matching `(\'\n"
+# define E_STX_EOF	"syntax error: unexpected end of file\n"
+# define E_STX_Q		"syntax error near unexpected token `"
+# define E_STX_NL	"syntax error near unexpected token `newline'\n"
+# define E_STX_BRA	"syntax error near unexpected token `('\n"
+# define E_STX_BRA_C	"syntax error near unexpected token `)'\n"
+# define E_STX_OPE	"syntax error : invalid operator "
+# define E_STX_HDOC	"syntax error: invalid heredoc delim \n"
+# define E_ASSIGN	"malloc error, failed assignement of "
+# define E_HDOC		"warning: here-document at line "
+# define E_EOF		" delimited by end-of-file\n"
+# define E_HDOC_EOF	"warning: here-document delimited by end-of-file (wanted `"
+# define E_HDOC_FDS	"heredoc fds management failed : "
+# define E_STDIN		"Incident with the STDIN\n"
+# define E_STDOUT	"Incident with the STDOUT\n"
+# define E_REDIR		"You might have redirected it, which is not supported.\n"
 
 # define METACHARACTERS	"|&;()<>"
 # define METASEPARATORS	"\t \n"
@@ -213,14 +213,22 @@ struct s_exec_data
 
 //// PROTOTYPES ////
 
+//loop_utils.c
+void		check_std_errors(void);
+void		save_last_status(int *status, t_env **env);
+void		get_input(
+				char **input, struct s_data *data, int *status, int *cmd_count);
+int			is_longer_than_arg_max(struct s_data *data, int *status);
+
 // BUILD_EXEC //
 // build_exec_scan.c
 t_token		*scan_subshell_tokens(t_token **token_list);
 int			scan_command_tokens(t_token **token_list, t_command *command);
-// build_exec_utils.c
+// build_exec_utils.c && build_exec_utils_bis.c
 int			is_and_or(t_token *token_list);
 int			should_exec_pipeline(t_token *token, int lvalue);
 void		skip_pipeline_tokens(t_token **token_list);
+int			should_scan_token(t_token *token);
 // build_exec.c
 int			token_list_to_exec(struct s_data *data);
 t_token		*create_and_fill_subtoken(t_token **sublist, t_token *token);
@@ -301,8 +309,9 @@ int			pid_wait_all(int exec_count, pid_t last_pid);
 // expand.c
 int			expand_command(t_token *token_list, t_env **env);
 int			is_expandable_char(char c);
-// expand_dollar.c
+// expand_dollar.c && expand_dollar_bis.c
 int			check_expand_dollar(t_token *token_list, t_env *env);
+int			expand_dollar(t_token *token_list, t_env *env, int index);
 // expand_asterix.c & expand_asterix_bis.c
 int			check_expand_asterisk(t_token *token_list);
 int			is_dir_only(char **pattern);
@@ -376,7 +385,6 @@ int			parser_clean_failure(t_token **token_list_head,
 				int *status, int error_id);
 
 // REDIRECT //
-
 // close_fds.c
 void		close_fds(int pipefds[2], int saved_stds[2]);
 // open_fds.c
@@ -408,6 +416,9 @@ void		init_exec_child_signals(void);
 void		sa_readline_handler(int sig);
 void		sa_heredoc_handler(int sig);
 void		sa_exec_child_handler(int sig);
+// check_signals.c
+void		prev_command_check_signal(int *status);
+int			heredoc_check_signal(struct s_data *data, int *status);
 
 // UTILS //
 // data.c

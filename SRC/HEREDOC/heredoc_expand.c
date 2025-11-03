@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_expand.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 18:05:29 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/28 17:46:11 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 10:51:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	heredoc_expand_input_var(char **input, char **new_input, t_env *env)
 	len = heredoc_get_var_name_length(*input);
 	if (heredoc_expand_get_var_value(input, len, env, &substr))
 	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		print_err(PROMPT, E_MALLOC, NULL, NULL);
 		return (ERR_MALLOC);
 	}
 	if (substr)
@@ -66,7 +66,7 @@ int	heredoc_expand_input_var(char **input, char **new_input, t_env *env)
 		*new_input = str_append(*new_input, substr);
 		if (*new_input == NULL)
 		{
-			print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+			print_err(PROMPT, E_MALLOC, NULL, NULL);
 			return (ERR_MALLOC);
 		}
 	}
@@ -85,13 +85,13 @@ int	heredoc_copy_until_dollar(char **input, char **new_input)
 	substr = extract_string(*input, len);
 	if (substr == NULL)
 	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		print_err(PROMPT, E_MALLOC, NULL, NULL);
 		return (ERR_MALLOC);
 	}
 	*new_input = str_append(*new_input, substr);
 	if (*new_input == NULL)
 	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		print_err(PROMPT, E_MALLOC, NULL, NULL);
 		return (ERR_MALLOC);
 	}
 	*input += len;

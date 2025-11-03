@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 11:41:11 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/24 19:14:06 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 10:51:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	transfer_env(t_env **env, char ***new_env)
 
 void	malloc_exit(t_exec *exec_list, struct s_exec_data *exec_data)
 {
-	print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+	print_err(PROMPT, E_MALLOC, NULL, NULL);
 	clean_data_close_fds(exec_data, exec_list, 1);
 	exit(2);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_delim.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 18:01:15 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/28 17:45:51 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 10:51:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	heredoc_skip_quotes(
 		}
 		if (iter[0] >= iter[2])
 		{
-			print_err(PROMPT, PERR_STX_HDOC, NULL, NULL);
+			print_err(PROMPT, E_STX_HDOC, NULL, NULL);
 			new_delim = ft_free(new_delim);
 			return (ERR_AMBIG);
 		}
@@ -61,7 +61,7 @@ int	heredoc_unquote_delim(char *delim, struct s_heredoc *hdoc_data, int *err)
 	hdoc_data->exp_delim = malloc(sizeof(*delim) * (iter[2] + 1));
 	if (!hdoc_data->exp_delim)
 	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		print_err(PROMPT, E_MALLOC, NULL, NULL);
 		*err = ERR_MALLOC;
 		return (*err);
 	}

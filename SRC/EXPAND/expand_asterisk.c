@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 17:27:05 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/16 19:57:25 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 12:40:51 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,19 @@
 
 int	should_expand_asterisk(t_token *token_list)
 {
-	int	i;
+	int		i;
+	char	c;
 
 	i = 0;
 	if (token_list->type != WORD)
 		return (FALSE);
 	while (token_list->str[i])
 	{
-		if (token_list->str[i] == '"')
+		if (token_list->str[i] == '"' || token_list->str[i] == '\'')
 		{
+			c = token_list->str[i];
 			i ++;
-			while (token_list->str[i] && token_list->str[i] != '"')
-				i ++;
-			if (!token_list->str[i])
-				break ;
-		}
-		else if (token_list->str[i] == '\'')
-		{
-			i ++;
-			while (token_list->str[i] && token_list->str[i] != '\'')
+			while (token_list->str[i] && token_list->str[i] != c)
 				i ++;
 			if (!token_list->str[i])
 				break ;
@@ -49,14 +43,14 @@ int	exp_asterisk_core(
 {
 	if (token_kind == WORD_FILE && *new_str)
 	{
-		print_err(PROMPT, pattern, ": ", PERR_AMBIG);
+		print_err(PROMPT, pattern, ": ", E_AMBIG);
 		free(*new_str);
 		return (ERR_AMBIG);
 	}
 	*new_str = str_append_sq(*new_str, file_name);
 	if (*new_str == NULL)
 	{
-		print_err(PROMPT, PERR_MALLOC, NULL, NULL);
+		print_err(PROMPT, E_MALLOC, NULL, NULL);
 		return (ERR_MALLOC);
 	}
 	return (ERR_SUCCESS);
@@ -95,12 +89,12 @@ int	expand_asterisk(t_token *token_list)
 	new_str = NULL;
 	cwd = getcwd(0, 0);
 	if (!cwd)
-		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), ERR_MALLOC);
+		return (print_err(PROMPT, E_MALLOC, NULL, NULL), ERR_MALLOC);
 	dir = opendir(cwd);
 	if (!dir)
 	{
 		free (cwd);
-		return (print_err(PROMPT, PERR_MALLOC, NULL, NULL), ERR_MALLOC);
+		return (print_err(PROMPT, E_MALLOC, NULL, NULL), ERR_MALLOC);
 	}
 	err = exp_asterisk_loop(dir, &new_str, token_list->str, token_list->kind);
 	if (err)

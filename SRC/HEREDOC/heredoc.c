@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 14:02:50 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 18:07:45 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 10:51:48 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	heredoc_fds_management(struct s_heredoc *hdoc_data, int	*err)
 		ft_close(&hdoc_data->heredoc_fds[0]);
 		ft_close(&hdoc_data->heredoc_fds[1]);
 		ft_close(&hdoc_data->heredoc_fds[2]);
-		print_err(PROMPT, PERR_HDOC_FDS, hdoc_data->exp_delim, NULL);
+		print_err(PROMPT, E_HDOC_FDS, hdoc_data->exp_delim, NULL);
 		hdoc_data->exp_delim = ft_free(hdoc_data->exp_delim);
 		*err = ERR_HDOC;
 		return (*err);
@@ -36,7 +36,7 @@ int	heredoc_anticipated_stop(struct s_heredoc *hdoc_data, int err)
 	if (g_signal == SIGINT
 		&& dup2(hdoc_data->heredoc_fds[2], STDIN_FILENO) == -1)
 	{
-		print_err(PROMPT, PERR_HDOC_FDS, hdoc_data->exp_delim, NULL);
+		print_err(PROMPT, E_HDOC_FDS, hdoc_data->exp_delim, NULL);
 		err = ERR_HDOC;
 	}
 	hdoc_data->exp_delim = ft_free(hdoc_data->exp_delim);

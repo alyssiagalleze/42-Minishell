@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   subshell_redirections.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 18:59:04 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/29 13:12:46 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 12:49:25 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+//TODO
 int	sub_redirect_out(t_exec *exec_list, int pipefds[2], int *fd_out)
 {
 	if (out_redirections(exec_list) == TRUE)

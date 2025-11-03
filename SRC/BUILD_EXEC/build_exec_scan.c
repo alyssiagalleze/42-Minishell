@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 18:27:48 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 18:31:33 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 11:29:02 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,7 @@ int	scan_command_tokens(t_token **token_list, t_command *command)
 	hdoc_count = 0;
 	arg_count = 0;
 	var = NULL;
-	while (*token_list
-		&& ((*token_list)->type == WORD
-			|| (*token_list)->type == REDIR_OPERATOR))
+	while (should_scan_token(*token_list))
 	{
 		if ((*token_list)->type == REDIR_OPERATOR)
 			scan_command_redirs(token_list, command, &redir_count, &hdoc_count);
@@ -115,8 +113,7 @@ int	scan_command_tokens(t_token **token_list, t_command *command)
 		}
 		*token_list = (*token_list)->next;
 	}
-	if (command->argv[0] == NULL && var)
-		if (scan_var_assign(var, command))
-			return (ERR_MALLOC);
+	if (command->argv[0] == NULL && var && scan_var_assign(var, command))
+		return (ERR_MALLOC);
 	return (ERR_SUCCESS);
 }
