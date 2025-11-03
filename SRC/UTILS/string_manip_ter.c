@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   string_manip_ter.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agalleze <agalleze@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:27:08 by agalleze          #+#    #+#             */
-/*   Updated: 2025/10/29 15:32:56 by agalleze         ###   ########.fr       */
+/*   Updated: 2025/11/03 14:22:10 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,20 +137,4 @@ char	*ft_strchr(const char *s, int c)
 	if (k == 0)
 		return ((char *)s);
 	return (NULL);
-}
-
-int	only_digit_no_overflow(char *arg)
-{
-	int	i;
-
-	i = 0;
-	while (arg[i])
-	{
-		if (!(arg[i] >= '0' && arg[i] <= '9'))
-			return (0);
-		i++;
-	}
-	if (ft_atoll(arg) > INT_MAX || ft_atoll(arg) < INT_MIN)
-		return (0);
-	return (1);
 }

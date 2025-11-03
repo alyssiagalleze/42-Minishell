@@ -6,13 +6,13 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 16:54:47 by tfiette           #+#    #+#             */
-/*   Updated: 2025/10/24 14:19:15 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:19:35 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	token_list_empty_node(t_token *token)
+static void	token_list_empty_node(t_token *token)
 {
 	token->str = NULL;
 	token->type = NONE;
@@ -56,7 +56,6 @@ void	token_list_copy_node(t_token *from, t_token *to)
 	to->dollar_expanded = from->dollar_expanded;
 }
 
-//TODO : token_list_copy_node pour subshell
 void	token_list_fill_node(
 	t_token *token, char *str, enum e_type type, enum e_kind kind)
 {	
@@ -84,15 +83,4 @@ int	token_list_size(t_token *token_list)
 		token_list = token_list->next;
 	}
 	return (i);
-}
-
-void	token_list_insert_list(t_token *token_from, t_token *new_list)
-{
-	t_token	*pivot;
-
-	pivot = token_from->next;
-	token_from->next = new_list;
-	while (new_list->next)
-		new_list = new_list->next;
-	new_list->next = pivot;
 }

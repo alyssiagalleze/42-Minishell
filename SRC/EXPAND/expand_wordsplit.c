@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:25:58 by tfiette           #+#    #+#             */
-/*   Updated: 2025/11/03 14:06:06 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:10:18 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,34 +36,6 @@ int	expand_wordsplit_tokenize(t_token *token_list, char **tab, int word_count)
 	token_list_fill_node(token_list, tab[0], WORD, token_list->kind);
 	token_list_insert_list(token_list, new_token_list);
 	return (ERR_SUCCESS);
-}
-
-int wordsplit_allocate_fill_strings(char **tab, char *str, int *word_count)
-{
-	int curr_word;
-	int curr_char;
-	
-	curr_word = 0;
-	curr_char = 0;
-	while (curr_word < *word_count)
-	{
-		curr_char = ws_allocate_string(tab, str, curr_char, curr_word);
-		if (curr_char == -1)
-		{
-			ws_free_tab(tab, *word_count);
-			return (FALSE);
-		}
-		curr_word ++;
-	}
-	tab[curr_word] = NULL;
-	curr_word = 0;
-	curr_char = 0;
-	while (curr_word < *word_count && tab[curr_word] != NULL)
-	{
-		curr_char = ws_fill_string(tab[curr_word], str, curr_char);
-		curr_word ++;
-	}
-	return (TRUE);
 }
 
 char	**wordsplit(int *word_count, char *str)

@@ -37,6 +37,7 @@ SRC=	SRC/main.c \
 		SRC/EXPAND/expand_dollar.c \
 		SRC/EXPAND/expand_dollar_bis.c \
 		SRC/EXPAND/expand_wordsplit.c \
+		SRC/EXPAND/expand_wordsplit_bis.c \
 		SRC/EXPAND/wordsplit_sort.c \
 		SRC/EXPAND/wordsplit_utils.c \
 		SRC/GNL/get_next_line.c \
@@ -53,6 +54,7 @@ SRC=	SRC/main.c \
 		SRC/LIST/exec_list.c \
 		SRC/LIST/pid_list.c \
 		SRC/LIST/token_list.c \
+		SRC/LIST/token_list_bis.c \
 		SRC/PARSER/parser.c \
 		SRC/PARSER/parser_bis.c \
 		SRC/REDIRECT/close_fds.c \
@@ -70,7 +72,9 @@ SRC=	SRC/main.c \
 		SRC/UTILS/string_manip.c \
 		SRC/UTILS/string_manip_bis.c \
 		SRC/UTILS/string_manip_ter.c \
-		SRC/UTILS/utils.c
+		SRC/UTILS/string_manip_qua.c \
+		SRC/UTILS/utils.c \
+		SRC/UTILS/utils_bis.c
 		
 OBJS=	$(addprefix $(D_BUILD), $(SRC:.c=.o))
 
