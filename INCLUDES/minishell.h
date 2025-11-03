@@ -6,7 +6,7 @@
 /*   By: tfiette <tfiette@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:35:10 by tfiette           #+#    #+#             */
-/*   Updated: 2025/11/03 12:30:25 by tfiette          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:24:25 by tfiette          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -317,17 +317,17 @@ int			check_expand_asterisk(t_token *token_list);
 int			is_dir_only(char **pattern);
 int			should_expand_file(char *file_name,
 				char *pattern, int dir_only, struct dirent *file);
-// expand_wordsplit.c
+// expand_wordsplit.c && expand_wordsplit_bis
 int			check_expand_wordsplit(t_token *token_list);
+int			wordsplit_allocate_fill_strings(
+				char **tab, char *str, int *word_count);
+void		check_wordsplit_failure(char **tab, const int word_count);
+
 // wordsplit_sort.c
 void		sort_tab(char **tab, int word_count);
 // wordsplit_utils.c
 void		ws_free_tab(char **tab, int word_count);
-int			ws_fill_string(char *to, char *from, int curr_char);
 int			ws_count_words(char *str);
-int			ws_allocate_string(char **tab,
-				char *str, int curr_char, int curr_word);
-void		check_wordsplit_failure(char **tab, const int word_count);
 
 // HEREDOCS //
 // herdoc_delim.c
@@ -367,12 +367,12 @@ int			env_size(t_env *lst);
 // exec_list.c
 void		exec_list_init_command(t_command *command);
 t_exec		*exec_list_add_node(t_exec **exec_list_start);
-// token_list.c
-int			token_list_size(t_token *token_list);
+// token_list.c && token_list_bis.c
 t_token		*token_list_add_node(t_token **token_list_start);
 void		token_list_copy_node(t_token *from, t_token *to);
 void		token_list_fill_node(t_token *token,
 				char *str, enum e_type type, enum e_kind kind);
+int			token_list_size(t_token *token_list);
 void		token_list_insert_list(t_token *token_from, t_token *new_list);
 
 // PARSER //
@@ -426,7 +426,7 @@ void		data_reset_pointers(struct s_data *data);
 void		data_save_head(struct s_data *data);
 // split.c
 char		**ft_split(char const *s, char c);
-// string_manip.c & string_manip_bis.c & string_manip_ter.c
+// string_manip.c & bis.c & ter.c & quad.c
 int			is_white_space(const char c);
 int			is_str_empty_or_null(const char *str);
 int			is_char_in_string(const char c,
@@ -445,7 +445,7 @@ char		*str_append(char *from, char *app);
 // error.c
 void		print_err(const char *str1,
 				const char *str2, const char *str3, const char *str4);
-// utils.c
+// utils.c & utils_bis.c
 char		*ft_itoa(int n);
 int			ft_atoi(const char *nptr);
 void		ft_close(int *fd);
